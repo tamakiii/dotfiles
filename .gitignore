@@ -1,5 +1,4 @@
+.vim/backup
+.vim/swapfile
+.vim/undo
 .DS_Store
-*~
-.config/*
-!.config/fish
-.zsh/history/
