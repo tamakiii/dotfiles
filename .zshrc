@@ -69,12 +69,9 @@ bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 
 # source another zshrc
-# source ~/.zsh/conf.d/path.zshrc
-# source ~/.zsh/conf.d/env.zshrc
-# source ~/.zsh/conf.d/alias.zshrc
-# source ~/.zsh/conf.d/tmux.zshrc
-# source ~/.zsh/conf.d/npm.zshrc
-# [[ -f ~/.env/.zshrc ]] && source ~/.env/.zshrc
+source ~/.zsh/config/path.zshrc
+source ~/.zsh/config/tmux.zshrc
+source ~/.zsh/config/npm.zshrc
 
 PROMPT="$ "
 
