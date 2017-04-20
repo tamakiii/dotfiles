@@ -1,6 +1,5 @@
-"
-" Note: Skip initialization for vim-tiny or vim-small.
-"
-if 1
-  execute 'source' fnamemodify(expand('<sfile>'), ':h').'/.vim/scripts/init.vim'
-endif
+set backupdir=~/.vim/backup
+set directory=~/.vim/swapfile
+if v:version > 730
+  set undodir=~/.vim/undo
+endi
