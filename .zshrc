@@ -1,6 +1,5 @@
 source ~/.zplug/init.zsh
 
-# zplug "robbyrussell/oh-my-zsh"
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
 zplug "mafredri/zsh-async"
