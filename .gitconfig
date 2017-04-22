@@ -3,3 +3,7 @@
 	email = tamaki.htm@gmail.com
 [push]
 	default = matching
+[color]
+	ui = true
+[core]
+	editor = vim
