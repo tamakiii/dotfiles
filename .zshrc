@@ -1,17 +1,10 @@
-# @see https://github.com/zsh-users/antigen
-source ~/.zsh/plugin/antigen/antigen.zsh
+source ~/.zplug/init.zsh
 
-antigen use oh-my-zsh
-
-antigen bundle git
-antigen bundle pip
-antigen bundle command-not-found
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle chrissicool/zsh-256color
-antigen bundle mafredri/zsh-async
-antigen bundle sindresorhus/pure
-
-antigen apply
+# zplug "robbyrussell/oh-my-zsh"
+zplug "plugins/git", from:oh-my-zsh
+zplug "plugins/pip", from:oh-my-zsh
+zplug "mafredri/zsh-async"
+zplug "sindresorhus/pure"
 
 # pure
 PURE_GIT_PULL=0
@@ -70,9 +63,19 @@ bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 
 # source another zshrc
+source ~/.zsh/config/alias.zshrc
 source ~/.zsh/config/path.zshrc
 source ~/.zsh/config/tmux.zshrc
 source ~/.zsh/config/npm.zshrc
 
 PROMPT="$ "
 
+# Install plugins if there are plugins that have not been installed
+if ! zplug check --verbose; then
+  printf "Install? [y/N]: "
+  if read -q; then
+    echo; zplug install
+  fi
+fi
+
+zplug load # --verbose
