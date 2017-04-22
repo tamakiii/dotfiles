@@ -94,6 +94,7 @@ if dein#load_state("$HOME/.vim")
   call dein#add('itchyny/lightline.vim')
   call dein#add('kyuhi/vim-emoji-complete')
   call dein#add('junegunn/fzf.vim')
+  call dein#add('tomasr/molokai')
 
   call dein#end()
   call dein#save_state()
