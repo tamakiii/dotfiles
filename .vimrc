@@ -93,6 +93,7 @@ if dein#load_state("$HOME/.vim")
   call dein#add('tomtom/tcomment_vim')
   call dein#add('itchyny/lightline.vim')
   call dein#add('kyuhi/vim-emoji-complete')
+  call dein#add('junegunn/fzf.vim')
 
   call dein#end()
   call dein#save_state()
@@ -112,6 +113,22 @@ vmap <Leader>c<space> :TComment<CR>
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 " imap <C-x><C-e> <Plug>(emoji-start-complete)
 
+"   fzf.vim (https://github.com/junegunn/fzf.vim)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+set runtimepath+=~/.fzf
+
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+nmap <leader>f :FZF<CR>
+
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
 "   Basics
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 syntax on
@@ -126,4 +143,3 @@ filetype plugin on
 " let g:solarized_contrast = "high"
 " let g:solarized_termtrans = 1
 colorscheme desert
-
