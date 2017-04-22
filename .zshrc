@@ -4,6 +4,8 @@ zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
 zplug "mafredri/zsh-async"
 zplug "sindresorhus/pure"
+zplug "zsh-users/zsh-completions"
+zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 
 # pure
 PURE_GIT_PULL=0
@@ -78,3 +80,5 @@ if ! zplug check --verbose; then
 fi
 
 zplug load # --verbose
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
