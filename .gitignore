@@ -6,5 +6,6 @@
 .vim/cache_vi
 .vim/state_vim.vim
 .vim/state_vi.vim
+.vim/.netrwhist
 .vim/.cache
 .DS_Store
