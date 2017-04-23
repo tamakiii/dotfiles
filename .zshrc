@@ -9,6 +9,7 @@ zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 
 # pure
 PURE_GIT_PULL=0
+HISTFILE=~/.zsh_history
 
 # zsh
 umask 002
