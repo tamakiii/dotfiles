@@ -18,6 +18,7 @@ bindkey -e
 HISTSIZE=1000000
 SAVEHIST=1000000
 SHELL=$(which zsh)
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # export
 export LANG=ja_JP.UTF-8
