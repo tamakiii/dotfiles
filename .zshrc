@@ -64,8 +64,14 @@ bindkey '^B' backward-char
 bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 
+# colors
+autoload colors
+colors
+
 # source another zshrc
 source ~/.zsh/config/alias.zshrc
+source ~/.zsh/config/setopt.zshrc
+source ~/.zsh/config/zstyle.zshrc
 source ~/.zsh/config/path.zshrc
 source ~/.zsh/config/tmux.zshrc
 source ~/.zsh/config/npm.zshrc
