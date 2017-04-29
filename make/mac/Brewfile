@@ -45,6 +45,7 @@ brew 'reattach-to-user-namespace'
 brew 'gzip'
 brew 'zlib'
 brew 'homebrew/php/php56'
+brew 'macvim'
 
 cask 'karabiner-elements'
 cask 'iso-flock-standalone'
