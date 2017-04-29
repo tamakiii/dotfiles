@@ -3,7 +3,6 @@
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 let s:uname = system("echo -n \"$(uname)\"")
 let s:hostname = system("echo -n \"$(hostname -s)\"")
-let g:solarized_menu=0
 
 "   Charsets
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -19,7 +18,7 @@ set noshowmode
 set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
 set iminsert=0
 set imsearch=0
-set clipboard+=unnamed
+set clipboard=unnamed,autoselect
 set browsedir=current
 
 set tabstop=2
