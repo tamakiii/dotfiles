@@ -3,6 +3,7 @@
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 let s:uname = system("echo -n \"$(uname)\"")
 let s:hostname = system("echo -n \"$(hostname -s)\"")
+let g:solarized_menu=0
 
 "   Charsets
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
