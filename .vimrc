@@ -70,10 +70,12 @@ autocmd FileType php set ai
 
 "   Shortcut
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nnoremap ; :
-nnoremap <ESC><ESC> :noh<CR><ESC>         " <ESC>二度押しで検索ハイライト解除
-nnoremap ,h ^
-nnoremap ,l $
+nmap ; :
+nmap <ESC><ESC> :noh<CR><ESC>         " <ESC>二度押しで検索ハイライト解除
+nmap ,h ^
+nmap ,l $
+nmap <C-w>t :tabnew<ESC>
+imap <C-w>t <Esc>:tabnew<ESC>
 
 
 "   deni.vim (https://github.com/Shougo/dein.vim)
