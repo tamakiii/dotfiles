@@ -34,6 +34,7 @@ set cmdheight=1
 set showmatch
 set title
 set matchtime=3
+set splitright
 
 "   Directories
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,6 +77,8 @@ nmap ,h ^
 nmap ,l $
 nmap <C-w>t :tabnew<ESC>
 imap <C-w>t <Esc>:tabnew<ESC>
+nmap <C-w>\| :vnew<ESC>
+imap <C-w>\| <Esc>:vnew<ESC>
 
 
 "   deni.vim (https://github.com/Shougo/dein.vim)
