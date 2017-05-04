@@ -46,6 +46,7 @@ brew 'gzip'
 brew 'zlib'
 brew 'homebrew/php/php56'
 brew 'macvim'
+brew 'coreutils'
 
 cask 'karabiner-elements'
 cask 'iso-flock-standalone'
