@@ -1,4 +1,4 @@
-.PHONY: install update uninstall clean check
+.PHONY: setup install update uninstall clean check
 
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAKE := $(shell which make)
