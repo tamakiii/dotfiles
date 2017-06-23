@@ -1,12 +1,9 @@
-.PHONY: setup install update uninstall clean check
+.PHONY: install update uninstall clean check
 
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAKE := $(shell which make)
 
-install:
-	@type brew > /dev/null
-	@brew tap Homebrew/brewdler
-	@brew tap osx-cross/avr
+install: update
 
 update:
 	@type brew > /dev/null
