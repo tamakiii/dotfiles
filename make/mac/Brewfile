@@ -1,6 +1,7 @@
 tap 'homebrew/brewdler'
 tap 'osx-cross/avr'
 tap 'caskroom/versions'
+tap 'tamakiii/anyenv'
 
 brew 'zsh'
 brew 'vim'
@@ -18,6 +19,7 @@ brew 'reattach-to-user-namespace'
 brew 'node'
 brew 'go'
 brew 'go-delve/delve/delve'
+brew 'anyenv'
 
 cask 'google-japanese-ime'
 cask 'google-chrome'
