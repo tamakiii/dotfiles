@@ -76,6 +76,7 @@ source ~/.zsh/config/zstyle.zshrc
 source ~/.zsh/config/path.zshrc
 source ~/.zsh/config/tmux.zshrc
 source ~/.zsh/config/npm.zshrc
+source ~/.zsh/config/anyenv.zshrc
 
 PROMPT="$ "
 
