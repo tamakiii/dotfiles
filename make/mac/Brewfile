@@ -18,7 +18,8 @@ brew 'reattach-to-user-namespace'
 brew 'ffmpeg'
 brew 'gifsicle'
 brew 'imagemagick'
-brew 'exa'
+brew 'exa' # http://wonderwall.hatenablog.com/entry/2017/08/07/222350
+brew 'pv' # http://wonderwall.hatenablog.com/entry/2017/08/03/072500
 
 brew 'node'
 brew 'go'
