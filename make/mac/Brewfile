@@ -15,7 +15,6 @@ brew 'watch'
 brew 'wget'
 brew 'utf8proc'
 brew 'reattach-to-user-namespace'
-<<<<<<< HEAD
 brew 'ffmpeg'
 brew 'gifsicle'
 brew 'imagemagick'
