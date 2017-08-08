@@ -18,6 +18,7 @@ brew 'reattach-to-user-namespace'
 brew 'ffmpeg'
 brew 'gifsicle'
 brew 'imagemagick'
+brew 'exa'
 
 brew 'node'
 brew 'go'
