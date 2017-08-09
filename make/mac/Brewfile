@@ -23,7 +23,6 @@ brew 'pv' # http://wonderwall.hatenablog.com/entry/2017/08/03/072500
 
 brew 'node'
 brew 'go'
-brew 'go-delve/delve/delve'
 brew 'anyenv'
 brew 'qrencode'
 
