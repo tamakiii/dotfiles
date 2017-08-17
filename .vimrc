@@ -99,7 +99,10 @@ if dein#load_state("$HOME/.vim")
   call dein#add('itchyny/lightline.vim')
   call dein#add('kyuhi/vim-emoji-complete')
   call dein#add('junegunn/fzf.vim')
+
   call dein#add('tomasr/molokai')
+  call dein#add('yuttie/hydrangea-vim')
+  call dein#add('lu-ren/SerialExperimentsLain')
 
   call dein#end()
   call dein#save_state()
@@ -148,4 +151,6 @@ filetype plugin on
 " let g:solarized_visibility = "high"
 " let g:solarized_contrast = "high"
 " let g:solarized_termtrans = 1
-colorscheme desert
+" colorscheme desert
+" colorscheme hydrangea
+colorscheme SerialExperimentsLain
