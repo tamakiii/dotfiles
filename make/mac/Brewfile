@@ -20,6 +20,7 @@ brew 'gifsicle'
 brew 'imagemagick'
 brew 'exa' # http://wonderwall.hatenablog.com/entry/2017/08/07/222350
 brew 'pv' # http://wonderwall.hatenablog.com/entry/2017/08/03/072500
+brew 'gnu-sed'
 
 brew 'node'
 brew 'go'
