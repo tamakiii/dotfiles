@@ -18,7 +18,7 @@ set noshowmode
 set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
 set iminsert=0
 set imsearch=0
-set clipboard=unnamed,autoselect
+set clipboard=unnamed
 set browsedir=current
 
 set tabstop=2
