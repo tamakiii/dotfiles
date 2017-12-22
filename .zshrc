@@ -92,7 +92,3 @@ fi
 zplug load # --verbose
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# tabtab source for electron-forge package
-# uninstall by removing these lines or running `tabtab uninstall electron-forge`
-[[ -f /Users/tamakiii/Sites/tamakiii/test/sample-app/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /Users/tamakiii/Sites/tamakiii/test/sample-app/node_modules/tabtab/.completions/electron-forge.zsh
