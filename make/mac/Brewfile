@@ -31,6 +31,8 @@ brew 'packer'
 brew 'freetype'
 brew 'docker'
 brew 'docker-compose'
+brew 'terraform'
+brew 'direnv'
 
 cask 'google-japanese-ime'
 cask 'google-chrome'
