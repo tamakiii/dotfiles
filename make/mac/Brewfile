@@ -1,11 +1,7 @@
 tap "osx-cross/avr"
-tap "tamakiii/anyenv"
 tap "homebrew/brewdler"
-tap "homebrew/science"
-tap "homebrew/core"
-tap "homebrew/versions"
 tap "caskroom/versions"
-tap "caskroom/cask"
+tap "homebrew/versions"
 
 brew "amazon-ecs-cli"
 brew "awscli"
