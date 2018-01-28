@@ -10,6 +10,9 @@ update:
 	@brew update
 	@brew bundle --file=$(DIR)/Brewfile
 
+import:
+	@brew bundle dump --force --file=$(DIR)/Brewfile
+
 clean:
 	@type brew > /dev/null
 	@brew bundle cleanup --force --file=$(DIR)/Brewfile
