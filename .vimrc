@@ -67,7 +67,10 @@ noremap \ ,
 
 "   Config by filetype
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-autocmd FileType php set ai
+augroup Filetype
+  autocmd!
+  autocmd BufNewFile,BufRead *.py setlocal tabstop=2 softtabstop=2 shiftwidth=2
+augroup END
 
 "   Shortcut
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
