@@ -10,3 +10,4 @@
 .vim/.cache
 .DS_Store
 .tmux/plugins/
+.tmux/resurrect/
