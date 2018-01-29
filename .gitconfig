@@ -7,4 +7,4 @@
 	ui = true
 [core]
 	editor = vim
-	pager = less -+F
+	pager = less
