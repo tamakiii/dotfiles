@@ -108,6 +108,15 @@ if dein#load_state("$HOME/.vim")
   call dein#add('lu-ren/SerialExperimentsLain')
 
   call dein#end()
+
+  colorscheme SerialExperimentsLain
+  " set t_Co=256
+  " let g:solarized_visibility = "high"
+  " let g:solarized_contrast = "high"
+  " let g:solarized_termtrans = 1
+  " colorscheme desert
+  " colorscheme hydrangea
+
   call dein#save_state()
 endif
 
@@ -148,12 +157,3 @@ filetype on
 filetype indent on
 filetype plugin on
 
-"   Colorscheme
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-" set t_Co=256
-" let g:solarized_visibility = "high"
-" let g:solarized_contrast = "high"
-" let g:solarized_termtrans = 1
-" colorscheme desert
-" colorscheme hydrangea
-colorscheme SerialExperimentsLain
