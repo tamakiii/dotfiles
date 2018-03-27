@@ -8,6 +8,8 @@
 .vim/state_vi.vim
 .vim/.netrwhist
 .vim/.cache
+.vim/cache_nvim
+.vim/state_nvim.vim
 .DS_Store
 .tmux/plugins/
 .tmux/resurrect/

@@ -110,11 +110,20 @@ if dein#load_state("$HOME/.vim")
   call dein#add('b4b4r07/vim-hcl')
 
   call dein#end()
+
+  colorscheme SerialExperimentsLain
+  " set t_Co=256
+  " let g:solarized_visibility = "high"
+  " let g:solarized_contrast = "high"
+  " let g:solarized_termtrans = 1
+  " colorscheme desert
+  " colorscheme hydrangea
+
   call dein#save_state()
 endif
 
 " If you want to install not installed plugins on startup.
-if dein#check_install()
+if has('vim_starting') && dein#check_install()
   call dein#install()
 endif
 
@@ -150,12 +159,3 @@ filetype on
 filetype indent on
 filetype plugin on
 
-"   Colorscheme
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-" set t_Co=256
-" let g:solarized_visibility = "high"
-" let g:solarized_contrast = "high"
-" let g:solarized_termtrans = 1
-" colorscheme desert
-" colorscheme hydrangea
-colorscheme SerialExperimentsLain
