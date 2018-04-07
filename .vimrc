@@ -106,6 +106,8 @@ if dein#load_state("$HOME/.vim")
   call dein#add('tomasr/molokai')
   call dein#add('yuttie/hydrangea-vim')
   call dein#add('lu-ren/SerialExperimentsLain')
+  call dein#add('hashivim/vim-hashicorp-tools')
+  call dein#add('b4b4r07/vim-hcl')
 
   call dein#end()
   call dein#save_state()
