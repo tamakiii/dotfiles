@@ -108,6 +108,7 @@ if dein#load_state("$HOME/.vim")
   call dein#add('lu-ren/SerialExperimentsLain')
   call dein#add('hashivim/vim-hashicorp-tools')
   call dein#add('b4b4r07/vim-hcl')
+  call dein#add('vim-scripts/nginx.vim')
 
   call dein#end()
   call dein#save_state()
