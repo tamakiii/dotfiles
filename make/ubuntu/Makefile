@@ -6,6 +6,7 @@ install:
 	apt install -y vim
 	apt install -y zsh
 	apt install -y tmux
+	apt install -y openssh-server
 
 before:
 	@echo "execute: sudo apt install make"
