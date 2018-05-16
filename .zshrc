@@ -94,3 +94,6 @@ fi
 zplug load # --verbose
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# fix: (eval):setopt:3: no such option: NO_warnnestedvar
+_comp_options="${_comp_options/NO_warnnestedvar/}"
