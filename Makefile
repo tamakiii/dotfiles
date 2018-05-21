@@ -32,6 +32,9 @@ update: ## Fetch changes for this repo
 install: update deploy init ## Run make update, deploy, init
 	@exec $$SHELL
 
+reset:
+	git submodule update --init
+
 clean: ## Remove the dot files and this repo
 	@echo 'Remove dot files in your home directory...'
 	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
