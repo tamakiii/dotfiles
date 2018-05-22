@@ -4,6 +4,8 @@ DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAKE := $(shell which make)
 
 install: update
+	@type bundle > /dev/null
+	@bundle install
 
 update:
 	@type brew > /dev/null
