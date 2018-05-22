@@ -18,7 +18,6 @@ import:
 clean:
 	@type brew > /dev/null
 	@brew bundle cleanup --force --file=$(DIR)/Brewfile
-	@rm -rf vendor/bundle
 
 check:
 	@type brew > /dev/null
