@@ -11,4 +11,3 @@
 .DS_Store
 .tmux/plugins/
 .tmux/resurrect/
-make/mac/vendor
