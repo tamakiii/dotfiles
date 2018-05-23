@@ -4,16 +4,14 @@ DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAKE := $(shell which make)
 
 install: \
-	brew/update \
+	brew/install \
 	bundle/install
 
 bundle/install:
 	@type bundle > /dev/null
 	@bundle install
 
-update: brew/update
-
-brew/update:
+brew/install:
 	@type brew > /dev/null
 	@brew update
 	@brew bundle --file=$(DIR)/Brewfile
