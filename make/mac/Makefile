@@ -3,11 +3,17 @@
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAKE := $(shell which make)
 
-install: update
+install: \
+	brew/update \
+	bundle/install
+
+bundle/install:
 	@type bundle > /dev/null
 	@bundle install
 
-update:
+update: brew/update
+
+brew/update:
 	@type brew > /dev/null
 	@brew update
 	@brew bundle --file=$(DIR)/Brewfile
