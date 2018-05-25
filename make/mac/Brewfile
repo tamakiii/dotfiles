@@ -24,6 +24,7 @@ brew "vim"
 brew "watch"
 brew "wget"
 brew "zsh"
+brew "ctop"
 
 cask "xquartz"
 cask "atom"
