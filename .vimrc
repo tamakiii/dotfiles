@@ -83,6 +83,9 @@ imap <C-w>t <Esc>:tabnew<ESC>
 nmap <C-w>\| :vnew<ESC>
 imap <C-w>\| <Esc>:vnew<ESC>
 
+"   Fix runtimepath
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+set runtimepath+=/usr/local/share/vim/vim81
 
 "   deni.vim (https://github.com/Shougo/dein.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
