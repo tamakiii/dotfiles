@@ -112,6 +112,7 @@ if dein#load_state("$HOME/.vim")
   call dein#add('hashivim/vim-hashicorp-tools')
   call dein#add('b4b4r07/vim-hcl')
   call dein#add('vim-scripts/nginx.vim')
+  call dein#add('leafgarland/typescript-vim')
 
   call dein#end()
   call dein#save_state()
