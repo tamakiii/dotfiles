@@ -164,3 +164,5 @@ filetype plugin on
 " colorscheme desert
 " colorscheme hydrangea
 colorscheme SerialExperimentsLain
+
+highlight Normal ctermfg=grey ctermbg=black
