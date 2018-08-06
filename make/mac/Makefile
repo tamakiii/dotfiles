@@ -1,12 +1,17 @@
 .PHONY: install update uninstall clean check
 
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+DOTDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))/../..))
 MAKE := $(shell which make)
 
 install: \
+	install/dotfiles \
 	install/brew \
 	install/bundle \
 	install/go
+
+install/dotfiles: \
+	~/.config/git/config
 
 install/bundle:
 	@type bundle > /dev/null
@@ -47,3 +52,6 @@ reinstall:
 	@grep '^cask' Brewfile
 	@grep '^cask' Brewfile | awk '{print $2}' | xargs -I@ brew cask reinstall @
 
+~/.config/git/config:
+	@cp $(DOTDIR)/etc/.config/git/config $@
+	@echo "edit:" $@

@@ -1,6 +1,3 @@
-[user]
-	name = tamakiii
-	email = tamaki.htm@gmail.com
 [push]
 	default = current
 [color]
@@ -8,3 +5,5 @@
 [core]
 	editor = vim
 	pager = less
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
