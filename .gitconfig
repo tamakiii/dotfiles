@@ -5,3 +5,5 @@
 [core]
 	editor = vim
 	pager = less
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
