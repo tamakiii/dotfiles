@@ -4,24 +4,38 @@ DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 MAKE := $(shell which make)
 
 install: \
-	brew/install \
-	bundle/install
+	install/brew \
+	install/bundle \
+	install/go
 
-bundle/install:
+install/bundle:
 	@type bundle > /dev/null
 	@bundle install
 
-brew/install:
+install/brew:
 	@type brew > /dev/null
 	@brew update
 	@brew bundle --file=$(DIR)/Brewfile
 
+install/go:
+	@type go > /dev/null
+	@go get -u github.com/golang/dep/cmd/dep
+	@go get -u github.com/jesseduffield/lazygit
+
 import:
 	@brew bundle dump --force --file=$(DIR)/Brewfile
 
-clean:
+clean: \
+	clean/brew \
+	clean/go
+
+clean/brew:
 	@type brew > /dev/null
 	@brew bundle cleanup --force --file=$(DIR)/Brewfile
+
+clean/go:
+	@go clean -i -n github.com/golang/dep/cmd/dep
+	@go clean -i -n github.com/jesseduffield/lazygit
 
 check:
 	@type brew > /dev/null
