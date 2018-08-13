@@ -5,6 +5,7 @@ tap "homebrew/versions"
 
 brew "amazon-ecs-cli"
 brew "awscli"
+brew "awslogs"
 brew "cmake"
 brew "colordiff"
 brew "coreutils"
