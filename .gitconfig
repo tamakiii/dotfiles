@@ -5,5 +5,13 @@
 [core]
 	editor = vim
 	pager = less
-[url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
+[url "git@github.com:"]
+  insteadOf = https://github.com/
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = tamakiii
+	email = tamakiii@users.noreply.github.com

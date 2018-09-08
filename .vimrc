@@ -165,4 +165,4 @@ filetype plugin on
 " colorscheme hydrangea
 colorscheme SerialExperimentsLain
 
-highlight Normal ctermfg=grey ctermbg=black
+" highlight Normal ctermfg=white ctermbg=236 guifg=#c0b1c2 guibg=#37414b guisp=#37414b
