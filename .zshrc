@@ -79,7 +79,6 @@ source ~/.zsh/conf.d/function.zshrc
 source ~/.zsh/conf.d/tmux.zshrc
 source ~/.zsh/conf.d/npm.zshrc
 source ~/.zsh/conf.d/anyenv.zshrc
-source ~/.zsh/conf.d/direnv.zshrc
 
 PROMPT="$ "
 
