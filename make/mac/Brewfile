@@ -25,6 +25,7 @@ brew "watch"
 brew "wget"
 brew "zsh"
 brew "ctop"
+brew "htop"
 
 cask "xquartz"
 cask "atom"
