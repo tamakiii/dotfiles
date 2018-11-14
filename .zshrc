@@ -13,7 +13,7 @@ zplug "zsh-users/zsh-syntax-highlighting", from:"github", on:"zsh-users/zsh-auto
 # pure
 PURE_GIT_PULL=0
 PURE_PROMPT_SYMBOL="$"
-HISTFILE=~/.zsh_history
+HISTFILE=$HOME/.zsh_history
 
 # zsh
 umask 002
@@ -25,8 +25,8 @@ SHELL=$(which zsh)
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # export
-export LANG=ja_JP.UTF-8
-export LANGUAGE=ja_JP:ja
+export LANG="ja_JP.UTF-8"
+export LANGUAGE="ja_JP:ja"
 export LC_CTYPE="ja_JP.UTF-8"
 export LC_NUMERIC="ja_JP.UTF-8"
 export LC_TIME="ja_JP.UTF-8"
@@ -40,7 +40,7 @@ export LC_TELEPHONE="ja_JP.UTF-8"
 export LC_MEASUREMENT="ja_JP.UTF-8"
 export LC_IDENTIFICATION="ja_JP.UTF-8"
 export LC_ALL=
-export LESSCHARSET=utf-8
+export LESSCHARSET="utf-8"
 
 # colors
 autoload colors
