@@ -67,4 +67,5 @@ if ! zplug check --verbose; then
 fi
 
 PURE_PROMPT_SYMBOL="$"
+
 zplug load # --verbose
