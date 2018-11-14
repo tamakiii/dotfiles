@@ -27,7 +27,6 @@ brew "zsh"
 brew "ctop"
 brew "htop"
 brew "peco"
-brew "fzf"
 brew "dep"
 brew "glances"
 
