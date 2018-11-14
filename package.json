@@ -5,5 +5,8 @@
   "repository": "git@github.com:tamakiii/dotfiles.git",
   "author": "tamakiii <tamakiii@users.noreply.github.com>",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "gtop": "^1.0.0"
+  }
 }
