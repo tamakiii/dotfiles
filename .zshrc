@@ -1,12 +1,12 @@
 source ~/.zplug/init.zsh
 
-zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/pip", from:oh-my-zsh
-zplug "zsh-users/zsh-completions"
+zplug "plugins/git", from:"oh-my-zsh"
+zplug "plugins/pip", from:"oh-my-zsh"
+zplug "zsh-users/zsh-completions", from:"github"
 zplug "mafredri/zsh-async", from:"github", use:"async.zsh"
 zplug "sindresorhus/pure", from:"github", use:"pure.zsh", as:"theme"
-zplug "docker/compose", use:contrib/completion/zsh
-zplug "felixr/docker-zsh-completion"
+zplug "docker/compose", use:"contrib/completion/zsh"
+zplug "felixr/docker-zsh-completion", from:"github"
 
 # pure
 PURE_GIT_PULL=0
