@@ -9,6 +9,7 @@ zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 zplug "zsh-users/zsh-completions"
 zplug "docker/compose", use:contrib/completion/zsh
 zplug "felixr/docker-zsh-completion"
+zplug "mollifier/anyframe"
 
 # pure
 PURE_GIT_PULL=0
@@ -72,6 +73,10 @@ bindkey '^E' end-of-line
 autoload colors
 colors
 
+# anyframe
+fpath+=($HOME/.zplug/repos/mollifier/anyframe(N-/))
+autoload -Uz anyframe-init && anyframe-init
+
 # source another zshrc
 source ~/.zsh/conf.d/path.zshrc
 source ~/.zsh/conf.d/alias.zshrc
@@ -82,6 +87,7 @@ source ~/.zsh/conf.d/function.zshrc
 source ~/.zsh/conf.d/tmux.zshrc
 source ~/.zsh/conf.d/npm.zshrc
 source ~/.zsh/conf.d/anyenv.zshrc
+source ~/.zsh/conf.d/keybind.zshrc
 
 PROMPT="$ "
 

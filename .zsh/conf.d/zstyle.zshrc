@@ -12,3 +12,5 @@ zstyle ':completion:*' group-name ''
 
 zstyle ':completion:*' list-separator '-->'
 zstyle ':completion:*:manuals' separate-sections true
+
+zstyle ":anyframe:selector:" use peco
