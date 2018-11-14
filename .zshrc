@@ -6,6 +6,8 @@ zplug "mafredri/zsh-async"
 zplug "sindresorhus/pure"
 zplug "zsh-users/zsh-completions"
 zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
+zplug "zsh-users/zsh-completions"
+zplug "docker/compose", use:contrib/completion/zsh
 
 # pure
 PURE_GIT_PULL=0
