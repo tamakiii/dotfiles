@@ -56,7 +56,7 @@ source ~/.zsh/conf.d/zstyle.zshrc
 source ~/.zsh/conf.d/function.zshrc
 source ~/.zsh/conf.d/tmux.zshrc
 source ~/.zsh/conf.d/npm.zshrc
-source ~/.zsh/conf.d/keybind.zshrc
+source ~/.zsh/conf.d/bindkey.zshrc
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
