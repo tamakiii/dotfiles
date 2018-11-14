@@ -8,7 +8,6 @@
   "private": true,
   "dependencies": {
     "gtop": "^1.0.0",
-    "npm-check-updates": "^2.14.3",
-    "vtop": "^0.6.1"
+    "npm-check-updates": "^2.14.3"
   }
 }
