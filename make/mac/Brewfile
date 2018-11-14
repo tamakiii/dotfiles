@@ -28,6 +28,8 @@ brew "ctop"
 brew "htop"
 brew "peco"
 brew "fzf"
+brew "dep"
+brew "glances"
 
 cask "xquartz"
 cask "atom"
