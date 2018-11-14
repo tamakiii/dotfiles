@@ -10,6 +10,7 @@ zplug "felixr/docker-zsh-completion"
 
 # pure
 PURE_GIT_PULL=0
+PURE_PROMPT_SYMBOL="$"
 HISTFILE=~/.zsh_history
 
 # zsh
@@ -64,7 +65,5 @@ if ! zplug check --verbose; then
     echo; zplug install
   fi
 fi
-
-PURE_PROMPT_SYMBOL="$"
 
 zplug load # --verbose
