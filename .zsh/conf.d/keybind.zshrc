@@ -1,3 +1,16 @@
+# http://zsh.sourceforge.net/Doc/Release/zsh_17.html
+autoload history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey '^R' history-incremental-pattern-search-backward
+bindkey '^S' history-incremental-pattern-search-forward
+bindkey "^P" history-beginning-search-backward-end
+bindkey "^N" history-beginning-search-forward-end
+bindkey '^F' forward-char
+bindkey '^B' backward-char
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
+
 # anyframe
 bindkey '^xb' anyframe-widget-cdr
 bindkey '^x^b' anyframe-widget-checkout-git-branch
