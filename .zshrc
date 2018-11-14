@@ -2,11 +2,13 @@ source ~/.zplug/init.zsh
 
 zplug "plugins/git", from:"oh-my-zsh"
 zplug "plugins/pip", from:"oh-my-zsh"
-zplug "zsh-users/zsh-completions", from:"github"
 zplug "mafredri/zsh-async", from:"github", use:"async.zsh"
 zplug "sindresorhus/pure", from:"github", use:"pure.zsh", as:"theme"
 zplug "docker/compose", use:"contrib/completion/zsh"
 zplug "felixr/docker-zsh-completion", from:"github"
+zplug "zsh-users/zsh-completions", from:"github"
+zplug "zsh-users/zsh-autosuggestions", from:"github", on:"zsh-users/zsh-completions"
+zplug "zsh-users/zsh-syntax-highlighting", from:"github", on:"zsh-users/zsh-autosuggestions"
 
 # pure
 PURE_GIT_PULL=0
