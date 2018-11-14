@@ -8,6 +8,7 @@ zplug "zsh-users/zsh-completions"
 zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 zplug "zsh-users/zsh-completions"
 zplug "docker/compose", use:contrib/completion/zsh
+zplug "felixr/docker-zsh-completion"
 
 # pure
 PURE_GIT_PULL=0
