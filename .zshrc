@@ -5,7 +5,6 @@ zplug "plugins/pip", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
 zplug "mafredri/zsh-async", from:"github", use:"async.zsh"
 zplug "sindresorhus/pure", from:"github", use:"pure.zsh", as:"theme"
-zplug "mollifier/anyframe"
 zplug "docker/compose", use:contrib/completion/zsh
 zplug "felixr/docker-zsh-completion"
 
@@ -44,11 +43,8 @@ export LESSCHARSET=utf-8
 autoload colors
 colors
 
-# fpath
-fpath+=($HOME/.zplug/repos/mollifier/anyframe(N-/))
-
-# anyframe
-autoload -Uz anyframe-init && anyframe-init
+# autoload
+autoload history-search-end
 
 # source another zshrc
 source ~/.zsh/conf.d/path.zshrc
