@@ -58,8 +58,6 @@ source ~/.zsh/conf.d/npm.zshrc
 source ~/.zsh/conf.d/anyenv.zshrc
 source ~/.zsh/conf.d/keybind.zshrc
 
-PROMPT="$ "
-
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
   printf "Install? [y/N]: "
@@ -68,4 +66,5 @@ if ! zplug check --verbose; then
   fi
 fi
 
+PURE_PROMPT_SYMBOL="$"
 zplug load # --verbose
