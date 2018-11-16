@@ -15,3 +15,5 @@
 [user]
 	name = tamakiii
 	email = tamakiii@users.noreply.github.com
+[pager]
+	branch = cat

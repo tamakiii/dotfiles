@@ -1,15 +1,19 @@
 source ~/.zplug/init.zsh
 
-zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/pip", from:oh-my-zsh
-zplug "mafredri/zsh-async"
-zplug "sindresorhus/pure"
-zplug "zsh-users/zsh-completions"
-zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
+zplug "plugins/git", from:"oh-my-zsh"
+zplug "plugins/pip", from:"oh-my-zsh"
+zplug "mafredri/zsh-async", from:"github", use:"async.zsh"
+zplug "sindresorhus/pure", from:"github", use:"pure.zsh", as:"theme"
+zplug "docker/compose", from:"github", use:"contrib/completion/zsh"
+zplug "felixr/docker-zsh-completion", from:"github"
+zplug "zsh-users/zsh-completions", from:"github"
+zplug "zsh-users/zsh-autosuggestions", from:"github", on:"zsh-users/zsh-completions"
+zplug "zsh-users/zsh-syntax-highlighting", from:"github", on:"zsh-users/zsh-autosuggestions"
 
 # pure
 PURE_GIT_PULL=0
-HISTFILE=~/.zsh_history
+PURE_PROMPT_SYMBOL="$"
+HISTFILE=$HOME/.zsh_history
 
 # zsh
 umask 002
@@ -21,8 +25,8 @@ SHELL=$(which zsh)
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # export
-export LANG=ja_JP.UTF-8
-export LANGUAGE=ja_JP:ja
+export LANG="ja_JP.UTF-8"
+export LANGUAGE="ja_JP:ja"
 export LC_CTYPE="ja_JP.UTF-8"
 export LC_NUMERIC="ja_JP.UTF-8"
 export LC_TIME="ja_JP.UTF-8"
@@ -36,38 +40,14 @@ export LC_TELEPHONE="ja_JP.UTF-8"
 export LC_MEASUREMENT="ja_JP.UTF-8"
 export LC_IDENTIFICATION="ja_JP.UTF-8"
 export LC_ALL=
-export LESSCHARSET=utf-8
-
-# setopt
-setopt auto_menu auto_cd correct auto_name_dirs auto_remove_slash
-setopt pushd_ignore_dups rm_star_silent sun_keyboard_hack
-setopt cdable_vars sh_word_split auto_param_keys
-setopt auto_pushd
-setopt list_packed
-setopt nolistbeep
-setopt complete_aliases
-setopt share_history        # share command history data
-setopt hist_ignore_all_dups hist_reduce_blanks hist_no_store print_eight_bit
-setopt prompt_subst
-stty stop undef
-
-# bindkey
-# http://zsh.sourceforge.net/Doc/Release/zsh_17.html
-autoload history-search-end
-zle -N history-beginning-search-backward-end history-search-end
-zle -N history-beginning-search-forward-end history-search-end
-bindkey '^R' history-incremental-pattern-search-backward
-bindkey '^S' history-incremental-pattern-search-forward
-bindkey "^P" history-beginning-search-backward-end
-bindkey "^N" history-beginning-search-forward-end
-bindkey '^F' forward-char
-bindkey '^B' backward-char
-bindkey '^A' beginning-of-line
-bindkey '^E' end-of-line
+export LESSCHARSET="utf-8"
 
 # colors
 autoload colors
 colors
+
+# autoload
+autoload history-search-end
 
 # source another zshrc
 source ~/.zsh/conf.d/path.zshrc
@@ -78,9 +58,7 @@ source ~/.zsh/conf.d/zstyle.zshrc
 source ~/.zsh/conf.d/function.zshrc
 source ~/.zsh/conf.d/tmux.zshrc
 source ~/.zsh/conf.d/npm.zshrc
-source ~/.zsh/conf.d/anyenv.zshrc
-
-PROMPT="$ "
+source ~/.zsh/conf.d/bindkey.zshrc
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -91,8 +69,3 @@ if ! zplug check --verbose; then
 fi
 
 zplug load # --verbose
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# fix: (eval):setopt:3: no such option: NO_warnnestedvar
-_comp_options="${_comp_options/NO_warnnestedvar/}"
