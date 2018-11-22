@@ -90,14 +90,15 @@ set runtimepath+=/usr/local/share/vim/vim81
 "   deni.vim (https://github.com/Shougo/dein.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 if &compatible
-  set nocompatible
+  set nocompatible               " Be iMproved
 endif
 
-set runtimepath+=$HOME/.vim/dein.vim
+" Required:
+set runtimepath+=$HOME/.cache/dein/repos/github.com/Shougo/dein.vim
 
 if dein#load_state("$HOME/.vim")
-  call dein#begin("$HOME/.vim")
-  call dein#add("$HOME/.vim/dein.vim")
+	call dein#begin("$HOME/.cache/dein")
+  call dein#add("$HOME/.cache/dein/repos/github.com/Shougo/dein.vim")
 
   call dein#add('shougo/neosnippet.vim')
   call dein#add('shougo/neosnippet-snippets')
