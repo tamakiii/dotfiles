@@ -30,3 +30,6 @@ docker:
 	sudo apt-get update
 	sudo apt-get install -y docker-ce
 
+uninstall-docker:
+	# https://docs.docker.com/install/linux/docker-ce/ubuntu/#uninstall-old-versions
+	sudo apt-get remove docker docker-engine docker.io
