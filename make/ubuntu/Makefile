@@ -1,5 +1,7 @@
 
-install:
+install: standard docker
+
+standard:
 	sudo apt install -y \
 	  openssh-server \
 	  nfs-common \
@@ -11,12 +13,23 @@ install:
 	  apt-transport-https \
 	  ca-certificates \
 	  curl \
+	  npm \
 	  software-properties-common \
 	  openjdk-8-jre
-	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-	sudo add-apt-repository "deb https://apt.dockerproject.org/repo ubuntu-xenial main"
-	sudo apt update
-	sudo apt-get install docker-engine docker docker-compose
 
-before:
-	@echo "execute: sudo apt install make"
+docker:
+	sudo apt-get update
+	sudo apt-get install \
+		     apt-transport-https \
+		     ca-certificates \
+		     curl \
+		     software-properties-common
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo apt-key fingerprint 0EBFCD88
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(shell lsb_release -cs) stable"
+	sudo apt-get update
+	sudo apt-get install -y docker-ce
+
+uninstall-docker:
+	# https://docs.docker.com/install/linux/docker-ce/ubuntu/#uninstall-old-versions
+	sudo apt-get remove docker docker-engine docker.io
