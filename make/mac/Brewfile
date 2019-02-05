@@ -5,7 +5,7 @@ tap "homebrew/versions"
 
 brew "amazon-ecs-cli"
 brew "awscli"
-brew "cmake"
+brew "make"
 brew "colordiff"
 brew "coreutils"
 # brew "docker"
