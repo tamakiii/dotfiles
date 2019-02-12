@@ -30,6 +30,7 @@ brew "htop"
 brew "peco"
 brew "dep"
 brew "glances"
+brew "hub"
 
 cask "xquartz"
 cask "atom"
