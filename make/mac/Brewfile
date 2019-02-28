@@ -31,6 +31,7 @@ brew "peco"
 brew "dep"
 brew "glances"
 brew "hub"
+brew "tig"
 
 cask "xquartz"
 cask "atom"
