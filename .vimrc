@@ -141,6 +141,16 @@ filetype on
 filetype indent on
 filetype plugin on
 
+"   asyncomplete.vim (https://github.com/prabirshrestha/asyncomplete.vim)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+imap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+imap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
+
+let g:asyncomplete_auto_popup = 1
+let g:asyncomplete_remove_duplicates = 1
+let g:asyncomplete_smart_completion = 1
+
 "   tcomment (https://github.com/tomtom/tcomment_vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 nmap <Leader>c<space> :TComment<CR>
