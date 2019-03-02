@@ -87,6 +87,8 @@ Plug 'natebosch/vim-lsc'
 Plug 'lu-ren/SerialExperimentsLain'
 Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
 Plug 'tomtom/tcomment_vim'
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
@@ -143,6 +145,19 @@ filetype plugin on
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 nmap <Leader>c<space> :TComment<CR>
 vmap <Leader>c<space> :TComment<CR>
+
+"   fzf.vim (https://github.com/junegunn/fzf.vim)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+set runtimepath+=~/.fzf
+
+" Mapping selecting mappings
+nmap <leader>f :FZF<CR>
+
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
 
 "   Colorscheme
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
