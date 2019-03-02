@@ -83,11 +83,11 @@ if &compatible
 endif
 
 " Required:
-set runtimepath+=$HOME/.cache/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-if dein#load_state("$HOME/.vim")
-	call dein#begin("$HOME/.cache/dein")
-  call dein#add("$HOME/.cache/dein/repos/github.com/Shougo/dein.vim")
+if dein#load_state("~/.vim")
+	call dein#begin("~/.cache/dein")
+  call dein#add("~/.cache/dein/repos/github.com/Shougo/dein.vim")
 
   call dein#add('shougo/neosnippet.vim')
   call dein#add('shougo/neosnippet-snippets')
