@@ -85,24 +85,14 @@ endif
 " Required:
 set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-if dein#load_state("~/.vim")
+if dein#load_state('~/.cache/dein')
 	call dein#begin("~/.cache/dein")
   call dein#add("~/.cache/dein/repos/github.com/Shougo/dein.vim")
 
-  call dein#add('shougo/neosnippet.vim')
-  call dein#add('shougo/neosnippet-snippets')
-  call dein#add('tomtom/tcomment_vim')
-  call dein#add('itchyny/lightline.vim')
-  call dein#add('kyuhi/vim-emoji-complete')
-  call dein#add('junegunn/fzf.vim')
+  if !has('nvim')
+  endif
 
-  call dein#add('tomasr/molokai')
-  call dein#add('yuttie/hydrangea-vim')
   call dein#add('lu-ren/SerialExperimentsLain')
-  call dein#add('hashivim/vim-hashicorp-tools')
-  call dein#add('b4b4r07/vim-hcl')
-  call dein#add('vim-scripts/nginx.vim')
-  call dein#add('leafgarland/typescript-vim')
 
   call dein#end()
   call dein#save_state()
