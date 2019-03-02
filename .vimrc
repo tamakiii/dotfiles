@@ -72,10 +72,6 @@ augroup END
 nmap ; :
 nmap <ESC><ESC> :noh<CR><ESC>
 
-"   Fix runtimepath
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set runtimepath+=/usr/local/share/vim/vim81
-
 "   deni.vim (https://github.com/Shougo/dein.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 if &compatible
