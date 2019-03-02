@@ -85,11 +85,13 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'prabirshrestha/asyncomplete-file.vim'
 Plug 'natebosch/vim-lsc'
 
-Plug 'lu-ren/SerialExperimentsLain'
-Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
 Plug 'tomtom/tcomment_vim'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
+
+Plug 'lu-ren/SerialExperimentsLain'
+Plug 'leafgarland/typescript-vim'
+Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
 
 call plug#end()
 
@@ -175,15 +177,18 @@ vmap <Leader>c<space> :TComment<CR>
 set runtimepath+=~/.fzf
 
 " Mapping selecting mappings
-nmap <c-x>fb <plug>(fzf-complete-buffer-line)
 nmap <c-x><c-r> :History:<CR>
+nmap <c-x>: :Commands<CR>
+nmap <c-x>b :Buffers<CR>
+nmap <c-x>c :Colors<CR>
+nmap <c-x>l :BLines<CR>
+nmap <c-x>w :Windows<CR>
 nmap <c-x>? :Helptags<CR>
+nmap <c-x>t :Filetypes<CR>
 nmap <c-x>f :FZF<CR>
 
 " Insert mode completion
-imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
 "   Colorscheme
