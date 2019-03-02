@@ -74,9 +74,13 @@ nmap <ESC><ESC> :noh<CR><ESC>
 
 "   vim-plug (https://github.com/junegunn/vim-plug)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+" :PlugInstall to install
 call plug#begin('~/.vim/plugged')
 
 Plug 'lu-ren/SerialExperimentsLain'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
 
 call plug#end()
 
