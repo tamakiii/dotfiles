@@ -53,11 +53,6 @@ endif
 set wildmenu
 set wildmode=list:longest,full
 set hlsearch
-set complete+=k
-set complete+=i
-set complete+=w
-set complete+=w
-set complete+=t
 set incsearch
 
 "   Keys
@@ -75,79 +70,65 @@ augroup END
 "   Shortcut
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 nmap ; :
-nmap <ESC><ESC> :noh<CR><ESC>         " <ESC>二度押しで検索ハイライト解除
-nmap ,h ^
-nmap ,l $
-nmap <C-w>t :tabnew<ESC>
-imap <C-w>t <Esc>:tabnew<ESC>
-nmap <C-w>\| :vnew<ESC>
-imap <C-w>\| <Esc>:vnew<ESC>
+nmap <ESC><ESC> :noh<CR><ESC>
 
-"   Fix runtimepath
+"   vim-plug (https://github.com/junegunn/vim-plug)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set runtimepath+=/usr/local/share/vim/vim81
 
-"   deni.vim (https://github.com/Shougo/dein.vim)
+" :PlugInstall to install
+call plug#begin('~/.vim/plugged')
+
+Plug 'lu-ren/SerialExperimentsLain'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'natebosch/vim-lsc'
+Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
+
+call plug#end()
+
+"   typescript-language-server (https://github.com/prabirshrestha/vim-lsp/wiki/Servers-TypeScript)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-if &compatible
-  set nocompatible               " Be iMproved
-endif
+augroup LspTypeScript
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+        \ 'name': 'typescript-language-server',
+        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'typescript-language-server --stdio']},
+        \ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'tsconfig.json'))},
+        \ 'whitelist': ['typescript', 'typescript.tsx'],
+        \ })
+  autocmd FileType typescript setlocal omnifunc=lsp#complete
+augroup END
 
-" Required:
-set runtimepath+=$HOME/.cache/dein/repos/github.com/Shougo/dein.vim
+augroup LspGo
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+        \ 'name': 'go-lang',
+        \ 'cmd': {server_info->['golsp']},
+        \ 'whitelist': ['go'],
+        \ })
+  autocmd FileType go setlocal omnifunc=lsp#complete
+  autocmd FileType python,go nmap gd <plug>(lsp-definition)
+augroup END
 
-if dein#load_state("$HOME/.vim")
-	call dein#begin("$HOME/.cache/dein")
-  call dein#add("$HOME/.cache/dein/repos/github.com/Shougo/dein.vim")
+augroup LspPhp
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+        \ 'name': 'php-language-server',
+        \ 'cmd': {server_info->['php', expand('~/.vim/plugged/php-language-server/bin/php-language-server.php')]},
+        \ 'whitelist': ['php'],
+        \ })
+  au User lsp_setup call lsp#register_server({
+        \ 'name': 'intelephense',
+        \ 'cmd': {server_info->['node', expand('~/.dotfiles/node_modules/intelephense/lib/intelephense.js'), '--stdio']},
+        \ 'initialization_options': {"storagePath": "/tmp/intelephense"},
+        \ 'whitelist': ['php'],
+        \ })
+  autocmd FileType php setlocal omnifunc=lsp#complete
+augroup END
 
-  call dein#add('shougo/neosnippet.vim')
-  call dein#add('shougo/neosnippet-snippets')
-  call dein#add('tomtom/tcomment_vim')
-  call dein#add('itchyny/lightline.vim')
-  call dein#add('kyuhi/vim-emoji-complete')
-  call dein#add('junegunn/fzf.vim')
-
-  call dein#add('tomasr/molokai')
-  call dein#add('yuttie/hydrangea-vim')
-  call dein#add('lu-ren/SerialExperimentsLain')
-  call dein#add('hashivim/vim-hashicorp-tools')
-  call dein#add('b4b4r07/vim-hcl')
-  call dein#add('vim-scripts/nginx.vim')
-  call dein#add('leafgarland/typescript-vim')
-
-  call dein#end()
-  call dein#save_state()
-endif
-
-" If you want to install not installed plugins on startup.
-if dein#check_install()
-  call dein#install()
-endif
-
-"   tcomment (https://github.com/tomtom/tcomment_vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap <Leader>c<space> :TComment<CR>
-vmap <Leader>c<space> :TComment<CR>
-
-"   vim-emoji-complete (https://github.com/kyuhi/vim-emoji-complete)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-" imap <C-x><C-e> <Plug>(emoji-start-complete)
-
-"   fzf.vim (https://github.com/junegunn/fzf.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set runtimepath+=~/.fzf
-
-" Mapping selecting mappings
-nmap <leader><tab> <plug>(fzf-maps-n)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
-nmap <leader>f :FZF<CR>
-
-" Insert mode completion
-imap <c-x><c-k> <plug>(fzf-complete-word)
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-imap <c-x><c-l> <plug>(fzf-complete-line)
+let g:lsp_async_completion = 0
 
 "   Basics
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -158,12 +139,4 @@ filetype plugin on
 
 "   Colorscheme
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-" set t_Co=256
-" let g:solarized_visibility = "high"
-" let g:solarized_contrast = "high"
-" let g:solarized_termtrans = 1
-" colorscheme desert
-" colorscheme hydrangea
 colorscheme SerialExperimentsLain
-
-" highlight Normal ctermfg=white ctermbg=236 guifg=#c0b1c2 guibg=#37414b guisp=#37414b

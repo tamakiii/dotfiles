@@ -8,6 +8,9 @@
   "private": true,
   "dependencies": {
     "gtop": "^1.0.0",
-    "npm-check-updates": "^2.15.0"
+    "intelephense": "^1.0.4",
+    "npm-check-updates": "^2.15.0",
+    "typescript": "^3.3.3333",
+    "typescript-language-server": "^0.3.7"
   }
 }
