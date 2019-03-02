@@ -90,31 +90,27 @@ call plug#end()
 
 "   typescript-language-server (https://github.com/prabirshrestha/vim-lsp/wiki/Servers-TypeScript)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-if executable('typescript-language-server')
-  augroup LspTypeScript
-    au!
-    autocmd User lsp_setup call lsp#register_server({
+augroup LspTypeScript
+  au!
+  autocmd User lsp_setup call lsp#register_server({
         \ 'name': 'typescript-language-server',
         \ 'cmd': {server_info->[&shell, &shellcmdflag, 'typescript-language-server --stdio']},
         \ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'tsconfig.json'))},
         \ 'whitelist': ['typescript', 'typescript.tsx'],
         \ })
-    autocmd FileType typescript setlocal omnifunc=lsp#complete
-  augroup END
-endif
+  autocmd FileType typescript setlocal omnifunc=lsp#complete
+augroup END
 
-if executable('golsp')
-  augroup LspGo
-    au!
-    autocmd User lsp_setup call lsp#register_server({
+augroup LspGo
+  au!
+  autocmd User lsp_setup call lsp#register_server({
         \ 'name': 'go-lang',
         \ 'cmd': {server_info->['golsp']},
         \ 'whitelist': ['go'],
         \ })
-    autocmd FileType go setlocal omnifunc=lsp#complete
-    autocmd FileType python,go nmap gd <plug>(lsp-definition)
-  augroup END
-endif
+  autocmd FileType go setlocal omnifunc=lsp#complete
+  autocmd FileType python,go nmap gd <plug>(lsp-definition)
+augroup END
 
 augroup LspPhp
   au!
