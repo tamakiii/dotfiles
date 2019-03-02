@@ -83,7 +83,6 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'prabirshrestha/asyncomplete-file.vim'
-Plug 'prabirshrestha/asyncomplete-buffer.vim'
 Plug 'natebosch/vim-lsc'
 
 Plug 'lu-ren/SerialExperimentsLain'
@@ -94,7 +93,7 @@ Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
-"   typescript-language-server (https://github.com/prabirshrestha/vim-lsp/wiki/Servers-TypeScript)
+"   asynccomplete (https://github.com/prabirshrestha/asyncomplete.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
     \ 'name': 'file',
@@ -103,12 +102,11 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
     \ 'completor': function('asyncomplete#sources#file#completor')
     \ }))
 
-call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
-    \ 'name': 'buffer',
-    \ 'whitelist': ['*'],
-    \ 'blacklist': ['go'],
-    \ 'completor': function('asyncomplete#sources#buffer#completor'),
-    \ }))
+"   vim-lsp (https://github.com/prabirshrestha/vim-lsp)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('/tmp/vim-lsp.log')
+let g:asyncomplete_log_file = expand('/tmp/asyncomplete.log')
 
 augroup LspTypeScript
   au!
@@ -159,9 +157,9 @@ filetype plugin on
 
 "   asyncomplete.vim (https://github.com/prabirshrestha/asyncomplete.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-imap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-imap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
 
 let g:asyncomplete_auto_popup = 1
 let g:asyncomplete_remove_duplicates = 1
@@ -177,7 +175,10 @@ vmap <Leader>c<space> :TComment<CR>
 set runtimepath+=~/.fzf
 
 " Mapping selecting mappings
-nmap <leader>f :FZF<CR>
+nmap <c-x>fb <plug>(fzf-complete-buffer-line)
+nmap <c-x><c-r> :History:<CR>
+nmap <c-x>? :Helptags<CR>
+nmap <c-x>f :FZF<CR>
 
 " Insert mode completion
 imap <c-x><c-k> <plug>(fzf-complete-word)
