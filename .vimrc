@@ -81,6 +81,9 @@ call plug#begin('~/.vim/plugged')
 Plug 'lu-ren/SerialExperimentsLain'
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'natebosch/vim-lsc'
 
 call plug#end()
 
