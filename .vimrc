@@ -84,6 +84,7 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'natebosch/vim-lsc'
+Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
 
 call plug#end()
 
@@ -114,6 +115,22 @@ if executable('golsp')
     autocmd FileType python,go nmap gd <plug>(lsp-definition)
   augroup END
 endif
+
+augroup LspPhp
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+        \ 'name': 'php-language-server',
+        \ 'cmd': {server_info->['php', expand('~/.vim/plugged/php-language-server/bin/php-language-server.php')]},
+        \ 'whitelist': ['php'],
+        \ })
+  au User lsp_setup call lsp#register_server({
+        \ 'name': 'intelephense',
+        \ 'cmd': {server_info->['node', expand('~/.dotfiles/node_modules/intelephense/lib/intelephense.js'), '--stdio']},
+        \ 'initialization_options': {"storagePath": "/tmp/intelephense"},
+        \ 'whitelist': ['php'],
+        \ })
+  autocmd FileType php setlocal omnifunc=lsp#complete
+augroup END
 
 let g:lsp_async_completion = 0
 
