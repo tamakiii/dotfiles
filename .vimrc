@@ -78,12 +78,13 @@ nmap <ESC><ESC> :noh<CR><ESC>
 " :PlugInstall to install
 call plug#begin('~/.vim/plugged')
 
-Plug 'lu-ren/SerialExperimentsLain'
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'natebosch/vim-lsc'
+
+Plug 'lu-ren/SerialExperimentsLain'
 Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
 
 call plug#end()
