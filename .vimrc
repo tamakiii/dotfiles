@@ -53,11 +53,6 @@ endif
 set wildmenu
 set wildmode=list:longest,full
 set hlsearch
-set complete+=k
-set complete+=i
-set complete+=w
-set complete+=w
-set complete+=t
 set incsearch
 
 "   Keys
@@ -75,13 +70,7 @@ augroup END
 "   Shortcut
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 nmap ; :
-nmap <ESC><ESC> :noh<CR><ESC>         " <ESC>二度押しで検索ハイライト解除
-nmap ,h ^
-nmap ,l $
-nmap <C-w>t :tabnew<ESC>
-imap <C-w>t <Esc>:tabnew<ESC>
-nmap <C-w>\| :vnew<ESC>
-imap <C-w>\| <Esc>:vnew<ESC>
+nmap <ESC><ESC> :noh<CR><ESC>
 
 "   Fix runtimepath
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
