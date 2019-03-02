@@ -106,6 +106,31 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
 
 "   vim-lsp (https://github.com/prabirshrestha/vim-lsp)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+":LspCodeAction	Gets a list of possible commands that can be applied to a file so it can be fixed (quick fix)
+":LspDeclaration	Go to declaration
+nmap <Leader>dec :LspDeclaration<CR>
+":LspDefinition	Go to definition
+nmap <Leader>def :LspDefinition<CR>
+":LspDocumentDiagnostics	Get current document diagnostics information
+":LspDocumentFormat	Format entire document
+":LspDocumentRangeFormat	Format document selection
+":LspDocumentSymbol	Show document symbols
+nmap <Leader>sy :LspDocumentSymbol<CR>
+":LspHover	Show hover information
+nmap <Leader>ho :LspHover<CR>
+":LspImplementation	Show implementation of interface
+nmap <Leader>im :LspImplementation<CR>
+":LspNextError	jump to next error
+":LspPreviousError	jump to previous error
+":LspReferences	Find references
+nmap <Leader>re :LspReferences<CR>
+":LspRename	Rename symbol
+":LspStatus	Show the status of the language server
+nmap <Leader>st :LspStatus<CR>
+":LspTypeDefinition	Go to type definition
+nmap <Leader>td :LspTypeDefinition<CR>
+":LspWorkspaceSymbol	Search/Show workspace symbol
+
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('/tmp/vim-lsp.log')
 let g:asyncomplete_log_file = expand('/tmp/asyncomplete.log')
