@@ -108,10 +108,6 @@ endif
 nmap <Leader>c<space> :TComment<CR>
 vmap <Leader>c<space> :TComment<CR>
 
-"   vim-emoji-complete (https://github.com/kyuhi/vim-emoji-complete)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-" imap <C-x><C-e> <Plug>(emoji-start-complete)
-
 "   fzf.vim (https://github.com/junegunn/fzf.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 set runtimepath+=~/.fzf
