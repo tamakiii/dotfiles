@@ -72,32 +72,13 @@ augroup END
 nmap ; :
 nmap <ESC><ESC> :noh<CR><ESC>
 
-"   deni.vim (https://github.com/Shougo/dein.vim)
+"   vim-plug (https://github.com/junegunn/vim-plug)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-if &compatible
-  set nocompatible               " Be iMproved
-endif
+call plug#begin('~/.vim/plugged')
 
-" Required:
-set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
+Plug 'lu-ren/SerialExperimentsLain'
 
-if dein#load_state('~/.cache/dein')
-	call dein#begin("~/.cache/dein")
-  call dein#add("~/.cache/dein/repos/github.com/Shougo/dein.vim")
-
-  if !has('nvim')
-  endif
-
-  call dein#add('lu-ren/SerialExperimentsLain')
-
-  call dein#end()
-  call dein#save_state()
-endif
-
-" If you want to install not installed plugins on startup.
-if dein#check_install()
-  call dein#install()
-endif
+call plug#end()
 
 "   Basics
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
