@@ -108,12 +108,4 @@ filetype plugin on
 
 "   Colorscheme
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-" set t_Co=256
-" let g:solarized_visibility = "high"
-" let g:solarized_contrast = "high"
-" let g:solarized_termtrans = 1
-" colorscheme desert
-" colorscheme hydrangea
 colorscheme SerialExperimentsLain
-
-" highlight Normal ctermfg=white ctermbg=236 guifg=#c0b1c2 guibg=#37414b guisp=#37414b
