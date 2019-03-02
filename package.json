@@ -8,6 +8,6 @@
   "private": true,
   "dependencies": {
     "gtop": "^1.0.0",
-    "npm-check-updates": "^2.14.3"
+    "npm-check-updates": "^2.15.0"
   }
 }
