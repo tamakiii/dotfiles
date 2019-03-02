@@ -86,6 +86,7 @@ Plug 'natebosch/vim-lsc'
 
 Plug 'lu-ren/SerialExperimentsLain'
 Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
+Plug 'tomtom/tcomment_vim'
 
 call plug#end()
 
@@ -137,6 +138,11 @@ syntax on
 filetype on
 filetype indent on
 filetype plugin on
+
+"   tcomment (https://github.com/tomtom/tcomment_vim)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+nmap <Leader>c<space> :TComment<CR>
+vmap <Leader>c<space> :TComment<CR>
 
 "   Colorscheme
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
