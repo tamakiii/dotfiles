@@ -33,6 +33,8 @@ brew "glances"
 brew "hub"
 brew "tig"
 
+brew "libmemcached"
+
 cask "xquartz"
 cask "atom"
 # cask "docker"
