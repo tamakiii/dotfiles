@@ -8,7 +8,8 @@ install: \
 	install/dotfiles \
 	install/brew \
 	install/bundle \
-	install/go
+	install/go \
+	install/php
 
 install/dotfiles: \
 	~/.config/git/config
@@ -26,6 +27,10 @@ install/go:
 	@type go > /dev/null
 	@go get -u github.com/golang/dep/cmd/dep
 	@go get -u github.com/jesseduffield/lazygit
+
+install/php:
+	@type pecl > /dev/null
+	@pecl install memcached
 
 import:
 	@brew bundle dump --force --file=$(DIR)/Brewfile
