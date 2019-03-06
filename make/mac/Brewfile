@@ -33,6 +33,7 @@ brew "glances"
 brew "hub"
 brew "tig"
 
+brew "php"
 brew "libmemcached"
 
 cask "xquartz"
