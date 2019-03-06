@@ -7,6 +7,7 @@ export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 export PATH="/usr/local/opt/mysql@5.5/bin:$PATH"
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+export PATH="/usr/local/Cellar/php/7.3.2/bin:$PATH"
 export PATH="./node_modules/.bin:$PATH"
 export PATH="./.bundle/bin:$PATH"
 

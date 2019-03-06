@@ -33,7 +33,9 @@ brew "glances"
 brew "hub"
 brew "tig"
 
+brew "php"
 brew "libmemcached"
+brew "zlib"
 
 cask "xquartz"
 cask "atom"
