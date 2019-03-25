@@ -36,6 +36,7 @@ brew "tig"
 brew "php"
 brew "libmemcached"
 brew "zlib"
+brew "protobuf"
 
 cask "xquartz"
 cask "atom"
