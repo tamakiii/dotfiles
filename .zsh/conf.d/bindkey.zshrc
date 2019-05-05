@@ -11,6 +11,11 @@ bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 
 if type peco 2>&1 > /dev/null; then
+  function peco-history-selection() {
+    BUFFER=`history -nr 1 | awk '!a[$0]++' | peco`
+    CURSOR=$#BUFFER
+    zle reset-prompt
+  }
   zle -N peco-history-selection
   bindkey '^R' peco-history-selection
 fi
