@@ -73,107 +73,15 @@ nmap ; :
 nmap <ESC><ESC> :noh<CR><ESC>
 
 "   vim-plug (https://github.com/junegunn/vim-plug)
+"   `:PlugInstall` to install
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-" :PlugInstall to install
 call plug#begin('~/.vim/plugged')
 
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
-Plug 'prabirshrestha/asyncomplete-file.vim'
-Plug 'natebosch/vim-lsc'
-
 Plug 'tomtom/tcomment_vim'
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
-
 Plug 'lu-ren/SerialExperimentsLain'
-Plug 'leafgarland/typescript-vim'
-Plug 'felixfbecker/php-language-server', {'do': 'composer install && composer run-script parse-stubs'}
 
 call plug#end()
-
-"   asynccomplete (https://github.com/prabirshrestha/asyncomplete.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
-    \ 'name': 'file',
-    \ 'whitelist': ['*'],
-    \ 'priority': 10,
-    \ 'completor': function('asyncomplete#sources#file#completor')
-    \ }))
-
-"   vim-lsp (https://github.com/prabirshrestha/vim-lsp)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-":LspCodeAction	Gets a list of possible commands that can be applied to a file so it can be fixed (quick fix)
-":LspDeclaration	Go to declaration
-nmap <Leader>dec :LspDeclaration<CR>
-":LspDefinition	Go to definition
-nmap <Leader>def :LspDefinition<CR>
-":LspDocumentDiagnostics	Get current document diagnostics information
-":LspDocumentFormat	Format entire document
-":LspDocumentRangeFormat	Format document selection
-":LspDocumentSymbol	Show document symbols
-nmap <Leader>sy :LspDocumentSymbol<CR>
-":LspHover	Show hover information
-nmap <Leader>ho :LspHover<CR>
-":LspImplementation	Show implementation of interface
-nmap <Leader>im :LspImplementation<CR>
-":LspNextError	jump to next error
-":LspPreviousError	jump to previous error
-":LspReferences	Find references
-nmap <Leader>re :LspReferences<CR>
-":LspRename	Rename symbol
-":LspStatus	Show the status of the language server
-nmap <Leader>st :LspStatus<CR>
-":LspTypeDefinition	Go to type definition
-nmap <Leader>td :LspTypeDefinition<CR>
-":LspWorkspaceSymbol	Search/Show workspace symbol
-
-let g:lsp_log_verbose = 1
-let g:lsp_log_file = expand('/tmp/vim-lsp.log')
-let g:asyncomplete_log_file = expand('/tmp/asyncomplete.log')
-
-augroup LspTypeScript
-  au!
-  autocmd User lsp_setup call lsp#register_server({
-        \ 'name': 'typescript-language-server',
-        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'typescript-language-server --stdio']},
-        \ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'tsconfig.json'))},
-        \ 'whitelist': ['typescript', 'typescript.tsx'],
-        \ })
-  autocmd FileType typescript setlocal omnifunc=lsp#complete
-augroup END
-
-augroup LspGo
-  au!
-  autocmd User lsp_setup call lsp#register_server({
-        \ 'name': 'go-lang',
-        \ 'cmd': {server_info->['golsp']},
-        \ 'whitelist': ['go'],
-        \ })
-  autocmd FileType go setlocal omnifunc=lsp#complete
-  autocmd FileType python,go nmap gd <plug>(lsp-definition)
-augroup END
-
-augroup LspPhp
-  au!
-  autocmd User lsp_setup call lsp#register_server({
-        \ 'name': 'php-language-server',
-        \ 'cmd': {server_info->['php', expand('~/.vim/plugged/php-language-server/bin/php-language-server.php')]},
-        \ 'whitelist': ['php'],
-        \ })
-  au User lsp_setup call lsp#register_server({
-        \ 'name': 'intelephense',
-        \ 'cmd': {server_info->['node', expand('~/.dotfiles/node_modules/intelephense/lib/intelephense.js'), '--stdio']},
-        \ 'initialization_options': {"storagePath": "/tmp/intelephense"},
-        \ 'whitelist': ['php'],
-        \ })
-  autocmd FileType php setlocal omnifunc=lsp#complete
-augroup END
-
-let g:lsp_async_completion = 0
 
 "   Basics
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -182,39 +90,10 @@ filetype on
 filetype indent on
 filetype plugin on
 
-"   asyncomplete.vim (https://github.com/prabirshrestha/asyncomplete.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
-
-let g:asyncomplete_auto_popup = 1
-let g:asyncomplete_remove_duplicates = 1
-let g:asyncomplete_smart_completion = 1
-
 "   tcomment (https://github.com/tomtom/tcomment_vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 nmap <Leader>c<space> :TComment<CR>
 vmap <Leader>c<space> :TComment<CR>
-
-"   fzf.vim (https://github.com/junegunn/fzf.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set runtimepath+=~/.fzf
-
-" Mapping selecting mappings
-nmap <c-x><c-r> :History:<CR>
-nmap <c-x>: :Commands<CR>
-nmap <c-x>b :Buffers<CR>
-nmap <c-x>c :Colors<CR>
-nmap <c-x>l :BLines<CR>
-nmap <c-x>w :Windows<CR>
-nmap <c-x>? :Helptags<CR>
-nmap <c-x>t :Filetypes<CR>
-nmap <c-x>f :FZF<CR>
-
-" Insert mode completion
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-l> <plug>(fzf-complete-line)
 
 "   Colorscheme
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

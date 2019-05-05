@@ -1,11 +1,9 @@
 source ~/.zplug/init.zsh
 
-zplug "plugins/git", from:"oh-my-zsh"
+# zplug "plugins/git", from:"oh-my-zsh"
 zplug "plugins/pip", from:"oh-my-zsh"
 zplug "mafredri/zsh-async", from:"github", use:"async.zsh"
 zplug "sindresorhus/pure", from:"github", use:"pure.zsh", as:"theme"
-zplug "docker/compose", from:"github", use:"contrib/completion/zsh"
-zplug "felixr/docker-zsh-completion", from:"github"
 zplug "zsh-users/zsh-completions", from:"github"
 zplug "zsh-users/zsh-autosuggestions", from:"github", on:"zsh-users/zsh-completions"
 zplug "zsh-users/zsh-syntax-highlighting", from:"github", on:"zsh-users/zsh-autosuggestions"
@@ -54,7 +52,6 @@ source ~/.zsh/conf.d/path.zshrc
 source ~/.zsh/conf.d/alias.zshrc
 source ~/.zsh/conf.d/export.zshrc
 source ~/.zsh/conf.d/setopt.zshrc
-source ~/.zsh/conf.d/zstyle.zshrc
 source ~/.zsh/conf.d/function.zshrc
 source ~/.zsh/conf.d/tmux.zshrc
 source ~/.zsh/conf.d/npm.zshrc
