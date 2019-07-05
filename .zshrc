@@ -1,3 +1,5 @@
+fpath=(/usr/local/share/zsh/functions ${fpath})
+
 source ~/.zplug/init.zsh
 
 # zplug "plugins/git", from:"oh-my-zsh"
