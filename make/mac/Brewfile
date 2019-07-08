@@ -32,6 +32,7 @@ brew "dep"
 brew "glances"
 brew "hub"
 brew "tig"
+brew "httpie"
 
 brew "php"
 brew "libmemcached"
