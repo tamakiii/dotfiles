@@ -1,30 +1,26 @@
-.PHONY: dependencies
+.PHONY: all dependencies
 
-ROOT_DIR := /Users/tamakiii/Sites
-ORGANIZATION_DIR := $(wildcard $(ROOT_DIR)/*)
-REPOSITORY_DIR := $(wildcard $(ROOT_DIR)/*/*)
-
+ROOT_DIR := $(HOME)/Sites
 ORGANIZATION :=
 REPOSITORY :=
 TARGET := $(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)
 
 all: dependencies \
 		$(ROOT_DIR)/$(ORGANIZATION) \
-		$(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY) \
-		$(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)/README.md \
-		$(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)/.git \
-		$(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)/.git/index \
-		$(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)/.git/config \
-		$(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)/.git/refs/remotes/origin
-	cd $(ROOT_DIR)/$(ORGANIZATION)/$(REPOSITORY)
+		$(TARGET) \
+		$(TARGET)/README.md \
+		$(TARGET)/.git \
+		$(TARGET)/.git/index \
+		$(TARGET)/.git/config \
+		$(TARGET)/.git/refs/remotes/origin
+	cd $(TARGET)
 
 dependencies:
-	type hub
-	type git
-	type tput
+	type hub > /dev/null
+	type git > /dev/null
 
 $(ROOT_DIR)/%:
-	make \
+	make -f $(lastword $(MAKEFILE_LIST)) \
 		ORGANIZATION=$(word 1,$(subst /, ,$(subst $(ROOT_DIR)/,,$@))) \
 		REPOSITORY=$(word 2,$(subst /, ,$(subst $(ROOT_DIR)/,,$@)))
 
@@ -48,4 +44,3 @@ $(TARGET)/.git/index:
 
 $(TARGET)/.git/refs/remotes/origin:
 	cd $(TARGET) && hub create "$(ORGANIZATION)/$(REPOSITORY)" && git push
-
