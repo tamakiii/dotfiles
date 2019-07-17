@@ -1,14 +1,16 @@
 fpath=(/usr/local/share/zsh/functions ${fpath})
 
-source ~/.zplug/init.zsh
+### Added by Zplugin's installer
+source ~/.zplugin/bin/zplugin.zsh
+autoload -Uz _zplugin
+(( ${+_comps} )) && _comps[zplugin]=_zplugin
+### End of Zplugin's installer chunk
 
-# zplug "plugins/git", from:"oh-my-zsh"
-zplug "plugins/pip", from:"oh-my-zsh"
-zplug "mafredri/zsh-async", from:"github", use:"async.zsh"
-zplug "sindresorhus/pure", from:"github", use:"pure.zsh", as:"theme"
-zplug "zsh-users/zsh-completions", from:"github"
-zplug "zsh-users/zsh-autosuggestions", from:"github", on:"zsh-users/zsh-completions"
-zplug "zsh-users/zsh-syntax-highlighting", from:"github", on:"zsh-users/zsh-autosuggestions"
+zplugin light "mafredri/zsh-async"
+zplugin light "sindresorhus/pure"
+zplugin light "zsh-users/zsh-completions"
+zplugin light "zsh-users/zsh-autosuggestions"
+zplugin light "zsh-users/zsh-syntax-highlighting"
 
 # pure
 PURE_GIT_PULL=0
@@ -59,13 +61,3 @@ source ~/.zsh/conf.d/tmux.zshrc
 source ~/.zsh/conf.d/npm.zshrc
 source ~/.zsh/conf.d/bindkey.zshrc
 source ~/.zsh/conf.d/completion.zshrc
-
-# Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-  printf "Install? [y/N]: "
-  if read -q; then
-    echo; zplug install
-  fi
-fi
-
-zplug load # --verbose
