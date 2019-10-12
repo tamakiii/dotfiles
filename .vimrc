@@ -80,6 +80,7 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'tomtom/tcomment_vim'
 Plug 'lu-ren/SerialExperimentsLain'
+Plug 'leafgarland/typescript-vim'
 
 call plug#end()
 
