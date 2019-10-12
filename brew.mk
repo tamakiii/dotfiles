@@ -16,7 +16,7 @@ update:
 
 Brewfile:
 	@type brew > /dev/null
-	@brew bundle dump --force --file=$(DIR)/Brewfile
+	@brew bundle dump --file=/dev/stdout | sort > $(DIR)/Brewfile
 
 uninstall:
 	@type brew > /dev/null
