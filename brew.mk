@@ -13,10 +13,17 @@ update:
 	@type brew > /dev/null
 	@brew bundle dump --force --file=$(DIR)/Brewfile
 
-sync:
-	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-tap ' | grep -o '".\+"' | xargs brew untap
+uninstall:
+	@type brew > /dev/null
+	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-tap '  | grep -o '".\+"' | xargs brew untap
 	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-brew ' | grep -o '".\+"' | xargs brew uninstall
 	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-cask ' | grep -o '".\+"' | xargs brew cask uninstall
+
+diff:
+	@type brew > /dev/null
+	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-tap ' | grep -o '".\+"' || true
+	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-brew ' | grep -o '".\+"' || true
+	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-cask ' | grep -o '".\+"' || true
 
 check:
 	@type brew > /dev/null
