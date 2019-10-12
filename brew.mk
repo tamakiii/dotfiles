@@ -1,3 +1,5 @@
+SHELL := bash
+
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 all: install
@@ -10,6 +12,10 @@ install:
 update:
 	@type brew > /dev/null
 	@brew bundle dump --force --file=$(DIR)/Brewfile
+
+sync:
+	diff -u <(brew bundle dump --all --file=/dev/stdout) $(DIR)/Brewfile | grep '^-brew ' | grep -o '".\+"' | xargs brew uninstall
+	diff -u <(brew bundle dump --all --file=/dev/stdout) $(DIR)/Brewfile | grep '^-cask ' | grep -o '".\+"' | xargs brew cask uninstall
 
 check:
 	@type brew > /dev/null
