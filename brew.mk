@@ -8,11 +8,15 @@ install:
 	@brew bundle --file=$(DIR)/Brewfile
 
 update:
+	@type brew > /dev/null
 	@brew bundle dump --force --file=$(DIR)/Brewfile
 
 check:
 	@type brew > /dev/null
 	@brew bundle check --file=$(DIR)/Brewfile
+
+cleanup:
+	@type brew > /dev/null
 	@brew bundle cleanup --file=$(DIR)/Brewfile
 
 reinstall:
