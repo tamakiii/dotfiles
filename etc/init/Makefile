@@ -1,13 +1,18 @@
-all:
-	cat $(realpath $(lastword $(MAKEFILE_LIST)))
+all: \
+	~/.config/fish/functions/fisher.fish \
+	~/.zplugin \
+	~/.vim/autoload/plug.vim \
+	install
 
-install: \
-	$(HOME)/.zplugin \
-	$(HOME)/.vim/autoload/plug.vim
+install:
+	fisher
 
-$(HOME)/.zplugin:
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+~/.config/fish/functions/fisher.fish:
+	curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher
 
-$(HOME)/.vim/autoload/plug.vim:
+~/.zplugin:
+	sh -c "$(shell curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+
+~/.vim/autoload/plug.vim:
 	curl -fLo $@ --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
