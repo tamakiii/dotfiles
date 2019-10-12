@@ -1,3 +1,5 @@
+.PHONY: Brewfile
+
 SHELL := bash
 
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -6,10 +8,13 @@ all: install
 
 install:
 	@type brew > /dev/null
-	@brew update
-	@brew bundle --file=$(DIR)/Brewfile
+	@brew bundle install --file=$(DIR)/Brewfile
 
 update:
+	@type brew > /dev/null
+	@brew update
+
+Brewfile:
 	@type brew > /dev/null
 	@brew bundle dump --force --file=$(DIR)/Brewfile
 
@@ -35,8 +40,11 @@ cleanup:
 
 reinstall:
 	@type brew > /dev/null
-	@grep '^cask' Brewfile
 	@grep '^cask' Brewfile | awk '{print $2}' | xargs -I@ brew cask reinstall @
+
+update-reset:
+	@type brew > /dev/null
+	@brew update-reset
 
 clean:
 	@type brew > /dev/null
