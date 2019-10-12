@@ -14,6 +14,7 @@ update:
 	@brew bundle dump --force --file=$(DIR)/Brewfile
 
 sync:
+	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-tap ' | grep -o '".\+"' | xargs brew untap
 	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-brew ' | grep -o '".\+"' | xargs brew uninstall
 	diff -u <(brew bundle dump --all --file=/dev/stdout | sort) <(cat $(DIR)/Brewfile | sort) | grep '^-cask ' | grep -o '".\+"' | xargs brew cask uninstall
 
