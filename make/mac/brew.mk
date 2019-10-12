@@ -1,5 +1,3 @@
-.PHONY: Brewfile
-
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 all: install
@@ -9,7 +7,7 @@ install:
 	@brew update
 	@brew bundle --file=$(DIR)/Brewfile
 
-import:
+update:
 	@brew bundle dump --force --file=$(DIR)/Brewfile
 
 check:
