@@ -1,15 +1,13 @@
-.PHONY: install update uninstall clean check
-
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 DOTDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))/../..))
 MAKE := $(shell which make)
 
 install: \
 	install/dotfiles \
-	install/brew \
 	install/bundle \
 	install/go \
 	install/php
+	make -f $(DIR)/make/mac/brew.mk
 
 install/dotfiles: \
 	~/.config/git/config
@@ -17,11 +15,6 @@ install/dotfiles: \
 install/bundle:
 	@type bundle > /dev/null
 	@bundle install
-
-install/brew:
-	@type brew > /dev/null
-	@brew update
-	@brew bundle --file=$(DIR)/Brewfile
 
 install/go:
 	@type go > /dev/null
@@ -32,30 +25,13 @@ install/php:
 	@type pecl > /dev/null
 	@pecl install memcached
 
-import:
-	@brew bundle dump --force --file=$(DIR)/Brewfile
-
 clean: \
-	clean/brew \
 	clean/go
-
-clean/brew:
-	@type brew > /dev/null
-	@brew bundle cleanup --force --file=$(DIR)/Brewfile
+	make -f $(DIR)/make/mac/brew.mk
 
 clean/go:
 	@go clean -i -n github.com/golang/dep/cmd/dep
 	@go clean -i -n github.com/jesseduffield/lazygit
-
-check:
-	@type brew > /dev/null
-	@brew bundle check --file=$(DIR)/Brewfile
-	@brew bundle cleanup --file=$(DIR)/Brewfile
-
-reinstall:
-	@type brew > /dev/null
-	@grep '^cask' Brewfile
-	@grep '^cask' Brewfile | awk '{print $2}' | xargs -I@ brew cask reinstall @
 
 ~/.config/git/config:
 	@cp $(DOTDIR)/etc/.config/git/config $@
