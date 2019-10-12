@@ -6,7 +6,8 @@ all: \
 	~/.config/git/config \
 	~/.config/fish \
 	~/.config/fish/config.fish \
-	~/.config/fish/fishfile
+	~/.config/fish/fishfile \
+	~/.config/fish/fish_variables
 
 ~/.config/git/config:
 	cp $(ROOT_DIR)/$(subst $(HOME)/,,$@) $@
@@ -15,6 +16,9 @@ all: \
 	ln -s $(ROOT_DIR)/$(subst $(HOME)/,,$@) $@
 
 ~/.config/fish/fishfile:
+	ln -s $(ROOT_DIR)/$(subst $(HOME)/,,$@) $@
+
+~/.config/fish/fish_variables:
 	ln -s $(ROOT_DIR)/$(subst $(HOME)/,,$@) $@
 
 ~/.config/fish:
@@ -28,7 +32,8 @@ all: \
 
 clean:
 	cp -r ~/.config $(shell mktemp -d)
-	# rm -rf ~/.config/git/config
+	rm -rf ~/.config/git/config
 	rm -rf ~/.config/fish/config.fish
 	rm -rf ~/.config/fish/fishfile
+	rm -rf ~/.config/fish/fish_variables
 
