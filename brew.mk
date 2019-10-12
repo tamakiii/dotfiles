@@ -16,10 +16,7 @@ update:
 
 Brewfile:
 	@type brew > /dev/null
-	rm -rf $@ && touch $@
-	brew bundle list --taps | sort | xargs -I@ echo 'tap "@"' >> $@
-	brew bundle list --brews | sort| xargs -I@ echo 'brew "@"' >> $@
-	brew bundle list --casks | sort | xargs -I@ echo 'cask "@"' >> $@
+	@brew bundle dump --force --file=$(DIR)/Brewfile
 
 uninstall:
 	@type brew > /dev/null
