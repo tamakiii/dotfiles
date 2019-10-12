@@ -3,14 +3,10 @@ DOTDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))/../..))
 MAKE := $(shell which make)
 
 install: \
-	install/dotfiles \
 	install/bundle \
 	install/go \
 	install/php
 	make -f $(DIR)/make/mac/brew.mk
-
-install/dotfiles: \
-	~/.config/git/config
 
 install/bundle:
 	@type bundle > /dev/null
@@ -32,7 +28,3 @@ clean: \
 clean/go:
 	@go clean -i -n github.com/golang/dep/cmd/dep
 	@go clean -i -n github.com/jesseduffield/lazygit
-
-~/.config/git/config:
-	@cp $(DOTDIR)/etc/.config/git/config $@
-	@echo "edit:" $@
