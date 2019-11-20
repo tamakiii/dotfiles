@@ -28,6 +28,6 @@ jobs:
     - name: Make install
       run: make install
     - name: List brew downloads
-      run: ls -lsS ${{ steps.brew-cache.outputs.dir }}/downloads
+      run: ls -lsS ${{ steps.brew-cache.outputs.dir }}
     - name: Cleanup some brew downloads
       run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
