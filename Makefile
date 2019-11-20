@@ -16,6 +16,7 @@ deploy: ## Create symlink to home directory
 	@echo '==> Start to deploy dotfiles to home directory.'
 	@echo ''
 	@$(foreach val, $(DOTFILES), ln -sfnv $(abspath $(val)) $(HOME)/$(val);)
+	make -f config.mk
 
 init: ## Setup environment settings
 	fish -c "fisher"
