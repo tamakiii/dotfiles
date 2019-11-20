@@ -13,12 +13,11 @@ jobs:
       run: echo "::set-output name=dir::$(brew --cache)"
     - name: Brew cache
       uses: actions/cache@v1
-      id: cache
+      id: brew-cache
       with:
         path: ${{ steps.brew-cache.outputs.dir }}
         key: ${{ runner.os }}-${{ hashFiles('**/Brewfile') }}
-        restore-keys: |
-          ${{ runner.os }}-
+        restore-keys: ${{ runner.os }}-
     - run: ls -lsa $(brew --cache)
     - name: Brew config
       run: brew config
