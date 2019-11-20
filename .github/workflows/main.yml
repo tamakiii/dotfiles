@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  itest:
+  test:
     runs-on: macos-latest
     steps:
     - name: Checkout
