@@ -23,14 +23,14 @@ jobs:
       run: brew uninstall node@12
     - name: Brew install
       run: make -f brew.mk
-    - run: ls -lsa ~
+    - run: ls -lsa ~/.config/fish
     - name: Test setup scripts
       run: make install
-    - run: ls -lsa ~
+    - run: ls -lsa ~/.config/fish
     - run: make update
-    - run: ls -lsa ~
+    - run: ls -lsa ~/.config/fish
     - run: make deploy
-    - run: ls -lsa ~
+    - run: ls -lsa ~/.config/fish
     - run: make init
     - name: Brew config
       run: brew config
