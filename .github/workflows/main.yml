@@ -29,3 +29,4 @@ jobs:
       run: make install
     - name: Brew config
       run: brew config
+    - run: ls -ls (brew --cache)/downloads
