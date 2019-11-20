@@ -15,7 +15,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ${{ steps.brew-cache-info.outputs.dir }}
-        key: ${{ runner.os }}-${{ hashFiles('**/Brewfile') }}
+        key: ${{ runner.os }}-${{ hashFiles('Brewfile') }}
     - run: ls -lsa $(brew --cache)
     - name: Brew config
       run: brew config
