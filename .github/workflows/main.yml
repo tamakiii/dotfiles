@@ -8,14 +8,18 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - name: Get brew cache directory
+      id: brew-cache
+      run: echo "::set-output name=dir::$(brew --cache)"
     - name: Brew cache
       uses: actions/cache@v1
       id: cache
       with:
-        path: /Users/runner/Library/Caches/Homebrew
-        key: ${{ runner.os }}-brew-${{ hashFiles('**/Brewfile') }}
+        path: ${{ steps.brew-cache.outputs.dir }}
+        key: ${{ runner.os }}-${{ hashFiles('**/Brewfile') }}
         restore-keys: |
-          ${{ runner.os }}-brew-
+          ${{ runner.os }}-
+    - run: ls -lsa $(brew --cache)
     - name: Brew config
       run: brew config
     - name: Uninstall default node
