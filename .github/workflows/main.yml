@@ -8,8 +8,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Uninstall node
-      run: brew uninstall node
+    - name: Uninstall default node
+      run: brew uninstall node@12
     - name: Brew config
       run: brew config
     - name: Brew install
