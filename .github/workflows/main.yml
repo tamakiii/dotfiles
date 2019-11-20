@@ -10,14 +10,12 @@ jobs:
       uses: actions/checkout@v1
     - name: Uninstall node
       run: brew uninstall node
-    - name: Which node
-      run: which node && node --version
     - name: Brew config
       run: brew config
-    - name: Brew cache
-      run: brew --cache
     - name: Brew install
       run: make -f brew.mk
+    - name: Which node
+      run: which node && node --version
     - run: ls -lsa $(brew --cache)
     - name: Test setup scripts
       run: make install
