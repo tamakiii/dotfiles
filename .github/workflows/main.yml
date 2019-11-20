@@ -21,6 +21,8 @@ jobs:
       run: brew config
     - name: Uninstall default node
       run: brew uninstall node@12
+    - name: Brew install
+      run: make -f brew.mk
     - run: ls -lsa ~
     - name: Test setup scripts
       run: make install
@@ -30,7 +32,5 @@ jobs:
     - run: make deploy
     - run: ls -lsa ~
     - run: make init
-    - name: Brew install
-      run: make -f brew.mk
     - name: Brew config
       run: brew config
