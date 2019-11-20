@@ -2,11 +2,7 @@ all: \
 	/usr/local/bin/brew \
 	~/.config/fish/functions/fisher.fish \
 	~/.zplugin \
-	~/.vim/autoload/plug.vim \
-	install
-
-install:
-	fish -c "fisher"
+	~/.vim/autoload/plug.vim
 
 /usr/local/bin/brew:
 	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"

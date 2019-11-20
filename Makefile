@@ -5,7 +5,8 @@ DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
 
 .DEFAULT_GOAL := help
 
-all:
+all: install update deploy init ## Run make update, deploy, init
+	@exec $$SHELL
 
 list: ## Show dot files in this repo
 	@$(foreach val, $(DOTFILES), /bin/ls -dF $(val);)
@@ -17,7 +18,7 @@ deploy: ## Create symlink to home directory
 	@$(foreach val, $(DOTFILES), ln -sfnv $(abspath $(val)) $(HOME)/$(val);)
 
 init: ## Setup environment settings
-	@DOTPATH=$(DOTPATH) make -C $(DOTPATH)/etc/init
+	fish -c "fisher"
 
 test: ## Test dotfiles and init scripts
 	@#DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/test/test.sh
@@ -29,8 +30,8 @@ update: ## Fetch changes for this repo
 	git submodule update
 	git submodule foreach git pull origin master
 
-install: update deploy init ## Run make update, deploy, init
-	@exec $$SHELL
+install: # Install dependencies
+	@DOTPATH=$(DOTPATH) make -C $(DOTPATH)/etc/init
 
 reset:
 	git submodule update --init

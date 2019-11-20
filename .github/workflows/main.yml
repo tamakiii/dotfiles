@@ -29,4 +29,4 @@ jobs:
     - name: Brew config
       run: brew config
     - name: Test setup scripts
-      run: make install
+      run: make
