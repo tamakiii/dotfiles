@@ -27,8 +27,6 @@ jobs:
       run: make -f brew.mk
     - name: Test setup scripts
       run: make install
-    - name: Brew config
-      run: brew config
     - name: List brew downloads
       run: ls -lsS $(brew --cache)/downloads
     - name: Cleanup brew downloads
