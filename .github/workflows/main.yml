@@ -32,4 +32,4 @@ jobs:
     - name: List brew downloads
       run: ls -lsS $(brew --cache)/downloads
     - name: Cleanup brew downloads
-      run: cd $(brew --cache)/downloads && ls -lsS | head -n 5 | awk '{ print $10 }' | xargs rm -rf
+      run: cd $(brew --cache)/downloads && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
