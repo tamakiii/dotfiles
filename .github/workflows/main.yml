@@ -16,5 +16,6 @@ jobs:
       run: brew --cache
     - name: Brew install
       run: make -f brew.mk
+    - run: ls -lsa $(brew --cache)
     - name: Test setup scripts
       run: make install
