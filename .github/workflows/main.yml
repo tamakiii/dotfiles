@@ -35,4 +35,4 @@ jobs:
     - run: ls -lsa ~
     - run: make deploy
     - run: ls -lsa ~
-    - run: make　init
+    - run: make init
