@@ -21,12 +21,12 @@ jobs:
       run: brew config
     - name: Uninstall default node
       run: brew uninstall node@12
-    - name: Brew install
+    - name: Make brew
       run: make -f brew.mk
     - name: Make config
       run: make -f config.mk
     - name: Make install
-      run: make install
+      run: make
     - name: List brew downloads
       run: ls -lsS ${{ steps.brew-cache.outputs.dir }}
     - name: Cleanup some brew downloads
