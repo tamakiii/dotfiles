@@ -8,23 +8,26 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - name: Get brew cache directory
+      id: brew-cache
+      run: echo "::set-output name=dir::$(brew --cache)/downloads"
     - name: Brew cache
       uses: actions/cache@v1
       with:
-        path: $(brew --cache)/downloads
+        path: ${{ steps.brew-cache.outputs.dir }}
         key: ${{ runner.os }}-${{ hashFiles('Brewfile') }}
     - run: ls -lsa $(brew --cache)
     - name: Brew config
       run: brew config
     - name: Uninstall default node
       run: brew uninstall node@12
-    - name: Make config
-      run: 	make -f config.mk
     - name: Brew install
       run: make -f brew.mk
-    - name: Test setup scripts
+    - name: Make config
+      run: make -f config.mk
+    - name: Make install
       run: make install
     - name: List brew downloads
-      run: ls -lsS $(brew --cache)/downloads
-    - name: Cleanup brew downloads
-      run: cd $(brew --cache)/downloads && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
+      run: ls -lsS ${{ steps.brew-cache.outputs.dir }}/downloads
+    - name: Cleanup some brew downloads
+      run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
