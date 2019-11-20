@@ -14,7 +14,7 @@ jobs:
     - name: Brew cache
       uses: actions/cache@v1
       with:
-        path: ${{ steps.brew-cache-info.outputs.dir }}
+        path: ${{ steps.brew-cache-info.outputs.dir }}/downloads
         key: ${{ runner.os }}-${{ hashFiles('**/Brewfile') }}
     - run: ls -lsa $(brew --cache)
     - name: Brew config
@@ -29,4 +29,4 @@ jobs:
       run: make install
     - name: Brew config
       run: brew config
-    - run: ls -ls (brew --cache)/downloads
+    - run: ls -ls $(brew --cache)/downloads
