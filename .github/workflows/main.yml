@@ -28,5 +28,12 @@ jobs:
       run: make -f brew.mk
     - name: Brew config
       run: brew config
+    - run: ls -lsa ~
     - name: Test setup scripts
-      run: make
+      run: make install
+    - run: ls -lsa ~
+    - run: make update
+    - run: ls -lsa ~
+    - run: make deploy
+    - run: ls -lsa ~
+    - run: make　init
