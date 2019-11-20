@@ -5,7 +5,7 @@ all: \
 	install
 
 install:
-	fisher
+	fish -c "fisher"
 
 ~/.config/fish/functions/fisher.fish:
 	curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher
