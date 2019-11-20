@@ -8,7 +8,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - run: echo $SHELL
     - name: Brew install
       run: make -f brew.mk
     - name: Test setup scripts
