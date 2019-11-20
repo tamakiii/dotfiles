@@ -29,4 +29,7 @@ jobs:
       run: make install
     - name: Brew config
       run: brew config
-    - run: ls -ls $(brew --cache)/downloads
+    - name: List brew downloads
+      run: ls -lsS $(brew --cache)/downloads
+    - name: Cleanup brew downloads
+      run: cd $(brew --cache)/downloads && ls -lsS | head -n 5 | awk '{ print $10 }' | xargs rm -rf
