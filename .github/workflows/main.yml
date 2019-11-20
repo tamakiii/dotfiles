@@ -8,13 +8,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Get brew cache directory
-      id: brew-cache-info
-      run: echo "::set-output name=dir::$(brew --cache)"
     - name: Brew cache
       uses: actions/cache@v1
       with:
-        path: ${{ steps.brew-cache-info.outputs.dir }}/downloads
+        path: $(brew --cache)/downloads
         key: ${{ runner.os }}-${{ hashFiles('Brewfile') }}
     - run: ls -lsa $(brew --cache)
     - name: Brew config
