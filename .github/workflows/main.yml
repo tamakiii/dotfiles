@@ -8,6 +8,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - name: Which node
+      run: which node && node --version
     - name: Brew config
       run: brew config
     - name: Brew cache
