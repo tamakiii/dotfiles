@@ -5,8 +5,7 @@ DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
 
 .DEFAULT_GOAL := help
 
-all: install update deploy init ## Run make update, deploy, init
-	@exec $$SHELL
+all:
 
 list: ## Show dot files in this repo
 	@$(foreach val, $(DOTFILES), /bin/ls -dF $(val);)
@@ -30,7 +29,7 @@ update: ## Fetch changes for this repo
 	git submodule update
 	git submodule foreach git pull origin master
 
-install: # Install dependencies
+install: update deploy init ## Run make update, deploy, init
 	@exec $$SHELL
 
 reset:
