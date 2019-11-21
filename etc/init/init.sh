@@ -2,12 +2,11 @@
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd)"
 
+echo "---"
 echo $OSTYPE
+echo "---"
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  make -f $DIR/brew.mk
-fi
-
+make -f $DIR/brew.mk
 make -f $DIR/config.mk
 make -C $DIR/etc/init
 
