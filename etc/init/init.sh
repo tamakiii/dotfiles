@@ -1,7 +1,12 @@
-make -C ~/.dotfiles/etc/init
-make -f ~/.dotfiles/config.mk
+#!/bin/bash
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." >/dev/null 2>&1 && pwd)"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  # Mac OSX
-  make -f ~/.dotfiles/brew.mk
+  make -f $DIR/brew.mk
 fi
+
+make -f $DIR/config.mk
+make -C $DIR/etc/init
+
+fish -c "fisher"
