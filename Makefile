@@ -18,7 +18,7 @@ deploy: ## Create symlink to home directory
 	@$(foreach val, $(DOTFILES), ln -sfnv $(abspath $(val)) $(HOME)/$(val);)
 
 init: ## Setup environment settings
-	fish -c "fisher"
+	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/init/init.sh
 
 test: ## Test dotfiles and init scripts
 	@#DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/test/test.sh
@@ -31,7 +31,7 @@ update: ## Fetch changes for this repo
 	git submodule foreach git pull origin master
 
 install: # Install dependencies
-	@DOTPATH=$(DOTPATH) make -C $(DOTPATH)/etc/init
+	@exec $$SHELL
 
 reset:
 	git submodule update --init
