@@ -16,9 +16,6 @@ jobs:
       with:
         path: ${{ steps.brew-cache.outputs.dir }}
         key: ${{ runner.os }}-${{ hashFiles('Brewfile') }}
-    - run: |
-      ls -lsa $(brew --cache)
-      ls -lsS /usr/local/Cellar
     - name: Brew config
       run: brew config
     - name: Uninstall default node
