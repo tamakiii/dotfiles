@@ -10,5 +10,5 @@ init:
 update:
 	make update
 
-init:
-	make init
+deploy:
+	make deploy
