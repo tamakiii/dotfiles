@@ -8,10 +8,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - name: Get brew cache directory
+      id: brew-cache
+      run: echo "::set-output name=dir::$(brew --cache)/downloads"
     - name: Brew cache
       uses: actions/cache@v1
       with:
-        path: /usr/local/Cellar
+        path: ${{ steps.brew-cache.outputs.dir }}
         key: ${{ runner.os }}-${{ hashFiles('Brewfile') }}
     - run: |
       ls -lsa $(brew --cache)
@@ -24,5 +27,5 @@ jobs:
       run: |
         make -f brew.mk
         OSTYPE="" bash etc/init/init.sh
-    - name: List brew Cellars
-      run: ls -lsS /usr/local/Cellar
+    - name: Cleanup some brew downloads
+      run: cd ${{ steps.brew-cache.outputs.dir }} && ls -lsS | head -n 10 | awk '{ print $10 }' | xargs rm -rf
