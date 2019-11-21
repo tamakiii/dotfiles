@@ -26,7 +26,7 @@ jobs:
     - name: Make config
       run: make -f config.mk
     - name: Make install
-      run: make
+      run: make all
     - name: List brew downloads
       run: ls -lsS ${{ steps.brew-cache.outputs.dir }}
     - name: Cleanup some brew downloads
