@@ -19,6 +19,10 @@ jobs:
     - name: Uninstall default node
       run: brew uninstall node@12
     - name: Make install
-      run: make -f ci.mk install
+      run: |
+        make -f brew.mk
+        make -f config.mk
+        make install
+        fish -c "fisher"
     - name: List brew downloads
       run: ls -lsS /usr/local/Cellar
