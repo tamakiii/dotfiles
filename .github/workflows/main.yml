@@ -21,8 +21,6 @@ jobs:
     - name: Make install
       run: |
         make -f brew.mk
-        make -f config.mk
-        make install
-        fish -c "fisher"
+        OSTYPE="" bash etc/init/init.sh
     - name: List brew downloads
       run: ls -lsS /usr/local/Cellar
