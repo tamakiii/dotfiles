@@ -14,3 +14,7 @@ make -f $DIR/config.mk
 
 fish -c "fisher"
 vim -E -s -u ~/.vimrc +PlugInstall +qall
+
+mkdir -p ~/.vim/backup
+mkdir -p ~/.vim/swapfile
+mkdir -p ~/.vim/undo
