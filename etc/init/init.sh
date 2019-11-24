@@ -14,7 +14,7 @@ make -f $DIR/config.mk
 
 fish -c "fisher"
 vim -E -s -u ~/.vimrc +PlugInstall +qall
-$(DIR)/tmux/plugins/tpm/tpm
+$DIR/.tmux/plugins/tpm/tpm
 
 mkdir -p ~/.vim/backup
 mkdir -p ~/.vim/swapfile
