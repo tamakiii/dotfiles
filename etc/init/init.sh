@@ -12,3 +12,4 @@ make -f $DIR/config.mk
 
 
 fish -c "fisher"
+vim -E -s -u ~/.vimrc +PlugInstall +qall
