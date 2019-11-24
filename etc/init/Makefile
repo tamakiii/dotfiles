@@ -5,7 +5,7 @@ all: \
 	~/.vim/autoload/plug.vim
 
 /usr/local/bin/brew:
-	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	ruby -e "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 ~/.config/fish/functions/fisher.fish:
 	curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher
