@@ -777,6 +777,9 @@
       },
       "intellij-idea": {
         "version": "2019.2.4"
+      },
+      "jetbrains-toolbox": {
+        "version": "1.16.6067"
       }
     },
     "tap": {
