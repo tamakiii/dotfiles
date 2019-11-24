@@ -44,6 +44,9 @@ update-reset:
 	@type brew > /dev/null
 	@brew update-reset
 
+unshallow:
+	 git -C "$$(brew --repo homebrew/core)" fetch --unshallow
+
 clean:
 	@type brew > /dev/null
 	@brew bundle cleanup --force --file=$(DIR)/Brewfile
