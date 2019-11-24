@@ -780,6 +780,9 @@
       },
       "jetbrains-toolbox": {
         "version": "1.16.6067"
+      },
+      "java": {
+        "version": "13.0.1,9:cec27d702aa74d5a8630c65ae61e4305"
       }
     },
     "tap": {
@@ -790,13 +793,13 @@
         "revision": "1a41629972a351085d297e2c336f8eda0dc771eb"
       },
       "homebrew/cask": {
-        "revision": "fae404b0b8571c4852401ad677626a94e079067a"
+        "revision": "6c7bdd4f71a36620ff399e444e09dadb909e7365"
       },
       "homebrew/cask-versions": {
         "revision": "06cf650cfcfd146aee896b0d0b347ef73578bbe3"
       },
       "homebrew/core": {
-        "revision": "e5111d3f694165cc43bc61e9d4d5cd90203a25e4"
+        "revision": "edfbaf674740013350b9f548776019b1927164dd"
       },
       "osx-cross/avr": {
         "revision": "e1df340224bf42372fb922e408e516c484056dce"
@@ -808,7 +811,7 @@
       "catalina": {
         "HOMEBREW_VERSION": "2.1.16",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "e5111d3f694165cc43bc61e9d4d5cd90203a25e4",
+        "Homebrew/homebrew-core": "edfbaf674740013350b9f548776019b1927164dd",
         "CLT": "11.0.0.0.1.1567737322",
         "Xcode": "11.0",
         "macOS": "10.15.1"
