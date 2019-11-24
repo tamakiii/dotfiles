@@ -771,6 +771,12 @@
       },
       "dropbox": {
         "version": "latest"
+      },
+      "docker": {
+        "version": "2.1.0.5,40693"
+      },
+      "intellij-idea": {
+        "version": "2019.2.4"
       }
     },
     "tap": {
