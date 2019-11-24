@@ -753,6 +753,24 @@
     "cask": {
       "google-japanese-ime": {
         "version": "latest"
+      },
+      "google-chrome": {
+        "version": "78.0.3904.108"
+      },
+      "iterm2": {
+        "version": "3.3.7"
+      },
+      "evernote": {
+        "version": "7.13_458080"
+      },
+      "slack": {
+        "version": "4.1.2"
+      },
+      "visual-studio-code": {
+        "version": "1.40.1"
+      },
+      "dropbox": {
+        "version": "latest"
       }
     },
     "tap": {
