@@ -4,8 +4,6 @@ SHELL := bash
 
 DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-all: install
-
 install:
 	@type brew > /dev/null
 	@brew bundle install --file=$(DIR)/Brewfile
