@@ -8,4 +8,5 @@
 /.vim/plugged/
 /.tmux/plugins/
 /.tmux/resurrect/
+/.config/fisher/
 /node_modules/
