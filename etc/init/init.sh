@@ -16,6 +16,9 @@ fish -c "fisher"
 vim -E -s -u ~/.vimrc +PlugInstall +qall
 $DIR/.tmux/plugins/tpm/tpm
 
+ln -fs /usr/local/bin/gcc-9 /usr/local/bin/gcc
+ln -fs /usr/local/bin/g++-9 /usr/local/bin/g++
+
 mkdir -p ~/.vim/backup
 mkdir -p ~/.vim/swapfile
 mkdir -p ~/.vim/undo
