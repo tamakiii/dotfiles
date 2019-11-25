@@ -71,6 +71,7 @@ augroup END
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 nmap ; :
 nmap <ESC><ESC> :noh<CR><ESC>
+nmap ,, :noh<CR><ESC>
 
 "   vim-plug (https://github.com/junegunn/vim-plug)
 "   `:PlugInstall` to install
