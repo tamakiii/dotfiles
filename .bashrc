@@ -49,3 +49,25 @@ bind "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
 
 # export PS1="\w $ "
 export PS1="$(echo -e '\U1F9F8') \h:\W $ "
+# export PS1='\ek\e\\'"$(echo -e '\U1F9F8') \h:\W\$ "
+# export PS1='\[\ek\e\\\][\u@\h \W]\$ '
+# PS1=$(echo -e '\U1F9F8')' [\u@\h \W]\$ '
+
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set menu-complete-display-prefix on
+bind '"\t": menu-complete'
+bind '"\e[Z": menu-complete-backward'
+
+# bind '"\e[6~": menu-complete'
+# bind '"\e[5~": menu-complete-backward'
+# bind 'TAB':menu-complete
+
+# # Display a list of the matching files
+#
+# bind "set show-all-if-ambiguous on"
+#
+# # Perform partial completion on the first Tab press,
+# # only start cycling full results on the second Tab press
+#
+# bind "set menu-complete-display-prefix on"
