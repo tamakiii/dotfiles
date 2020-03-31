@@ -9,3 +9,5 @@
 /.tmux/plugins/
 /.tmux/resurrect/
 /node_modules/
+/vendor/
+/deps/

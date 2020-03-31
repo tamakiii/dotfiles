@@ -1,5 +1,7 @@
 brew "amazon-ecs-cli"
 brew "awscli"
+brew "bash"
+brew "bash-completion"
 brew "coreutils"
 brew "docker"
 brew "docker-compose"

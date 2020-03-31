@@ -1,4 +1,5 @@
 export PATH="/usr/local/bin:$PATH"
+export PATH="~/.local/bin:$PATH"
 
 export LANG=""
 export LC_COLLATE="ja_JP.UTF-8"
@@ -14,13 +15,34 @@ export FZF_COMPLETION_OPTS="+c -x"
 export FZF_PREVIEW_FILE_CMD="head -n 10"
 export FZF_PREVIEW_DIR_CMD="ls -lsa"
 export FZF_LEGACY_KEYBINDINGS=0
+# export FZF_COMPLETION_TRIGGER=''
+# export FZF_TMUX=1
 
 export FZF_DEFAULT_OPTS="
-  --height 100%
+  --no-height
   --layout=reverse
   --color=dark
   --color=fg:-1,bg:-1,hl:#5fff87,fg+:-1,bg+:-1,hl+:#ffaf5f
   --color=info:#af87ff,prompt:#5fff87,pointer:#ff87d7,marker:#ff87d7,spinner:#ff87d7
 "
 
+stty werase undef
+bind '\C-w:unix-filename-rubout'
+
+bind "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
+
+# bindkey '^T' fzf-completion
+# bindkey '^I' $fzf_default_completion
+#
+# function select-history() {
+#   BUFFER=$(history -n -r 1 | fzf --no-sort +m --query "$LBUFFER" --prompt="History > ")
+#     CURSOR=$#BUFFER
+#   }
+# zle -N select-history
+# bindkey '^r' select-history
+
+# source ~/.bash/plugin/fzf-tab-completion/bash/fzf-bash-completion.sh
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && source "/usr/local/etc/profile.d/bash_completion.sh"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# bind -x '"\t": fzf_bash_completion'
