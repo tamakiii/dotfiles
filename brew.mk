@@ -2,7 +2,7 @@
 
 SHELL := bash
 
-DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 install:
 	@type brew > /dev/null
