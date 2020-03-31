@@ -46,3 +46,6 @@ bind "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # bind -x '"\t": fzf_bash_completion'
+
+# export PS1="\w $ "
+export PS1="$(echo -e '\U1F9F8') \h:\W $ "
