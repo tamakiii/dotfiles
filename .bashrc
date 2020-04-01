@@ -48,7 +48,7 @@ bind "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
 # bind -x '"\t": fzf_bash_completion'
 
 # export PS1="\w $ "
-export PS1="$(echo -e '\U1F9F8') \h:\W $ "
+export PS1="$(echo -e '\U1F9F8') \h:\W \n$ "
 # export PS1='\ek\e\\'"$(echo -e '\U1F9F8') \h:\W\$ "
 # export PS1='\[\ek\e\\\][\u@\h \W]\$ '
 # PS1=$(echo -e '\U1F9F8')' [\u@\h \W]\$ '
