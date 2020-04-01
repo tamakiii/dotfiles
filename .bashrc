@@ -29,13 +29,14 @@ export FZF_DEFAULT_OPTS="
 "
 
 function history-fzf() {
-  READLINE_LINE=$(history | cut -c 8- | sort | uniq | fzf --query "$LBUFFER")
+  READLINE_LINE=$(history | tac | fzf --query "$LBUFFER")
   READLINE_POINT=$#READLINE_LINE
 }
 
 stty werase undef
 
 export PS1="$(echo -e '\U1F9F8') \h:\W \n$ "
+export HISTCONTROL=ignoreboth:erasedups
 
 bind "set show-all-if-ambiguous on"
 bind "set show-all-if-unmodified on"
