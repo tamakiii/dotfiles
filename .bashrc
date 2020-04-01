@@ -28,14 +28,22 @@ export FZF_DEFAULT_OPTS="
   --color=info:#af87ff,prompt:#5fff87,pointer:#ff87d7,marker:#ff87d7,spinner:#ff87d7
 "
 
+function history-fzf() {
+  READLINE_LINE=$(history | cut -c 8- | sort | uniq | fzf --query "$LBUFFER")
+  READLINE_POINT=$#READLINE_LINE
+}
+
 stty werase undef
 
 export PS1="$(echo -e '\U1F9F8') \h:\W \n$ "
 
-set show-all-if-ambiguous on
-set show-all-if-unmodified on
-set menu-complete-display-prefix on
-bind '"\t": menu-complete'
-bind '"\e[Z": menu-complete-backward'
-bind '\C-w:unix-filename-rubout'
-bind "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
+bind "set show-all-if-ambiguous on"
+bind "set show-all-if-unmodified on"
+bind "set completion-ignore-case on"
+bind "set menu-complete-display-prefix on"
+
+bind    "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
+bind    '"\t": menu-complete'
+bind    '"\e[Z": menu-complete-backward'
+bind    '"\C-w": unix-filename-rubout'
+bind -x '"\C-r": history-fzf'
