@@ -29,7 +29,7 @@ export FZF_DEFAULT_OPTS="
 "
 
 function history-fzf() {
-  READLINE_LINE=$(history | tac | fzf --query "$LBUFFER")
+  READLINE_LINE=$(history | tac | cut -c 8- | fzf --query "$LBUFFER")
   READLINE_POINT=$#READLINE_LINE
 }
 
