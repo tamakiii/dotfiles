@@ -43,6 +43,9 @@ zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}
 autoload -Uz compinit
 compinit
 
+# autosuggestion
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
 # fzf
 export FZF_TMUX_HEIGHT="40%"
 export FZF_LEGACY_KEYBINDINGS=1
