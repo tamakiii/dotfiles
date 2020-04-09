@@ -1,27 +1,64 @@
-all: \
-	/usr/local/bin/brew \
-	~/.config/fish/functions/fisher.fish \
-	~/.zplugin \
-	~/.vim/autoload/plug.vim
+.PHONY: help dep install uninstall setup clean
 
-sessionmanager: \
-	/usr/local/bin/session-manager-plugin
+DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST)))/../..)
 
-/usr/local/bin/brew:
-	ruby -e "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+help: ## Self-documented Makefile
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(lastword $(MAKEFILE_LIST)) \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-~/.config/fish/functions/fisher.fish:
-	curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs https://git.io/fisher
+dep:
+	@type fzf > /dev/null
+	@type vim > /dev/null
+	@type tmux > /dev/null
 
-~/.zplugin:
-	sh -c "$$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+install: setup ## Install
+	vim -E -s -u ~/.vimrc +PlugInstall +qall
+	~/.tmux/plugins/tpm/tpm
+	/usr/local/opt/fzf/install \
+		--no-zsh \
+		--no-fish \
+		--key-bindings \
+		--completion \
+		--update-rc
 
-~/.vim/autoload/plug.vim:
-	curl -fLo $@ --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+uninstall:
+	/usr/local/opt/fzf/uninstall
 
-/usr/local/bin/session-manager-plugin: /tmp/sessionmanager-bundle.zip
-	unzip -o $< -d /tmp && sudo /tmp/sessionmanager-bundle/install -i /usr/local/sessionmanagerplugin -b /usr/local/bin/session-manager-plugin
+setup: \
+	~/.local/bin/bpkg \
+	~/.tmux/plugins/tpm \
+	~/.bash/plugin/fzf-tab-completion \
+	~/.vim/backup \
+	~/.vim/swapfile \
+	~/.vim/undo
 
-/tmp/sessionmanager-bundle.zip:
-	curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/mac/sessionmanager-bundle.zip" -o /tmp/sessionmanager-bundle.zip
+~/.local/bin/bpkg:
+	curl -sLo- http://get.bpkg.sh | bash
 
+~/.tmux/plugin/tpm:
+	git clone https://github.com/tmux-plugin/tpm $@
+
+~/.bash/plugin/fzf-tab-completion: ~/.bash/plugin
+	git clone git@github.com:lincheney/fzf-tab-completion.git $@
+
+~/.bash/plugin: ~/.bash
+	mkdir -p $@
+
+~/.bash:
+	mkdir -p $@
+
+~/.vim/backup:
+	mkdir -p $@
+
+~/.vim/swapfile:
+	mkdir -p $@
+
+~/.vim/undo:
+	mkdir -p $@
+
+clean:
+	rm -rf ~/.local/bin/bpkg
+	rm -rf ~/.tmux/plugins/tpm
+	rm -rf ~/.vim/backup
+	rm -rf ~/.vim/swapfile
+	rm -rf ~/.vim/undo
