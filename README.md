@@ -16,3 +16,8 @@ make -f dotfiles.mk test
 make -f brew.mk diff
 make -f brew.mk -B Brewfile
 ```
+
+## NPM
+```sh
+make -f npm.mk install
+```

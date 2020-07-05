@@ -122,12 +122,14 @@ imap <leader><tab> <plug>(fzf-maps-i)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
 
-nmap <leader>f<space> :Files<cr>
-nmap <leader>fg<space> :GFiles<cr>
-nmap <leader>fgg<space> :GFiles?<cr>
-nmap <leader>fb<space> :Buffers<cr>
-nmap <leader>fw<space> :Windows<cr>
-nmap <leader>f:<space> :History:<cr>
+nmap <leader>f<space> :Files!<cr>
+nmap <leader>g<space> :GFiles<cr>
+nmap <leader>gs<space> :GFiles!?<cr>
+nmap <leader>b<space> :Buffers<cr>
+" nmap <leader>ag<space> :call fzf#vim#ag_raw('--hidden --ignore .git -l -g ""')<cr>
+nmap <leader>ag<space> :Ag!<cr>
+nmap <leader>w<space> :Windows!<cr>
+nmap <leader>h<space> :History:<cr>
 
 imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)

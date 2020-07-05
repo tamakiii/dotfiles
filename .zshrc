@@ -44,9 +44,15 @@ autoload -Uz compinit
 compinit
 
 # autosuggestion
-source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.vendor/zsh-users/autosuggestions/zsh-autosuggestions.zsh
+source ~/.vendor/zsh-users/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # fzf
+if [[ -x "$(command -v ag)" ]]; then
+  export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -l -g ""'
+else
+  export FZF_DEFAULT_COMMAND='find .'
+fi
 export FZF_TMUX_HEIGHT="40%"
 export FZF_LEGACY_KEYBINDINGS=1
 export FZF_PREVIEW_FILE_CMD="head -n 10"
@@ -59,8 +65,17 @@ export FZF_DEFAULT_OPTS="
   --color=info:#af87ff,prompt:#5fff87,pointer:#ff87d7,marker:#ff87d7,spinner:#ff87d7
 "
 
+# History
+setopt hist_ignore_all_dups
+setopt hist_ignore_dups
+setopt share_history
+setopt append_history
+setopt inc_append_history
+setopt hist_no_store
+setopt hist_reduce_blanks
+
 function fzf-history() {
-  BUFFER=$(history -n -r 1 | fzf --no-sort +m --query "$LBUFFER")
+  BUFFER=$(history -n 1 | fzf --no-sort +m --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort --query "$LBUFFER")
   CURSOR=$#BUFFER
 }
 zle -N fzf-history
