@@ -1,45 +1,21 @@
-DOTPATH    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-CANDIDATES := $(wildcard .??*) bin
-EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml
-DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
+.PHONY: help install dependencies clean
 
-.DEFAULT_GOAL := help
+help:
+	@cat $(firstword $(MAKEFILE_LIST))
 
-all:
+install: \
+	dependencies \
+	build
 
-list: ## Show dot files in this repo
-	@$(foreach val, $(DOTFILES), /bin/ls -dF $(val);)
+build:
+	[[ "$$OSTYPE" == "darwin"* ]] && [[ "$$SKIP_BREW" != "1" ]] && \
+		$(MAKE) -f brew.mk install
+	$(MAKE) -f dotfiles.mk install
 
-deploy: ## Create symlink to home directory
-	@echo 'Copyright (c) 2013-2015 BABAROT All Rights Reserved.'
-	@echo '==> Start to deploy dotfiles to home directory.'
-	@echo ''
-	@$(foreach val, $(DOTFILES), ln -sfnv $(abspath $(val)) $(HOME)/$(val);)
+dependencies:
+	type make > /dev/null
 
-init: ## Setup environment settings
-	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/init/init.sh
-
-test: ## Test dotfiles and init scripts
-	@#DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/test/test.sh
-	@echo "test is inactive temporarily"
-
-update: ## Fetch changes for this repo
-	git pull origin master
-	git submodule init
-	git submodule update
-	git submodule foreach git pull origin master
-
-install: update deploy init ## Run make update, deploy, init
-	@exec $$SHELL
-
-reset:
-	git submodule update --init
-
-clean: ## Remove the dot files and this repo
-	@echo 'Remove dot files in your home directory...'
-	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
-
-help: ## Self-documented Makefile
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| sort \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+clean:
+	[[ "$$OSTYPE" == "darwin"* ]] && [[ "$$SKIP_BREW" != "1" ]] && \
+		$(MAKE) -f brew.mk clean
+	$(MAKE) -f dotfiles.mk clean
