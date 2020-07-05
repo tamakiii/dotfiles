@@ -47,6 +47,11 @@ compinit
 source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # fzf
+if [[ -x "$(command -v ag)" ]]; then
+  export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -l -g ""'
+else
+  export FZF_DEFAULT_COMMAND='find .'
+fi
 export FZF_TMUX_HEIGHT="40%"
 export FZF_LEGACY_KEYBINDINGS=1
 export FZF_PREVIEW_FILE_CMD="head -n 10"
