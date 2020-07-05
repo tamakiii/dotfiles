@@ -5,6 +5,8 @@ help:
 
 install: \
 	dependencies \
+	vendor \
+	local \
 	build
 
 build:
@@ -15,7 +17,15 @@ build:
 dependencies:
 	type make > /dev/null
 
+vendor:
+	mkdir $@
+
+local:
+	mkdir $@
+
 clean:
+	rm -rf vendor
+	rm -rf local
 	[[ "$$OSTYPE" == "darwin"* ]] && [[ "$$SKIP_BREW" != "1" ]] && \
 		$(MAKE) -f brew.mk clean
 	$(MAKE) -f dotfiles.mk clean
