@@ -45,6 +45,8 @@ compinit
 
 # autosuggestion
 source ~/.vendor/zsh-users/autosuggestions/zsh-autosuggestions.zsh
+source ~/.vendor/zsh-users/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.vendor/zsh-users/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # fzf
 if [[ -x "$(command -v ag)" ]]; then

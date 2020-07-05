@@ -6,6 +6,8 @@ help:
 install: \
 	dependencies \
 	vendor/zsh-users/autosuggestions \
+	vendor/zsh-users/zsh-syntax-highlighting \
+	vendor/zsh-users/zsh-history-substring-search \
 	build
 
 dependencies:
@@ -17,6 +19,12 @@ build:
 vendor/zsh-users/autosuggestions: vendor/zsh-users
 	[[ -d $@ ]] && touch $@ || git clone https://github.com/zsh-users/zsh-autosuggestions.git $@
 
+vendor/zsh-users/zsh-syntax-highlighting: vendor/zsh-users
+	[[ -d $@ ]] && touch $@ || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $@
+
+vendor/zsh-users/zsh-history-substring-search: vendor/zsh-users
+	[[ -d $@ ]] && touch $@ || git clone https://github.com/zsh-users/zsh-history-substring-search.git $@
+
 vendor/zsh-users: vendor
 	mkdir $@
 
@@ -24,4 +32,6 @@ vendor:
 	mkdir $@
 
 clean:
-	rm -rf vendor/
+	rm -rf vendor/zsh-users/autosuggestions
+	rm -rf vendor/zsh-users/zsh-syntax-highlighting
+	rm -rf vendor/zsh-users/zsh-history-substring-search
