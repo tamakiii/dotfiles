@@ -1,43 +1,45 @@
-DOTPATH    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-CANDIDATES := $(wildcard .??*) bin
-EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml
-DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
+.PHONY: help install dependencies brew build deploy test update clean
 
 .DEFAULT_GOAL := help
 
-all:
+DOTPATH    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+CANDIDATES := $(wildcard .??*)
+EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml
+DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
+
+install: \
+	dependencies \
+	brew \
+	build \
+	deploy
+
+dependencies:
+	type grep > /dev/null
+	type sort > /dev/null
+	type awk > /dev/null
+
+brew:
+	 -$(MAKE) -f brew.mk install
+
+build:
+	$(MAKE) -f build.mk install
+
+update: 
+	$(MAKE) -f build.mk update
 
 list: ## Show dot files in this repo
-	@$(foreach val, $(DOTFILES), /bin/ls -dF $(val);)
+	@$(foreach val, $(DOTFILES), ls -dF $(val);)
 
 deploy: ## Create symlink to home directory
-	@echo 'Copyright (c) 2013-2015 BABAROT All Rights Reserved.'
-	@echo '==> Start to deploy dotfiles to home directory.'
-	@echo ''
 	@$(foreach val, $(DOTFILES), ln -sfnv $(abspath $(val)) $(HOME)/$(val);)
-
-init: ## Setup environment settings
-	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/init/init.sh
 
 test: ## Test dotfiles and init scripts
 	@#DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/test/test.sh
 	@echo "test is inactive temporarily"
 
-update: ## Fetch changes for this repo
-	git pull origin master
-	git submodule init
-	git submodule update
-	git submodule foreach git pull origin master
-
-install: update deploy init ## Run make update, deploy, init
-	@exec $$SHELL
-
-reset:
-	git submodule update --init
-
 clean: ## Remove the dot files and this repo
-	@echo 'Remove dot files in your home directory...'
 	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
+	$(MAKE) -f build.mk clean
 
 help: ## Self-documented Makefile
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
