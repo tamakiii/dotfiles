@@ -1,5 +1,9 @@
 .PHONY: all dependencies
 
+# TODO
+#   Define: ORGANIZATIONS := tamakiii tamakiii-sandbox
+#   Use: $(ORGANIZATIONS)/
+
 ROOT_DIR := $(HOME)/Sites
 ORGANIZATION :=
 REPOSITORY :=
@@ -43,4 +47,4 @@ $(TARGET)/.git/index:
 		git remote add origin git@github.com:$(ORGANIZATION)/$(REPOSITORY).git
 
 $(TARGET)/.git/refs/remotes/origin:
-	cd $(TARGET) && hub create "$(ORGANIZATION)/$(REPOSITORY)" && git push
+	cd $(TARGET) && hub create "$(ORGANIZATION)/$(REPOSITORY)"
