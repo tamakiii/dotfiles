@@ -66,8 +66,17 @@ export FZF_DEFAULT_OPTS="
   --color=info:#af87ff,prompt:#5fff87,pointer:#ff87d7,marker:#ff87d7,spinner:#ff87d7
 "
 
+# History
+setopt hist_ignore_all_dups
+setopt hist_ignore_dups
+setopt share_history
+setopt append_history
+setopt inc_append_history
+setopt hist_no_store
+setopt hist_reduce_blanks
+
 function fzf-history() {
-  BUFFER=$(history -n -r 1 | fzf --no-sort +m --query "$LBUFFER")
+  BUFFER=$(history -n -r 1 | fzf --no-sort +m --tiebreak=index --bind=ctrl-r:toggle-sort --query "$LBUFFER")
   CURSOR=$#BUFFER
 }
 zle -N fzf-history
