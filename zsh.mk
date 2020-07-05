@@ -13,7 +13,7 @@ dependencies:
 	type zsh > /dev/null
 
 build:
-	#
+	# OK
 
 vendor/zsh-users/autosuggestions: vendor/zsh-users
 	[[ -d $@ ]] && touch $@ || git clone https://github.com/zsh-users/zsh-autosuggestions.git $@
