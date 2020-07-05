@@ -1,0 +1,6 @@
+*~
+*.swp
+*.bak
+*.old
+.git
+node_modules
