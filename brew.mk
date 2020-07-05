@@ -8,7 +8,6 @@ help:
 	cat $(lastword $(MAKEFILE_LIST))
 
 dependencies:
-	[[ "$$OSTYPE" != "darwin"* ]] || [[ "$$SKIP_BREW" == "1" ]] && exit 1
 	type brew > /dev/null
 	type git > /dev/null
 
