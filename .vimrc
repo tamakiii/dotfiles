@@ -67,12 +67,6 @@ augroup Filetype
   autocmd BufNewFile,BufRead *.py setlocal tabstop=2 softtabstop=2 shiftwidth=2
 augroup END
 
-"   Shortcut
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap ; :
-nmap <ESC><ESC> :noh<CR><ESC>
-nmap ,, :noh<CR><ESC>
-
 "   vim-plug (https://github.com/junegunn/vim-plug)
 "   `:PlugInstall` to install
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -84,6 +78,8 @@ Plug 'lu-ren/SerialExperimentsLain'
 Plug 'leafgarland/typescript-vim'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
+Plug 'tyru/open-browser.vim'
+Plug 'tyru/open-browser-github.vim'
 
 call plug#end()
 
@@ -94,23 +90,44 @@ filetype on
 filetype indent on
 filetype plugin on
 
+"   Shortcut
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+nmap ; :
+nmap <esc><esc> :noh<cr><esc>
+nmap <leader><space> :noh<cr><esc>
+nmap <leader>r<space> :source $MYVIMRC<cr>
+nmap <leader>e<space> :e %<cr>
+
+"   vim-plug (https://github.com/junegunn/vim-plug)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+nmap <leader>i<space> :PlugInstall<cr>
+
 "   tcomment (https://github.com/tomtom/tcomment_vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap <Leader>c<space> :TComment<CR>
-vmap <Leader>c<space> :TComment<CR>
+nmap <leader>c<space> :TComment<cr>
+vmap <leader>c<space> :TComment<cr>
+
+"   open-browser.vim (https://github.com/tyru/open-browser.vim)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+vmap <leader>o<space> <plug>(openbrowser-open)
+
+"   open-browser-github.vim (https://github.com/tyru/open-browser-github.vim)
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+nmap <leader>og<space> :'<,'>OpenGithubFile<cr>
 
 "   fzf.vim (https://github.com/junegunn/fzf.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap <Leader><tab> <plug>(fzf-maps-n)
+nmap <leader><tab> <plug>(fzf-maps-n)
+imap <leader><tab> <plug>(fzf-maps-i)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
 
-nmap <Leader>f<space> :Files<CR>
-nmap <Leader>fg<space> :GFiles<CR>
-nmap <Leader>fgg<space> :GFiles?<CR>
-nmap <Leader>fb<space> :Buffers<CR>
-nmap <Leader>fw<space> :Windows<CR>
-nmap <Leader>f:<space> :History:<CR>
+nmap <leader>f<space> :Files<cr>
+nmap <leader>fg<space> :GFiles<cr>
+nmap <leader>fgg<space> :GFiles?<cr>
+nmap <leader>fb<space> :Buffers<cr>
+nmap <leader>fw<space> :Windows<cr>
+nmap <leader>f:<space> :History:<cr>
 
 imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
