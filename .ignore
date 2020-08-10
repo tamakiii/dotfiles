@@ -4,3 +4,4 @@
 *.old
 .git
 node_modules
+vendor
