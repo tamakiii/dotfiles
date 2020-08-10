@@ -24,6 +24,7 @@ export LC_MEASUREMENT="ja_JP.UTF-8"
 export LC_IDENTIFICATION="ja_JP.UTF-8"
 export LC_ALL=
 export LESSCHARSET="utf-8"
+export PATH="/usr/local/opt/llvm/bin:$PATH"
 
 # colors
 autoload colors
@@ -75,7 +76,7 @@ setopt hist_no_store
 setopt hist_reduce_blanks
 
 function fzf-history() {
-  BUFFER=$(history -n 1 | fzf --no-sort +m --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort --query "$LBUFFER")
+  BUFFER=$(history -n 1 | fzf --exact --no-sort +m --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort --query "$LBUFFER")
   CURSOR=$#BUFFER
 }
 zle -N fzf-history

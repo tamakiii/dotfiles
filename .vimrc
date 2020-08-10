@@ -85,6 +85,9 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'chr4/nginx.vim'
+Plug 'bronson/vim-trailing-whitespace'
+Plug 'Yggdroot/indentLine'
 
 call plug#end()
 
@@ -122,6 +125,8 @@ nmap <leader>og<space> :'<,'>OpenGithubFile<cr>
 
 "   fzf.vim (https://github.com/junegunn/fzf.vim)
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+let g:fzf_buffers_jump = 1
+
 nmap <leader><tab> <plug>(fzf-maps-n)
 imap <leader><tab> <plug>(fzf-maps-i)
 xmap <leader><tab> <plug>(fzf-maps-x)
@@ -135,6 +140,7 @@ nmap <leader>w<space> :Windows!<cr>
 
 nmap <leader>h<space> :History:<cr>
 nmap <leader>co<space> :Commands!<cr>
+nmap <leader>lsp<space> :Commands("^Lsp")!<cr>
 nmap <leader>ag<space> :Ag!<cr>
 
 imap <c-x><c-k> <plug>(fzf-complete-word)
