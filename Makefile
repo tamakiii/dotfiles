@@ -7,7 +7,6 @@ help:
 install: \
 	dependencies \
 	vendor \
-	brew \
 	zsh \
 	tmux \
 	vim \
