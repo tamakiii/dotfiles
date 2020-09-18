@@ -8,7 +8,7 @@ help:
 
 install: \
 	dependencies \
-	vendor \
+	dotfiles
 	zsh \
 	tmux \
 	vim \
@@ -36,11 +36,7 @@ vim:
 npm:
 	$(MAKE) -f npm.mk install
 
-vendor:
-	mkdir $@
-
 clean:
-	rm -rf vendor
 	$(MAKE) -f dotfiles.mk clean
 	$(MAKE) -f zsh.mk clean
 	$(MAKE) -f tmux.mk clean
