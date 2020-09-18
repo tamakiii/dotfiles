@@ -8,6 +8,7 @@ RUN apt-get update && \
       tmux \
       git \
       ssh \
+      curl \
       && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

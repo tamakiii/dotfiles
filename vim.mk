@@ -7,17 +7,15 @@ help:
 
 install: \
 	dependencies \
-	setup \
+	.vim/undo
+	.vim/backup \
+	.vim/swapfile \
 	.vim/autoload/plug.vim \
 	.vim/repos
 
 dependencies:
 	@type vim > /dev/null
-
-setup: \
-	.vim/backup \
-	.vim/swapfile \
-	.vim/undo
+	@type curl > /dev/null
 
 .vim/autoload/plug.vim: .vim/autoload
 	curl -fLo $@ --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
