@@ -21,7 +21,7 @@ dependencies:
 	curl -fLo $@ --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 .vim/repos:
-	vim +PlugInstall +qall
+	vim -E -s +PlugInstall +qall
 
 .vim/autoload: .vim
 	mkdir -p $@
