@@ -45,8 +45,8 @@ autoload -Uz compinit
 compinit
 
 # autosuggestion
-source ~/.vendor/zsh-users/autosuggestions/zsh-autosuggestions.zsh
-source ~/.vendor/zsh-users/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/dotfiles/vendor/zsh-users/autosuggestions/zsh-autosuggestions.zsh
+source ~/dotfiles/vendor/zsh-users/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # fzf
 if [[ -x "$(command -v ag)" ]]; then
