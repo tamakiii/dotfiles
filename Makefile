@@ -1,5 +1,4 @@
-.PHONY: help install dependencies clean
-.PHONY: brew apt dotfiles zsh tmux vim npm
+.PHONY: help install clean
 
 SHELL := bash
 OS_NAME := $(shell source ./os.sh | grep -e '^NAME=' | awk -F= '{ print $$2 }')
