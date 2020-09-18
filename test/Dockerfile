@@ -12,11 +12,13 @@ RUN apt-get update && \
       ca-certificates \
       locales \
       less \
+      npm \
       && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN localedef -f UTF-8 -i ja_JP ja_JP && \
+    localedef -f UTF-8 -i en_US en_US && \
     update-locale ja_JP.UTF-8
 
 ENV LC_TYPE ja_JP.UTF-8
