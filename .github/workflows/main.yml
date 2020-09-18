@@ -9,10 +9,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Ssh key
-      uses: shimataro/ssh-key-action@v1
+      uses: shimataro/ssh-key-action@v2
       with:
-        private-key: ${{ secrets.SSH_KEY }}
-        public-key: ${{ secrets.SSH_KEY_PUBLIC }}
-        known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+        key: ${{ secrets.SSH_KEY }}
+        name: id_rsa # optional
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+        config: ${{ secrets.CONFIG }} # ssh_config; optional
     - name: Test
       run: make -f ci.mk test
