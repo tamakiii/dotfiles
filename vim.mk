@@ -7,7 +7,7 @@ help:
 
 install: \
 	dependencies \
-	.vim/undo
+	.vim/undo \
 	.vim/backup \
 	.vim/swapfile \
 	.vim/autoload/plug.vim \
