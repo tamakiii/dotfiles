@@ -8,17 +8,17 @@ install: \
 	dependencies \
 	vendor \
 	brew \
-	dotfiles \
 	zsh \
 	tmux \
 	vim \
-	npm
+	npm \
+	dotfiles
 
 dependencies:
 	type make > /dev/null
 
 brew:
-	[[ "$$OSTYPE" == "darwin"* ]] && $(MAKE) -f brew.mk install || true
+	[[ "$$OSTYPE" == "darwin"* ]] && $(MAKE) -f brew.mk install
 
 dotfiles:
 	$(MAKE) -f dotfiles.mk install

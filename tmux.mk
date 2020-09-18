@@ -12,9 +12,11 @@ dependencies:
 	@type git > /dev/null
 
 .tmux/plugins/tpm: .tmux/plugins
-	[[ ! -d "$@" ]] && git clone https://github.com/tmux-plugins/tpm $@ || true
+	[[ -d $@ ]] || git clone https://github.com/tmux-plugins/tpm $@
 
 .tmux/plugins: .tmux
+	mkdir -p $@
+
 .tmux:
 	mkdir -p $@
 
