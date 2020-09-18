@@ -1,5 +1,7 @@
 .PHONY: help install dependencies setup clean
 
+SHELL := bash
+
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 

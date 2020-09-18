@@ -1,5 +1,7 @@
 .PHONY: help install dependencies build clean
 
+SHELL := bash
+
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
@@ -9,7 +11,7 @@ install: \
 	.zsh/vendor/zsh-syntax-highlighting
 
 dependencies:
-	@type zsh > /dev/null
+	type zsh > /dev/null
 
 .zsh/vendor/autosuggestions: .zsh/vendor
 	[[ -d $@ ]] || git clone https://github.com/zsh-users/zsh-autosuggestions.git $@

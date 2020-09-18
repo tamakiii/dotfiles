@@ -1,6 +1,8 @@
 .PHONY: help install dependencies clean
 .PHONY: brew dotfiles zsh tmux vim npm
 
+SHELL := bash
+
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
