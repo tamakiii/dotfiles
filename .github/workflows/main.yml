@@ -10,6 +10,4 @@ jobs:
       uses: actions/checkout@v1
     - name: Brew config
       run: brew config
-    - name: Make install
-      run: |
-        SKIP_BREW=1 bash etc/init/init.sh
+      run: make -f brew.mk install
