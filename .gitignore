@@ -8,7 +8,6 @@
 /.vim/plugged/
 /.tmux/plugins/
 /.tmux/resurrect/
+/.zsh/
 /node_modules/
-/vendor/
-/local/
-/deps/
+/test/vendor/

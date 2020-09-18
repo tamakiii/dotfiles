@@ -1,5 +1,7 @@
 .PHONY: help install dependencies clean
 
+SHELL := bash
+
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
@@ -8,7 +10,7 @@ install: \
 	node_modules
 
 dependencies:
-	type node > /dev/null
+	@type node > /dev/null
 
 node_modules:
 	npm install

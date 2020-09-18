@@ -1,3 +1,4 @@
+SHELL := bash
 
 install: standard docker
 

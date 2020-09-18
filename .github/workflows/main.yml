@@ -8,8 +8,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Brew config
-      run: brew config
-    - name: Make install
-      run: |
-        SKIP_BREW=1 bash etc/init/init.sh
+    - name: Ssh key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - name: Test
+      run: make -f ci.mk test
