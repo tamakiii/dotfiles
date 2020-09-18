@@ -8,7 +8,5 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Config
-      run: brew config
-    - name: make -f brew.mk install
-      run: make -f brew.mk install
+    - name: Test
+      run: make -f ci.mk test
