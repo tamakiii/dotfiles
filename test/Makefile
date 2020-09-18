@@ -1,5 +1,6 @@
 .PHONY: help dependencies setup build test bash clean
 
+SHELL := bash
 NAME := tamakiii/dotfiles/test
 BRANCH := $(shell git -C .. symbolic-ref --short HEAD)
 
