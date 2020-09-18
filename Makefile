@@ -8,7 +8,7 @@ help:
 
 install: \
 	dependencies \
-	dotfiles
+	dotfiles \
 	zsh \
 	tmux \
 	vim \
