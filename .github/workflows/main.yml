@@ -8,5 +8,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - name: Ssh key
+      uses: shimataro/ssh-key-action@v1
+      with:
+        private-key: ${{ secrets.SSH_KEY }}
+        public-key: ${{ secrets.SSH_KEY_PUBLIC }}
+        known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
     - name: Test
       run: make -f ci.mk test
