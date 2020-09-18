@@ -12,7 +12,7 @@ dependencies:
 	@type git > /dev/null
 
 .tmux/plugins/tpm: .tmux/plugins
-	[[ -d $@ ]] || git clone -b $(BRANCH) git@github.com:tmux-plugins/tpm.git $@
+	[[ -d $@ ]] || git clone git@github.com:tmux-plugins/tpm.git $@
 
 .tmux/plugins: .tmux
 	mkdir -p $@

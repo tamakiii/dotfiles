@@ -14,10 +14,10 @@ dependencies:
 	type zsh > /dev/null
 
 .zsh/vendor/autosuggestions: .zsh/vendor
-	[[ -d $@ ]] || git clone -b $(BRANCH) git@github.com:zsh-users/zsh-autosuggestions.git $@
+	[[ -d $@ ]] || git clone git@github.com:zsh-users/zsh-autosuggestions.git $@
 
 .zsh/vendor/zsh-syntax-highlighting: .zsh/vendor
-	[[ -d $@ ]] || git clone -b $(BRANCH) git@github.com:zsh-users/zsh-syntax-highlighting.git $@
+	[[ -d $@ ]] || git clone git@github.com:zsh-users/zsh-syntax-highlighting.git $@
 
 .zsh/vendor: .zsh
 	mkdir -p $@
