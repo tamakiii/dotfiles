@@ -10,7 +10,5 @@ jobs:
       uses: actions/checkout@v1
     - name: Config
       run: brew config
-    - name: make install
-      run: make install
     - name: make -f brew.mk install
       run: make -f brew.mk install
