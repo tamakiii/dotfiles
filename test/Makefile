@@ -21,7 +21,7 @@ bash: vendor/dotfiles
 	docker run -it --rm -w /root/dotfiles -v $$(realpath $<):/root/dotfiles -v ~/.ssh:/root/.ssh $(NAME) bash -l
 
 vendor/dotfiles:
-	[[ -d $@ ]] || git clone -b $(BRANCH) https://github.com/tamakiii/dotfiles.git $@
+	[[ -d $@ ]] || git clone -b $(BRANCH) git@github.com:tamakiii/dotfiles.git $@
 
 dependencies:
 	@type docker > /dev/null
