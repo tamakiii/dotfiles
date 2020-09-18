@@ -8,10 +8,11 @@ install: \
 	.tmux/plugins/tpm
 
 dependencies:
-	type git > /dev/null
+	@type tmux > /dev/null
+	@type git > /dev/null
 
 .tmux/plugins/tpm: .tmux/plugins
-		git clone https://github.com/tmux-plugins/tpm $@
+	[[ ! -d "$@" ]] && git clone https://github.com/tmux-plugins/tpm $@ || true
 
 .tmux/plugins: .tmux
 .tmux:

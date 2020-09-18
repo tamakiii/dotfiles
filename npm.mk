@@ -8,7 +8,7 @@ install: \
 	node_modules
 
 dependencies:
-	type node > /dev/null
+	@type node > /dev/null
 
 node_modules:
 	npm install

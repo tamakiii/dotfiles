@@ -1,7 +1,7 @@
 .PHONY: help install dependencies build clean
 
 help:
-	@cat $(firstword ($MAKEFILE_LIST))
+	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
 	dependencies \
