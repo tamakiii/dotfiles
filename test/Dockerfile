@@ -16,10 +16,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN locale-gen && \
-    sed -i 's/^# ja_JP.UTF-8 UTF-8$/ja_JP.UTF-8 UTF-8/g' /etc/locale.gen && \
+RUN localedef -f UTF-8 -i ja_JP ja_JP && \
     update-locale ja_JP.UTF-8
 
-# ENV LANG ja_JP.UTF-8
-# ENV LANGUAGE ja_JP:en
-# ENV LC_ALL ja_JP.UTF-8
+ENV LC_TYPE ja_JP.UTF-8
+ENV LC_ALL ja_JP.UTF-8
+ENV LANG ja_JP.UTF-8
