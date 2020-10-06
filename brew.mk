@@ -20,11 +20,14 @@ setup: \
 	dependencies \
 	versions
 
-install:
-	brew bundle install
+install: Brewfile
+	brew bundle install --file=$<
 
 upgrade:
 	brew upgrade
+
+update:
+	brew update
 
 Brewfile:
 	brew bundle dump --quiet --file=/dev/stdout | sort > $@
