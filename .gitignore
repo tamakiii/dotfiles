@@ -11,3 +11,4 @@
 /.zsh/
 /node_modules/
 /test/vendor/
+/vendor/
