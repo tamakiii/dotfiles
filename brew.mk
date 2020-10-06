@@ -1,4 +1,4 @@
-.PHONY: help setup install dependencies versions upgrade diff unshallow clean
+.PHONY: help setup install dependencies versions upgrade update diff unshallow clean
 
 SHELL := bash
 DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -23,7 +23,7 @@ setup: \
 install: Brewfile
 	brew bundle install --file=$<
 
-upgrade:
+upgrade: update
 	brew upgrade
 
 update:
