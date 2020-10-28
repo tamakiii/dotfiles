@@ -1,5 +1,4 @@
 " init
-set all&
 autocmd!
 
 syntax on
