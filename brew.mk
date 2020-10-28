@@ -1,4 +1,4 @@
-.PHONY: help dependencies versions install build upgrade diff unshallow clean
+.PHONY: help setup install dependencies versions upgrade update diff unshallow clean
 
 SHELL := bash
 DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -16,19 +16,21 @@ versions:
 	@git --version
 	@diff --version | head -n 1
 
-install: \
+setup: \
 	dependencies \
-	versions \
-	build
+	versions
 
-build:
-	brew bundle install
+install: Brewfile
+	brew bundle install --file=$<
 
-upgrade:
+upgrade: update
 	brew upgrade
 
+update:
+	brew update
+
 Brewfile:
-	brew bundle dump --file=/dev/stdout | sort > $@
+	brew bundle dump --quiet --file=/dev/stdout | sort > $@
 
 diff:
 	@diff -u <(cat Brewfile | sort) <(brew bundle dump --file=/dev/stdout | sort)

@@ -1,33 +1,38 @@
+" init
+set all&
+autocmd!
 
-"   Environments
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-let s:uname = system("echo -n \"$(uname)\"")
-let s:hostname = system("echo -n \"$(hostname -s)\"")
+syntax on
 
-"   Charsets
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+language en_US.UTF-8
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
 set encoding=utf-8
 set fileencodings=ucs-bom,utf-8,default,sjis,euc-jp,latin1
-language en_US.UTF-8
-
-"   Editor & View
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+set noswapfile
+set nobackup
+set noundofile
 set nowrap
 set noerrorbells
-set laststatus=2
 set noshowmode
+set nocompatible
+set laststatus=2
 set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
 set iminsert=0
 set imsearch=0
 set clipboard=unnamed
 set browsedir=current
-
+set colorcolumn=80
 set tabstop=2
-set softtabstop=0
+set softtabstop=2
 set shiftwidth=2
 set expandtab
 set autoindent
 set smartindent
+set smartcase
 set backspace=indent,eol,start
 set number
 set ruler
@@ -36,17 +41,7 @@ set showmatch
 set title
 set matchtime=3
 set splitright
-
-"   Directories
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set backupdir=~/.vim/backup
-set directory=~/.vim/swapfile
-if v:version > 730
-  set undodir=~/.vim/undo
-endif
-
-"   Search
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+set timeout timeoutlen=1000 ttimeoutlen=50
 set ignorecase
 if v:version > 730
   set wildignorecase
@@ -56,137 +51,93 @@ set wildmode=list:longest,full
 set hlsearch
 set incsearch
 
-"   Keys
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-let mapleader = ","
-noremap \ ,
-
-"   Config by filetype
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 augroup Filetype
   autocmd!
-  autocmd BufNewFile,BufRead *.py setlocal tabstop=2 softtabstop=2 shiftwidth=2
+  autocmd FileType php setlocal tabstop=4 softtabstop=4 shiftwidth=4
 augroup END
 
-"   vim-plug (https://github.com/junegunn/vim-plug)
-"   `:PlugInstall` to install
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+let mapleader = ","
 
 call plug#begin('~/.vim/plugged')
-
-Plug 'tomtom/tcomment_vim'
+Plug 'sheerun/vim-polyglot'
 Plug 'lu-ren/SerialExperimentsLain'
-Plug 'leafgarland/typescript-vim'
+Plug 'ghifarit53/tokyonight-vim'
+" Plug 'jremmen/vim-ripgrep'
+Plug 'tomtom/tcomment_vim'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+Plug 'bronson/vim-trailing-whitespace'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'tyru/open-browser.vim'
 Plug 'tyru/open-browser-github.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'mattn/vim-lsp-settings'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
-Plug 'chr4/nginx.vim'
-Plug 'bronson/vim-trailing-whitespace'
-Plug 'Yggdroot/indentLine'
-
+Plug 'vim-vdebug/vdebug'
+Plug 'preservim/nerdtree'
+Plug 'liuchengxu/vim-which-key'
+Plug 'chrisbra/Colorizer'
+Plug 'guns/xterm-color-table.vim'
 call plug#end()
 
-"   Basics
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-syntax on
-filetype on
-filetype indent on
-filetype plugin on
+" vim-lsp
+let g:lsp_signs_enabled = 1
+let g:lsp_diagnostics_echo_cursor = 1
 
-"   Shortcut
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap ; :
-nmap <esc><esc> :noh<cr><esc>
-nmap <leader><space> :noh<cr><esc>
-nmap <leader>r<space> :source $MYVIMRC<cr>
-nmap <leader>e<space> :e %<cr>
+nmap ?? :LspHover<cr>
+nmap ?! :LspDocumentDiagnostics<cr>
 
-"   vim-plug (https://github.com/junegunn/vim-plug)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap <leader>i<space> :PlugInstall<cr>
+" prabirshrestha/asyncomplete.vim
+inoremap <expr> <tab>   pumvisible() ? "\<c-n>" : "\<tab>"
+inoremap <expr> <S-tab> pumvisible() ? "\<c-p>" : "\<S-tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
 
-"   tcomment (https://github.com/tomtom/tcomment_vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap <leader>c<space> :TComment<cr>
-vmap <leader>c<space> :TComment<cr>
-
-"   open-browser.vim (https://github.com/tyru/open-browser.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vmap <leader>o<space> <plug>(openbrowser-open)
-
-"   open-browser-github.vim (https://github.com/tyru/open-browser-github.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nmap <leader>og<space> :'<,'>OpenGithubFile<cr>
-
-"   fzf.vim (https://github.com/junegunn/fzf.vim)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+" fzf.vim
 let g:fzf_buffers_jump = 1
+nmap <leader>p :Files<cr>
+nmap <leader>P :Commands<cr>
+nmap <leader>b :Buffers<cr>
+nmap <leader>g :GFiles<cr>
+nmap <leader>g? :GFiles?<cr>
 
-nmap <leader><tab> <plug>(fzf-maps-n)
-imap <leader><tab> <plug>(fzf-maps-i)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
-
-nmap <leader>f<space> :Files!<cr>
-nmap <leader>g<space> :GFiles<cr>
-nmap <leader>gs<space> :GFiles!?<cr>
-nmap <leader>b<space> :Buffers<cr>
-nmap <leader>w<space> :Windows!<cr>
-
-nmap <leader>h<space> :History:<cr>
-nmap <leader>co<space> :Commands!<cr>
-nmap <leader>lsp<space> :Commands("^Lsp")!<cr>
-nmap <leader>ag<space> :Ag!<cr>
+nmap <C-x>f <plug>(fzf-maps-n)
+imap <C-x>f <plug>(fzf-maps-i)
+xmap <C-x>f <plug>(fzf-maps-x)
+omap <C-x>f <plug>(fzf-maps-o)
 
 imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
-"   vim-lsp (https://github.com/prabirshrestha/vim-lsp)
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-let g:lsp_signs_enabled = 1
-let g:lsp_diagnostics_echo_cursor = 1
+" vim-which-key
+nmap <leader>? :<c-u>WhichKey ''<cr>
 
-nmap <leader>?<space> :LspHover<cr>
-nmap ?? :LspHover<cr>
+" Shortcuts
+function! Esc()
+  :let @/ = ""
+  :call popup_clear()
+endfunction
 
-nmap <leader>ref<space> :LspReference<cr>
-nmap <leader>rename<space> :LspRename<cr>
-nmap <leader>stat<space> :LspStatus<cr>
-nmap <leader>status<space> :LspStatus<cr>
+nmap ; :
+nmap <esc><esc> :call Esc()<cr>
+nmap <c-x>r :source $MYVIMRC<cr>
 
-nmap <leader>error<space> :LspNextError<cr>
-nmap <leader>en<space> :LspNextError<cr>
-nmap <leader>ep<space> :LspPreviousError<cr>
-
-nmap <leader>warn<space> :LspNextWarning<cr>
-nmap <leader>warning<space> :LspNextWarning<cr>
-nmap <leader>wn<space> :LspNextWarning<cr>
-nmap <leader>wp<space> :LspPreviousWarning<cr>
-
-nmap <leader>def<space> :LspDefinition<cr>
-nmap <leader>dec<space> :LspDeclaration<cr>
-nmap <leader>decl<space> :LspDeclaration<cr>
-nmap <leader>impl<space> :LspImplementation<cr>
-nmap <leader>type<space> :LspTypeDefinition<cr>
-nmap <leader>diag<space> :LspDocumentDiagnostics<cr>
-
-nmap <leader>def? :LspPeekDefinition<cr>
-nmap <leader>dec? :LspPeekDeclaration<cr>
-nmap <leader>decl? :LspPeekDeclaration<cr>
-nmap <leader>impl? :LspPeekImplementation<cr>
-nmap <leader>type? :LspPeekTypeDefinition<cr>
-nmap <leader>diag? :LspDocumentDiagnostics<cr>
-
-"   Colorscheme
-" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+" color scheme
 colorscheme SerialExperimentsLain
 hi Normal ctermbg=NONE guibg=NONE
-hi NonText ctermbg=NONE guibg=NONE
+" hi NonText ctermbg=NONE guibg=NONE
 
+"colorscheme koehler
+"hi Normal ctermbg=NONE guibg=NONE
+" colorscheme lain
+
+" let g:tokyonight_enable_italic_comment = 1
+" let g:tokyonight_transparent_background = 1
+" colorscheme tokyonight
+" highlight clear Comment
+" highlight clear Search
+" highlight Search term=reverse ctermbg=242 guibg=#32344a
+" hi Normal ctermbg=NONE guibg=NONE
+" hi NonText ctermbg=NONE guibg=NONE

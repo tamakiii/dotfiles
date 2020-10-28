@@ -8,23 +8,29 @@ SHELL=$(which zsh)
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # export
-export LANG="ja_JP.UTF-8"
-export LANGUAGE="ja_JP:ja"
-export LC_CTYPE="ja_JP.UTF-8"
-export LC_NUMERIC="ja_JP.UTF-8"
-export LC_TIME="ja_JP.UTF-8"
-export LC_COLLATE="ja_JP.UTF-8"
-export LC_MONETARY="ja_JP.UTF-8"
-export LC_MESSAGES="ja_JP.UTF-8"
-export LC_PAPER="ja_JP.UTF-8"
-export LC_NAME="ja_JP.UTF-8"
-export LC_ADDRESS="ja_JP.UTF-8"
-export LC_TELEPHONE="ja_JP.UTF-8"
-export LC_MEASUREMENT="ja_JP.UTF-8"
-export LC_IDENTIFICATION="ja_JP.UTF-8"
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US:ja"
+export LC_CTYPE="en_US.UTF-8"
+export LC_NUMERIC="en_US.UTF-8"
+export LC_TIME="en_US.UTF-8"
+export LC_COLLATE="en_US.UTF-8"
+export LC_MONETARY="en_US.UTF-8"
+export LC_MESSAGES="en_US.UTF-8"
+export LC_PAPER="en_US.UTF-8"
+export LC_NAME="en_US.UTF-8"
+export LC_ADDRESS="en_US.UTF-8"
+export LC_TELEPHONE="en_US.UTF-8"
+export LC_MEASUREMENT="en_US.UTF-8"
+export LC_IDENTIFICATION="en_US.UTF-8"
 export LC_ALL=
 export LESSCHARSET="utf-8"
+
+# paths
+export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
+export PATH="/usr/local/opt/ruby/bin:$PATH"
+export PATH="/usr/local/lib/ruby/gems/2.7.0/bin:$PATH"
+export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
 # colors
 autoload colors
