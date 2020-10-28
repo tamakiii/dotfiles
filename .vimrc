@@ -61,8 +61,6 @@ let mapleader = ","
 call plug#begin('~/.vim/plugged')
 Plug 'sheerun/vim-polyglot'
 Plug 'lu-ren/SerialExperimentsLain'
-Plug 'ghifarit53/tokyonight-vim'
-" Plug 'jremmen/vim-ripgrep'
 Plug 'tomtom/tcomment_vim'
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/asyncomplete.vim'
@@ -72,13 +70,9 @@ Plug 'mattn/vim-lsp-settings'
 Plug 'bronson/vim-trailing-whitespace'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
-Plug 'tyru/open-browser.vim'
-Plug 'tyru/open-browser-github.vim'
+Plug 'k0kubun/vim-open-github'
 Plug 'vim-vdebug/vdebug'
 Plug 'preservim/nerdtree'
-Plug 'liuchengxu/vim-which-key'
-Plug 'chrisbra/Colorizer'
-Plug 'guns/xterm-color-table.vim'
 call plug#end()
 
 " vim-lsp
@@ -111,9 +105,6 @@ imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
-" vim-which-key
-nmap <leader>? :<c-u>WhichKey ''<cr>
-
 " Shortcuts
 function! Esc()
   :let @/ = ""
@@ -127,17 +118,3 @@ nmap <c-x>r :source $MYVIMRC<cr>
 " color scheme
 colorscheme SerialExperimentsLain
 hi Normal ctermbg=NONE guibg=NONE
-" hi NonText ctermbg=NONE guibg=NONE
-
-"colorscheme koehler
-"hi Normal ctermbg=NONE guibg=NONE
-" colorscheme lain
-
-" let g:tokyonight_enable_italic_comment = 1
-" let g:tokyonight_transparent_background = 1
-" colorscheme tokyonight
-" highlight clear Comment
-" highlight clear Search
-" highlight Search term=reverse ctermbg=242 guibg=#32344a
-" hi Normal ctermbg=NONE guibg=NONE
-" hi NonText ctermbg=NONE guibg=NONE
