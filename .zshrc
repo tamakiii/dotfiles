@@ -30,7 +30,8 @@ export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
 export PATH="/usr/local/lib/ruby/gems/2.7.0/bin:$PATH"
 export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
-export PATH="$PATH:/usr/local/bin"
+export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
 
 # colors
 autoload colors
@@ -55,8 +56,8 @@ source ~/.zsh/vendor/autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/vendor/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # fzf
-if [[ -x "$(command -v ag)" ]]; then
-  export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -l -g ""'
+if [[ -x "$(command -v rg)" ]]; then
+  export FZF_DEFAULT_COMMAND='rg --hidden --files --follow --glob "!.git/*'
 else
   export FZF_DEFAULT_COMMAND='find .'
 fi
