@@ -57,6 +57,9 @@ augroup END
 
 let mapleader = ","
 
+" vimspector
+let g:vimspector_enable_mappings = 'VISUAL_STUDIO'
+
 call plug#begin('~/.vim/plugged')
 Plug 'sheerun/vim-polyglot'
 Plug 'lu-ren/SerialExperimentsLain'
@@ -71,7 +74,6 @@ Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'k0kubun/vim-open-github'
 Plug 'vim-vdebug/vdebug'
-Plug 'preservim/nerdtree'
 call plug#end()
 
 " vim-lsp
@@ -88,11 +90,14 @@ inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
 
 " fzf.vim
 let g:fzf_buffers_jump = 1
-nmap <leader>p :Files<cr>
-nmap <leader>P :Commands<cr>
+nmap <leader>f :Files<cr>
+nmap <leader>c :Commands<cr>
 nmap <leader>b :Buffers<cr>
 nmap <leader>g :GFiles<cr>
 nmap <leader>g? :GFiles?<cr>
+nmap <leader>m :Maps<cr>
+nmap <leader>h :History:<cr>
+nmap <leader>/ :Rg<cr>
 
 nmap <C-x>f <plug>(fzf-maps-n)
 imap <C-x>f <plug>(fzf-maps-i)
@@ -113,6 +118,9 @@ endfunction
 nmap ; :
 nmap <esc><esc> :call Esc()<cr>
 nmap <c-x>r :source $MYVIMRC<cr>
+nmap <c-x>e :e $MYVIMRC<cr>
+nmap <C-j> :bprev<CR>
+nmap <C-k> :bnext<CR>
 
 " color scheme
 colorscheme SerialExperimentsLain
