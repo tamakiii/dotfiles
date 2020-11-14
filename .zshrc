@@ -1,4 +1,5 @@
 # zsh
+emulate -LR zsh
 umask 002
 bindkey -v
 bindkey -e
@@ -33,6 +34,10 @@ export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 
+# Editor
+export VISUAL=$(which vim)
+export EDITOR=$(which vim)
+
 # colors
 autoload colors
 colors
@@ -57,7 +62,7 @@ source ~/.zsh/vendor/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # fzf
 if [[ -x "$(command -v rg)" ]]; then
-  export FZF_DEFAULT_COMMAND='rg --hidden --files --follow --glob "!.git/*'
+  export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
 else
   export FZF_DEFAULT_COMMAND='find .'
 fi
