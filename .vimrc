@@ -1,5 +1,4 @@
 " init
-set all&
 autocmd!
 
 syntax on
@@ -56,13 +55,19 @@ augroup Filetype
   autocmd FileType php setlocal tabstop=4 softtabstop=4 shiftwidth=4
 augroup END
 
+augroup FileExt
+  autocmd!
+  autocmd BufEnter,BufNew *.docker set filetype=dockerfile
+augroup END
+
 let mapleader = ","
+
+" vimspector
+let g:vimspector_enable_mappings = 'VISUAL_STUDIO'
 
 call plug#begin('~/.vim/plugged')
 Plug 'sheerun/vim-polyglot'
 Plug 'lu-ren/SerialExperimentsLain'
-Plug 'ghifarit53/tokyonight-vim'
-" Plug 'jremmen/vim-ripgrep'
 Plug 'tomtom/tcomment_vim'
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/asyncomplete.vim'
@@ -72,13 +77,9 @@ Plug 'mattn/vim-lsp-settings'
 Plug 'bronson/vim-trailing-whitespace'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
-Plug 'tyru/open-browser.vim'
-Plug 'tyru/open-browser-github.vim'
-Plug 'vim-vdebug/vdebug'
-Plug 'preservim/nerdtree'
-Plug 'liuchengxu/vim-which-key'
-Plug 'chrisbra/Colorizer'
-Plug 'guns/xterm-color-table.vim'
+Plug 'k0kubun/vim-open-github'
+" Plug 'vim-vdebug/vdebug'
+Plug 'puremourning/vimspector'
 call plug#end()
 
 " vim-lsp
@@ -95,11 +96,14 @@ inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
 
 " fzf.vim
 let g:fzf_buffers_jump = 1
-nmap <leader>p :Files<cr>
-nmap <leader>P :Commands<cr>
+nmap <leader>f :Files<cr>
+nmap <leader>c :Commands<cr>
 nmap <leader>b :Buffers<cr>
 nmap <leader>g :GFiles<cr>
 nmap <leader>g? :GFiles?<cr>
+nmap <leader>m :Maps<cr>
+nmap <leader>h :History:<cr>
+nmap <leader>/ :Rg<cr>
 
 nmap <C-x>f <plug>(fzf-maps-n)
 imap <C-x>f <plug>(fzf-maps-i)
@@ -111,8 +115,8 @@ imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
-" vim-which-key
-nmap <leader>? :<c-u>WhichKey ''<cr>
+" vimspector
+source $HOME/.vim/config/vimspector.vim
 
 " Shortcuts
 function! Esc()
@@ -123,21 +127,10 @@ endfunction
 nmap ; :
 nmap <esc><esc> :call Esc()<cr>
 nmap <c-x>r :source $MYVIMRC<cr>
+nmap <c-x>e :e $MYVIMRC<cr>
+nmap <C-h> :tabp<CR>
+nmap <C-l> :tabn<CR>
 
 " color scheme
 colorscheme SerialExperimentsLain
 hi Normal ctermbg=NONE guibg=NONE
-" hi NonText ctermbg=NONE guibg=NONE
-
-"colorscheme koehler
-"hi Normal ctermbg=NONE guibg=NONE
-" colorscheme lain
-
-" let g:tokyonight_enable_italic_comment = 1
-" let g:tokyonight_transparent_background = 1
-" colorscheme tokyonight
-" highlight clear Comment
-" highlight clear Search
-" highlight Search term=reverse ctermbg=242 guibg=#32344a
-" hi Normal ctermbg=NONE guibg=NONE
-" hi NonText ctermbg=NONE guibg=NONE
