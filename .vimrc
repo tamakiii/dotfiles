@@ -55,6 +55,11 @@ augroup Filetype
   autocmd FileType php setlocal tabstop=4 softtabstop=4 shiftwidth=4
 augroup END
 
+augroup FileExt
+  autocmd!
+  autocmd BufEnter,BufNew *.docker set filetype=dockerfile
+augroup END
+
 let mapleader = ","
 
 " vimspector
@@ -73,7 +78,8 @@ Plug 'bronson/vim-trailing-whitespace'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'k0kubun/vim-open-github'
-Plug 'vim-vdebug/vdebug'
+" Plug 'vim-vdebug/vdebug'
+Plug 'puremourning/vimspector'
 call plug#end()
 
 " vim-lsp
@@ -109,6 +115,9 @@ imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
+" vimspector
+source $HOME/.vim/config/vimspector.vim
+
 " Shortcuts
 function! Esc()
   :let @/ = ""
@@ -119,8 +128,8 @@ nmap ; :
 nmap <esc><esc> :call Esc()<cr>
 nmap <c-x>r :source $MYVIMRC<cr>
 nmap <c-x>e :e $MYVIMRC<cr>
-nmap <C-j> :bprev<CR>
-nmap <C-k> :bnext<CR>
+nmap <C-h> :tabp<CR>
+nmap <C-l> :tabn<CR>
 
 " color scheme
 colorscheme SerialExperimentsLain
