@@ -16,7 +16,8 @@ install: \
 	tmux \
 	vim \
 	npm \
-	dotfiles
+	dotfiles \
+	ssh
 
 dependencies:
 	type make > /dev/null
@@ -36,9 +37,27 @@ vim:
 npm:
 	$(MAKE) -f npm.mk install
 
+ssh: | \
+	~/.ssh/id_ed25519 \
+	~/.ssh/config
+
+~/.ssh/id_ed25519: | ~/.ssh
+	ssh-keygen -t ed2551
+
+~/.ssh/config: | ~/.ssh
+	echo "Host *" > $@
+	echo "  AddKeysToAgent yes" >> $@
+	echo "  UseKeychain yes" >> $@
+	echo "  IdentityFile ~/.ssh/id_ed25519" >> $@
+	chmod 600 $@
+
+~/.ssh:
+	-mkdir $@
+
 clean:
 	$(MAKE) -f dotfiles.mk clean
 	$(MAKE) -f zsh.mk clean
 	$(MAKE) -f tmux.mk clean
 	$(MAKE) -f vim.mk clean
 	$(MAKE) -f npm.mk clean
+	rm -rf ~/.ssh/id_ed25519 ~/.ssh/config
