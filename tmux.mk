@@ -13,14 +13,14 @@ dependencies:
 	@type tmux > /dev/null
 	@type git > /dev/null
 
-.tmux/plugins/tpm: .tmux/plugins
+.tmux/plugins/tpm: | .tmux/plugins
 	[[ -d $@ ]] || git clone git@github.com:tmux-plugins/tpm.git $@
 
 .tmux/plugins: .tmux
-	mkdir -p $@
+	-mkdir -p $@
 
 .tmux:
-	mkdir -p $@
+	-mkdir -p $@
 
 clean:
 	rm -rf .tmux

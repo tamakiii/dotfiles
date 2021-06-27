@@ -1,10 +1,13 @@
-.PHONY: help install dependencies clean
-.PHONY: brew dotfiles zsh tmux vim npm
+.PHONY: help setup install dependencies clean
+.PHONY: dotfiles zsh tmux vim npm
 
 SHELL := bash
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
+
+setup:
+	[[ "$$OSTYPE" == "darwin"* ]] && $(MAKE) -f brew.mk setup install
 
 install: \
 	dependencies \
@@ -17,9 +20,6 @@ install: \
 
 dependencies:
 	type make > /dev/null
-
-brew:
-	[[ "$$OSTYPE" == "darwin"* ]] && $(MAKE) -f brew.mk install
 
 dotfiles:
 	$(MAKE) -f dotfiles.mk install

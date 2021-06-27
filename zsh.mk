@@ -13,17 +13,17 @@ install: \
 dependencies:
 	type zsh > /dev/null
 
-.zsh/vendor/autosuggestions: .zsh/vendor
+.zsh/vendor/autosuggestions: | .zsh/vendor
 	[[ -d $@ ]] || git clone git@github.com:zsh-users/zsh-autosuggestions.git $@
 
 .zsh/vendor/zsh-syntax-highlighting: .zsh/vendor
 	[[ -d $@ ]] || git clone git@github.com:zsh-users/zsh-syntax-highlighting.git $@
 
 .zsh/vendor: .zsh
-	mkdir -p $@
+	-mkdir -p $@
 
 .zsh:
-	mkdir -p $@
+	-mkdir -p $@
 
 clean:
 	rm r-f .zsh/vendor
