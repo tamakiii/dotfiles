@@ -78,7 +78,6 @@ Plug 'bronson/vim-trailing-whitespace'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'k0kubun/vim-open-github'
-" Plug 'vim-vdebug/vdebug'
 Plug 'puremourning/vimspector'
 call plug#end()
 
@@ -128,8 +127,8 @@ nmap ; :
 nmap <esc><esc> :call Esc()<cr>
 nmap <c-x>r :source $MYVIMRC<cr>
 nmap <c-x>e :e $MYVIMRC<cr>
-nmap <C-h> :tabp<CR>
-nmap <C-l> :tabn<CR>
+nmap <C-x>h :tabp<CR>
+nmap <C-x>l :tabn<CR>
 
 " color scheme
 colorscheme SerialExperimentsLain

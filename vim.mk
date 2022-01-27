@@ -1,4 +1,4 @@
-.PHONY: help install dependencies setup clean
+.PHONY: help install update dependencies setup clean
 
 SHELL := bash
 
@@ -12,6 +12,9 @@ install: \
 	.vim/swapfile \
 	.vim/autoload/plug.vim \
 	.vim/repos
+
+update:
+	vim -E -s +PlugUpdate +visual +qall
 
 dependencies:
 	@type vim > /dev/null
