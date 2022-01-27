@@ -78,7 +78,6 @@ Plug 'bronson/vim-trailing-whitespace'
 Plug 'junegunn/fzf', { 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'k0kubun/vim-open-github'
-" Plug 'vim-vdebug/vdebug'
 Plug 'puremourning/vimspector'
 call plug#end()
 
