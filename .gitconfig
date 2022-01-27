@@ -11,5 +11,5 @@
 [pager]
 	branch = cat
 	log = less -R -F -X
-[credential]
-	helper = osxkeychain
+[init]
+	defaultBranch = main
