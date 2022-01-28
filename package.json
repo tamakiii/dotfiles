@@ -7,10 +7,9 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "gtop": "^1.0.0",
-    "intelephense": "^1.4.1",
-    "npm-check-updates": "^3.1.2",
-    "typescript": "^3.3.3333",
-    "typescript-language-server": "^0.3.7"
+    "intelephense": "^1.8.0",
+    "npm-check-updates": "^12.2.1",
+    "typescript": "^4.5.5",
+    "typescript-language-server": "^0.9.5"
   }
 }
