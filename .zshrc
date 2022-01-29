@@ -10,7 +10,7 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # export
 export LANG="en_US.UTF-8"
-export LANGUAGE="en_US:ja"
+export LANGUAGE="en_US:us"
 export LC_CTYPE="en_US.UTF-8"
 export LC_NUMERIC="en_US.UTF-8"
 export LC_TIME="en_US.UTF-8"
