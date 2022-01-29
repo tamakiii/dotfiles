@@ -28,15 +28,16 @@ export LESSCHARSET="utf-8"
 
 # paths
 export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/opt/ruby/bin:$PATH"
-export PATH="/usr/local/lib/ruby/gems/2.7.0/bin:$PATH"
-export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
-export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # export PATH="/usr/local/opt/ruby/bin:$PATH"
-export PATH="/usr/local/bin:$PATH"
+# export PATH="/usr/local/lib/ruby/gems/2.7.0/bin:$PATH"
+export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
+# export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+# export PATH="/usr/local/opt/ruby/bin:$PATH"
 export PATH="$HOME/.symfony/bin:$PATH"
-export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
-export PATH="$PATH:$HOME/Library/Android/sdk/emulator"
+# export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
+# export PATH="$PATH:$HOME/Library/Android/sdk/emulator"
+export PATH="$HOME/.rbenv/shims:$PATH"
+export PATH="/usr/local/bin:$PATH"
 
 # google-cloud-sdk
 source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
