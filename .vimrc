@@ -1,0 +1,4 @@
+" init
+autocmd!
+
+syntax on
