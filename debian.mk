@@ -4,6 +4,7 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: install-packages
+	chsh -s $(shell which zsh)
 	$(MAKE) -f vim.mk install
 
 install-packages:
@@ -13,6 +14,7 @@ install-packages:
 	  vim \
 	  curl \
 	  ca-certificates \
+	  zsh \
 	  man
 
 update:
