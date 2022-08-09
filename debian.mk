@@ -3,8 +3,8 @@
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install: update
-	apt install -y tmux git
+install:
+	apt install -y tmux git vim
 
 update:
 	apt update
