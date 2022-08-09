@@ -1,10 +1,18 @@
-.PHONY: help install update clean
+.PHONY: help install install-packages update clean
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install:
-	apt install -y tmux git vim
+install: install-packages
+	$(MAKE) -f vim.mk install
+
+install-packages:
+	apt install -y --no-install-recommends \
+	  tmux \
+	  git \
+	  vim \
+	  curl \
+	  man
 
 update:
 	apt update
