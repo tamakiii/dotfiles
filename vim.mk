@@ -10,6 +10,12 @@ install: \
 update:
 	vim -c 'PlugUpdate --sync' -c qa
 
-~/.vim/autoload/plug.vim:
-	curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+~/.vim/autoload/plug.vim: ~/.vim/autoload
+	curl -fLo $@ \
 	  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+~/.vim/autoload:
+	mkdir -p ~/.vim/autoload
+
+clean:
+	rm -rf ~/.vim/autoload
