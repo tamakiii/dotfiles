@@ -1,10 +1,13 @@
-.PHONY: help install clean
+.PHONY: help install update clean
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install:
-	echo "hello linux"
+install: update
+	apt install -y tmux git
+
+update:
+	apt update
 
 clean:
-	echo "nothing to clean"
+	apt clean
