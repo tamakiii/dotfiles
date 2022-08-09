@@ -7,6 +7,7 @@ syntax on
 set noswapfile
 set nobackup
 set noundofile
+set number
 
 " let
 let mapleader = ","
