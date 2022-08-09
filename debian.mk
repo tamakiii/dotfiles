@@ -12,6 +12,7 @@ install-packages:
 	  git \
 	  vim \
 	  curl \
+	  ca-certificates \
 	  man
 
 update:
