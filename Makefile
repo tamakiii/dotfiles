@@ -1,6 +1,6 @@
 .PHONY: help install clean
 
-UNAME := $(shell uname | tr '[:upper:]' '[:lower:]')
+UNAME := $(shell ./script/os-check.sh)
 MAKEFILE := $(UNAME).mk
 
 help:
