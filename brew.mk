@@ -5,3 +5,9 @@ help:
 
 install: Brewfile
 	brew bundle install --file=$<
+
+Brewfile:
+	brew bundle dump --quiet --file=/dev/stdout | sort > $@
+
+clean:
+	brew bundle cleanup --force

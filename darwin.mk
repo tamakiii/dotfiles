@@ -1,7 +1,11 @@
-.PHONY: help install
+.PHONY: help install clean
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install:
-	echo "Hello, Darwin"
+	$(MAKE) -f brew.mk $@
+
+
+clean:
+	$(MAKE) -f brew.mk $@
