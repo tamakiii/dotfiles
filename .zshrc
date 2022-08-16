@@ -1,6 +1,10 @@
 # antigen
 source ~/.zsh/antigen.zsh
 
+# antigen
+antigen bundle zsh-users/zsh-autosuggestions
+antigen apply
+
 # general
 umask 002
 bindkey -v
