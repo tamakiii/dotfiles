@@ -36,3 +36,10 @@ setopt hist_no_store
 setopt hist_reduce_blanks
 setopt hist_ignore_all_dups
 setopt hist_ignore_dups
+
+function fzf-history() {
+  BUFFER=$(history -n 1 | fzf --exact --no-sort +m --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort --query "$LBUFFER")
+  CURSOR=$#BUFFER
+}
+zle -N fzf-history
+bindkey '^r' fzf-history
