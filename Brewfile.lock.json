@@ -24,6 +24,18 @@
         "options": {
           "full_name": "docker"
         }
+      },
+      "discord": {
+        "version": "0.0.268",
+        "options": {
+          "full_name": "discord"
+        }
+      },
+      "slack": {
+        "version": "4.27.154",
+        "options": {
+          "full_name": "slack"
+        }
       }
     },
     "brew": {
@@ -323,6 +335,8 @@
             }
           }
         }
+      },
+      "discord": {
       }
     }
   },
