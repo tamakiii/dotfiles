@@ -15,6 +15,7 @@ let mapleader = ","
 " vim-plug
 call plug#begin()
 Plug 'tomtom/tcomment_vim'
+Plug 'bronson/vim-trailing-whitespace'
 Plug 'lu-ren/SerialExperimentsLain'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
