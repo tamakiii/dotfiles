@@ -7,8 +7,10 @@ help:
 
 install:
 	$(MAKE) -f dotfiles.mk $@
+	$(MAKE) -f vim.mk $@
 	$(MAKE) -f $(UNAME).mk $@
 
 clean:
 	$(MAKE) -f dotfiles.mk $@
+	$(MAKE) -f vim.mk $@
 	$(MAKE) -f $(UNAME).mk $@
