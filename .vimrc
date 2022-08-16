@@ -8,6 +8,7 @@ set noswapfile
 set nobackup
 set noundofile
 set number
+set backspace=indent,eol,start
 
 " let
 let mapleader = ","
