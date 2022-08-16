@@ -6,11 +6,11 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install:
+	$(MAKE) -f $(UNAME).mk $@
 	$(MAKE) -f dotfiles.mk $@
 	$(MAKE) -f vim.mk $@
-	$(MAKE) -f $(UNAME).mk $@
 
 clean:
+	$(MAKE) -f $(UNAME).mk $@
 	$(MAKE) -f dotfiles.mk $@
 	$(MAKE) -f vim.mk $@
-	$(MAKE) -f $(UNAME).mk $@
