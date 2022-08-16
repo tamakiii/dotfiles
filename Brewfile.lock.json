@@ -48,6 +48,12 @@
         "options": {
           "full_name": "visual-studio-code"
         }
+      },
+      "evernote": {
+        "version": "10.42.7,3561,aac6aeb5e7",
+        "options": {
+          "full_name": "evernote"
+        }
       }
     },
     "brew": {
