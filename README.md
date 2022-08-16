@@ -8,6 +8,6 @@ make -C ~/.dotfiles install
 
 ## Run on Docker
 ```sh
-make -f docker.mk build login
+make -f docker.mk build shell
 make -C ~/.dotfiles install
 ```
