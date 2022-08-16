@@ -36,6 +36,18 @@
         "options": {
           "full_name": "slack"
         }
+      },
+      "keeper-password-manager": {
+        "version": "16.7.2,1658764644578",
+        "options": {
+          "full_name": "keeper-password-manager"
+        }
+      },
+      "visual-studio-code": {
+        "version": "1.70.1",
+        "options": {
+          "full_name": "visual-studio-code"
+        }
       }
     },
     "brew": {
@@ -345,7 +357,7 @@
       "monterey": {
         "HOMEBREW_VERSION": "3.5.9",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "a72ae2da727b2dff651183a30ba8bf83d729014f",
+        "Homebrew/homebrew-core": "38f504e2fdf3fc2226203e357d063a0330884019",
         "CLT": "13.4.0.0.1.1651278267",
         "Xcode": "13.4",
         "macOS": "12.3"
