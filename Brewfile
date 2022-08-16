@@ -109,3 +109,6 @@ cask "google-japanese-ime"
 # tap "osx-cross/avr"
 # tap "qmk/qmk"
 # tap "tamakiii/tap", "git@github.com:tamakiii/homebrew-tap.git"
+
+# tap "homebrew/cask-drivers"
+# cask "kensington-trackball-works"
