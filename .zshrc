@@ -1,3 +1,6 @@
+# antigen
+source ~/.zsh/antigen.zsh
+
 # general
 umask 002
 bindkey -v
