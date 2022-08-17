@@ -9,6 +9,8 @@ set nobackup
 set noundofile
 set number
 set backspace=indent,eol,start
+set clipboard+=unnamed
+set hlsearch
 
 " let
 let mapleader = ","
