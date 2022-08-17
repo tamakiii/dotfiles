@@ -1,3 +1,5 @@
+tap "mutagen-io/mutagen"
+
 brew "awscli"
 brew "fzf"
 brew "git"
@@ -12,6 +14,8 @@ brew "zsh"
 brew "zsh-completions"
 brew "zsh-autosuggestions"
 brew "mysql-client"
+brew "mutagen-io/mutagen/mutagen-compose"
+
 cask "docker"
 cask "evernote"
 cask "google-chrome"

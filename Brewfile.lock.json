@@ -580,6 +580,15 @@
             }
           }
         }
+      },
+      "mutagen-io/mutagen/mutagen-compose": {
+        "version": "0.15.1",
+        "bottle": false
+      }
+    },
+    "tap": {
+      "mutagen-io/mutagen": {
+        "revision": "6e51b8f0fca2104bf510c68301057a80428ad074"
       }
     }
   },
@@ -588,7 +597,7 @@
       "monterey": {
         "HOMEBREW_VERSION": "3.5.9",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "8a98e070bcf0290bbb6675199c01851b3aff575c",
+        "Homebrew/homebrew-core": "28373cc081b3c0ff8b5b114debb81c068790a80d",
         "CLT": "13.4.0.0.1.1651278267",
         "Xcode": "13.4",
         "macOS": "12.5"
