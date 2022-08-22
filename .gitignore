@@ -2,4 +2,7 @@
 /.zsh/antigen.zsh
 /.zsh/vendor/
 /.tmux/plugins/
+/.vim/autoload
+/.vim/plugged
+/.vim/swapfile
 /Brewfile.lock.json
