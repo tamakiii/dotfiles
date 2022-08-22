@@ -2,3 +2,4 @@
 /.zsh/antigen.zsh
 /.zsh/vendor/
 /.tmux/plugins/
+/Brewfile.lock.json
