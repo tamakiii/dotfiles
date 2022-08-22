@@ -7,6 +7,7 @@ help:
 
 install:
 	$(MAKE) -f $(UNAME).mk $@
+	$(MAKE) -f vim.mk $@
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
 
