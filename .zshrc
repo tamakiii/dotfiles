@@ -32,6 +32,10 @@ $ "
 # completion
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
 
+# compinit
+autoload -Uz compinit
+compinit
+
 # history
 setopt share_history
 setopt append_history
