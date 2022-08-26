@@ -5,4 +5,5 @@
 /.vim/autoload
 /.vim/plugged
 /.vim/swapfile
+/.vim/.netrwhist
 /Brewfile.lock.json
