@@ -29,6 +29,9 @@ autoload history-search-end
 PROMPT="$(echo -e '\U1F9F8') %M:%c
 $ "
 
+# completion
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
+
 # history
 setopt share_history
 setopt append_history
