@@ -3,4 +3,5 @@
 	email = tamakiii@users.noreply.github.com
 
 [push]
-  default = current
+	default = current
+
