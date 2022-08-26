@@ -24,6 +24,7 @@ Plug 'bronson/vim-trailing-whitespace'
 Plug 'lu-ren/SerialExperimentsLain'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-dotenv'
 call plug#end()
 
 " fzf.vim
