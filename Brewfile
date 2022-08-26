@@ -1,5 +1,6 @@
 tap "mutagen-io/mutagen"
 
+brew "ca-certificates"
 brew "awscli"
 brew "fzf"
 brew "git"
