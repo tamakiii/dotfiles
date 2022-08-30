@@ -48,5 +48,6 @@ endfunction
 nmap <esc><esc> :call Esc()<cr>
 
 " color scheme
-silent! colorscheme SerialExperimentsLain
-hi Normal ctermbg=NONE guibg=NONE
+colorscheme default
+" silent! colorscheme SerialExperimentsLain
+" hi Normal ctermbg=NONE guibg=NONE
