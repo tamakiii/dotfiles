@@ -1,0 +1,7 @@
+[user]
+	name = tamakiii
+	email = tamakiii@users.noreply.github.com
+
+[push]
+	default = current
+

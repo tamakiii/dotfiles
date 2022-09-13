@@ -1,0 +1,9 @@
+/dependency/
+/.zsh/antigen.zsh
+/.zsh/vendor/
+/.tmux/plugins/
+/.vim/autoload
+/.vim/plugged
+/.vim/swapfile
+/.vim/.netrwhist
+/Brewfile.lock.json
