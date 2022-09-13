@@ -1,45 +1,21 @@
-.PHONY: help install update dependencies setup clean
-
-SHELL := bash
+.PHONY: help install update clean
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
-	dependencies \
-	.vim/undo \
-	.vim/backup \
-	.vim/swapfile \
-	.vim/autoload/plug.vim \
-	.vim/repos
+	~/.vim/autoload/plug.vim
+	vim -c 'PlugInstall --sync' -c qa
 
 update:
-	vim -E -s +PlugUpdate +visual +qall
+	vim -c 'PlugUpdate --sync' -c qa
 
-dependencies:
-	@type vim > /dev/null
-	@type curl > /dev/null
+~/.vim/autoload/plug.vim: ~/.vim/autoload
+	curl -fLo $@ \
+	  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-.vim/autoload/plug.vim: .vim/autoload
-	curl -fLo $@ --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-.vim/repos:
-	vim -E -s +PlugInstall +visual +qall
-
-.vim/autoload: .vim
-	mkdir -p $@
-
-.vim/backup:
-	mkdir -p $@
-
-.vim/swapfile:
-	mkdir -p $@
-
-.vim/undo:
-	mkdir -p $@
+~/.vim/autoload:
+	mkdir -p ~/.vim/autoload
 
 clean:
-	rm -rf .vim/backup
-	rm -rf .vim/swapfile
-	rm -rf .vim/undo
-
+	rm -rf ~/.vim/autoload

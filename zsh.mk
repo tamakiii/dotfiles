@@ -1,29 +1,17 @@
-.PHONY: help install dependencies build clean
-
-SHELL := bash
+.PHONY: help install clean
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
-	dependencies \
-	.zsh/vendor/autosuggestions \
-	.zsh/vendor/zsh-syntax-highlighting
+	.zsh/antigen.zsh
 
-dependencies:
-	type zsh > /dev/null
-
-.zsh/vendor/autosuggestions: .zsh/vendor
-	[[ -d $@ ]] || git clone git@github.com:zsh-users/zsh-autosuggestions.git $@
-
-.zsh/vendor/zsh-syntax-highlighting: .zsh/vendor
-	[[ -d $@ ]] || git clone git@github.com:zsh-users/zsh-syntax-highlighting.git $@
-
-.zsh/vendor: .zsh
-	mkdir -p $@
+.zsh/antigen.zsh: .zsh
+	curl -L git.io/antigen > $@
+	chmod u+x $@
 
 .zsh:
-	mkdir -p $@
+	mkdir $@
 
 clean:
-	rm r-f .zsh/vendor
+	rm -rf dependency
