@@ -13,6 +13,9 @@ set clipboard+=unnamed
 set hlsearch
 set autoindent
 set smartindent
+set tabstop=2
+set shiftwidth=2
+set expandtab
 
 " let
 let mapleader = ","
