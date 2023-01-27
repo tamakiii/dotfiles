@@ -1,0 +1,7 @@
+theme = "default"
+
+[editor]
+bufferline = "multiple"
+
+[editor.cursor-shape]
+insert = "bar"
