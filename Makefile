@@ -10,9 +10,11 @@ install:
 	$(MAKE) -f vim.mk $@
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
+	$(MAKE) -f npm.mk $@
 
 clean:
 	$(MAKE) -f $(UNAME).mk $@
 	$(MAKE) -f vim.mk $@
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
+	$(MAKE) -f npm.mk $@
