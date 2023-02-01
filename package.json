@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/tamakiii/dotfiles/issues"
   },
-  "homepage": "https://github.com/tamakiii/dotfiles#readme"
+  "homepage": "https://github.com/tamakiii/dotfiles#readme",
+  "dependencies": {
+    "intelephense": "^1.9.4"
+  }
 }
