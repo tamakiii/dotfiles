@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/tamakiii/dotfiles#readme",
   "dependencies": {
+    "@yaegassy/coc-marksman": "^0.2.6",
     "@yaegassy/coc-pylsp": "^0.9.1",
     "bash-language-server": "^4.6.2",
     "coc-rust-analyzer": "^0.72.0",
