@@ -23,6 +23,7 @@
     "@yaegassy/coc-marksman": "^0.2.6",
     "@yaegassy/coc-pylsp": "^0.9.1",
     "bash-language-server": "^4.6.2",
+    "coc-metals": "^1.0.14",
     "coc-rust-analyzer": "^0.72.0",
     "coc-solargraph": "^1.2.4",
     "intelephense": "^1.9.4",
