@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/tamakiii/dotfiles#readme",
   "dependencies": {
+    "@yaegassy/coc-pylsp": "^0.9.1",
     "bash-language-server": "^4.6.2",
     "intelephense": "^1.9.4",
     "typescript-language-server": "^3.0.3",
