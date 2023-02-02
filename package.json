@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/tamakiii/dotfiles#readme",
   "dependencies": {
+    "bash-language-server": "^4.6.2",
     "intelephense": "^1.9.4"
   }
 }
