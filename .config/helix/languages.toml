@@ -1,0 +1,15 @@
+[[language]]
+name = "keymap"
+scope = "source.keymap"
+injection-regex = "^keymap$"
+file-types = ["keymap"]
+indent = { tab-width = 2, unit = "  " }
+# language-server = { command = "", args = [""] }
+# formatter = { command = "", args = [""] }
+roots = []
+auto-format = false
+
+[[grammar]]
+name = "keymap"
+source = { git = "https://github.com/tree-sitter/tree-sitter-c", rev = "7175a6dd5fc1cee660dce6fe23f6043d75af424a" }
+
