@@ -19,7 +19,8 @@ export LANG="en_US.UTF-8"
 export LANGUAGE="en_US"
 
 # path
-export PATH="$(pwd)/node_modules/.bin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
+export PATH="~/.dotfiles/node_modules/.bin:$PATH"
 
 # colors
 autoload colors
