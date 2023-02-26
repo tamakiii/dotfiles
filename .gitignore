@@ -8,3 +8,4 @@
 /.vim/swapfile
 /.vim/.netrwhist
 /Brewfile.lock.json
+/bin/
