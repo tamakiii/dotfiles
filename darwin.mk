@@ -1,4 +1,4 @@
-.PHONY: help install clean
+.PHONY: help install uninstall
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -7,5 +7,5 @@ install:
 	$(MAKE) -f brew.mk $@
 
 
-clean:
+uninstall:
 	$(MAKE) -f brew.mk $@

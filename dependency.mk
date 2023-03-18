@@ -1,5 +1,5 @@
 .PHONY: help setup install
-.PHONY: teardown clean
+.PHONY: teardown uninstall
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -19,5 +19,5 @@ dependency:
 teardown:
 	rm -rf dependency
 
-clean:
+uninstall:
 	//
