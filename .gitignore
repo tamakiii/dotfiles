@@ -7,4 +7,5 @@
 /.vim/plugged
 /.vim/swapfile
 /.vim/.netrwhist
+/.local/
 /Brewfile.lock.json
