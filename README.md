@@ -11,3 +11,8 @@ make -C ~/.dotfiles install
 make -f docker.mk build shell
 make -C ~/.dotfiles install
 ```
+
+## poetry add
+```sh
+python3 -m poetry add ...
+```
