@@ -6,12 +6,14 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 setup:
+	python3 -m poetry config --local virtualenvs.create false
 	python3 -m poetry config --local virtualenvs.prompt null
 
 install: \
 	$(DIR_VIRTUALENV)
 
 teardown:
+	python3 -m poetry config --local virtualenvs.create --unset
 	python3 -m poetry config --local virtualenvs.prompt --unset
 
 uninstall:
