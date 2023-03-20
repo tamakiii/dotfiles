@@ -1,5 +1,6 @@
 /dependency/
 /node_modules/
+/.config/configstore/
 /.zsh/antigen.zsh
 /.zsh/vendor/
 /.tmux/plugins/
