@@ -12,6 +12,7 @@ install:
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
 	$(MAKE) -f npm.mk $@
+	$(MAKE) -f poetry.mk $@
 
 uninstall:
 	$(MAKE) -f $(UNAME).mk $@
@@ -20,3 +21,4 @@ uninstall:
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
 	$(MAKE) -f npm.mk $@
+	$(MAKE) -f poetry.mk $@
