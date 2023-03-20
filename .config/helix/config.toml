@@ -1,4 +1,4 @@
-theme = "emacs"
+theme = "fleet_transparent"
 
 [editor]
 bufferline = "multiple"

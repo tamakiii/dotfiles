@@ -1,4 +1,4 @@
-.PHONY: help install clean
+.PHONY: help install uninstall
 
 CANDIDATES := $(wildcard .??*)
 EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml
@@ -10,5 +10,5 @@ help:
 install:
 	@$(foreach f, $(DOTFILES), ln -sfnv $(abspath $f) $(HOME)/$f;)
 
-clean:
+uninstall:
 	@-$(foreach f, $(DOTFILES), rm -vrf $(HOME)/$f;)

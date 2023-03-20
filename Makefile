@@ -1,4 +1,4 @@
-.PHONY: help install clean
+.PHONY: help install uninstall
 
 UNAME := $(shell ./script/os-check.sh)
 
@@ -7,14 +7,18 @@ help:
 
 install:
 	$(MAKE) -f $(UNAME).mk $@
+	$(MAKE) -f nvim.mk $@
 	$(MAKE) -f vim.mk $@
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
 	$(MAKE) -f npm.mk $@
+	$(MAKE) -f poetry.mk $@
 
-clean:
+uninstall:
 	$(MAKE) -f $(UNAME).mk $@
+	$(MAKE) -f nvim.mk $@
 	$(MAKE) -f vim.mk $@
 	$(MAKE) -f zsh.mk $@
 	$(MAKE) -f dotfiles.mk $@
 	$(MAKE) -f npm.mk $@
+	$(MAKE) -f poetry.mk $@

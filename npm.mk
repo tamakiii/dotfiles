@@ -1,10 +1,13 @@
-.PHONY: help install clean
+.PHONY: help install uninstall
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install:
+install: \
+	node_modules
+
+node_modules:
 	npm install
 
-clean:
+uninstall:
 	rm -rf node_modules

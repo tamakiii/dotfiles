@@ -1,5 +1,6 @@
 /dependency/
 /node_modules/
+/.config/configstore/
 /.zsh/antigen.zsh
 /.zsh/vendor/
 /.tmux/plugins/
@@ -7,4 +8,5 @@
 /.vim/plugged
 /.vim/swapfile
 /.vim/.netrwhist
+/.local/
 /Brewfile.lock.json

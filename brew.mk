@@ -1,4 +1,4 @@
-.PHONY: help install deps clean
+.PHONY: help install deps uninstall
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -12,5 +12,5 @@ Brewfile:
 deps:
 	brew deps --tree --installed
 
-clean:
+uninstall:
 	brew bundle cleanup --force

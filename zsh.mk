@@ -13,5 +13,5 @@ install: \
 .zsh:
 	mkdir $@
 
-clean:
-	rm -rf dependency
+uninstall:
+	rm -rf .zsh/antigen.zsh
