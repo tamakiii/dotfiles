@@ -24,4 +24,4 @@ poetry.lock:
 	python3 -m poetry self lock --no-update
 
 $(DIR_VIRTUALENV):
-	python3 -m poetry install --no-root
+	python3 -m poetry install --no-cache --no-root
