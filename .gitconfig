@@ -7,3 +7,5 @@
 
 [core]
 	editor = hx
+[init]
+	defaultBranch = main
