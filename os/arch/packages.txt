@@ -16,6 +16,7 @@ lightdm-gtk-greeter 1:2.0.8-3
 linux 6.5.9.arch2-1
 linux-firmware 20230918.3672ccab-1
 linux-headers 6.5.9.arch2-1
+mesa-utils 9.0.0-3
 nano 7.2-1
 neofetch 7.1.0-2
 openssh 9.5p1-1
