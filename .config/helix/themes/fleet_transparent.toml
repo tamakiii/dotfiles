@@ -1,3 +1,0 @@
-inherits = "fleet_dark"
-
-"ui.background" = { fg = "white"}
