@@ -5,6 +5,7 @@ base 3-2
 base-devel 1-1
 btrfs-progs 6.5.3-2
 efibootmgr 18-2
+fcitx5-mozc 2.26.4632.102.g4d2e3bd-2
 firefox 119.0-1
 foot 1.16.2-2
 git 2.42.0-1
