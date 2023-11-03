@@ -5,10 +5,11 @@ CONFIGFILES := $(wildcard ./.config/*)
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install: 
-	$(foreach f, $(CONFIGFILES), ln -sfnv $(abspath $f) $(HOME)/$f;)
+install: $(HOME)/.config
+	$(foreach f, $(CONFIGFILES), ln -sf $(abspath $f) $(HOME)/$f;)
 
 uninstall:
-	-$(foreach f, $(CONFIGFILES), rm -vrf $(HOME)/$f;)
+	-$(foreach f, $(CONFIGFILES), unlink $(HOME)/$f;)
 
-
+$(HOME)/.config:
+	mkdir -p $@
