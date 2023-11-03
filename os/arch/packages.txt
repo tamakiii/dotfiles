@@ -31,6 +31,8 @@ terminus-font 4.49.1-6
 tmux 3.3_a-7
 ttf-font-awesome 6.4.2-1
 ttf-hanazono 20170904-4
+ttf-kanjistrokeorders 4.004-2
+ttf-mplus-git r286.71d438c-1
 ttf-sazanami 20040629-11
 vim 9.0.2070-1
 waybar 0.9.23-1
