@@ -1,0 +1,5 @@
+theme = "base16_transparent"
+# theme = "fleet_transparent"
+
+[editor.cursor-shape]
+insert = "bar"
