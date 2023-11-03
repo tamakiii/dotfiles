@@ -1,3 +1,5 @@
+adobe-source-han-sans-jp-fonts 2.004-1
+adobe-source-han-serif-jp-fonts 2.002-1
 amd-ucode 20230918.3672ccab-1
 base 3-2
 base-devel 1-1
