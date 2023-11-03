@@ -67,6 +67,7 @@ xorg-xkbutils 1.0.5-1
 xorg-xkill 1.0.6-1
 xorg-xlsatoms 1.1.4-1
 xorg-xlsclients 1.1.5-1
+xorg-xlsfonts 1.0.7-1
 xorg-xpr 1.1.0-1
 xorg-xrandr 1.5.2-1
 xorg-xrefresh 1.0.7-1
