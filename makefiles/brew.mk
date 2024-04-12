@@ -3,11 +3,11 @@
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install: Brewfile
+install: ../Brewfile
 	brew bundle install --file=$<
 
 uninstall:
 	brew bundle cleanup --force
 
-Brewfile:
+../Brewfile:
 	brew bundle dump --quiet --file=/dev/stdout | sort > $@

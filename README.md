@@ -4,5 +4,5 @@
 ```sh
 make -f makefiles/mac.mk install
 brew install ...
-make -f makefiles/brew.mk -B Brewfile
+make -C makefiles -f brew.mk -B ../Brewfile
 ```
