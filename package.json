@@ -1,0 +1,11 @@
+{
+  "name": "tamakiii-dotfiles",
+  "version": "1.0.0",
+  "description": "## How to use ```sh make -C makefiles -f mac.mk install brew install ... make -C makefiles -f brew.mk -B ../Brewfile ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
