@@ -1,3 +1,4 @@
 /.config/.isolated-storage/
 /.config/iterm2/
 /Brewfile.lock.json
+/tmux-client-*.log
