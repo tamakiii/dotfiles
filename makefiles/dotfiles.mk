@@ -6,9 +6,11 @@ help:
 install: \
 	~/.config \
 	~/.zsh \
-	~/.zshrc
+	~/.zshrc \
+	~/.venv
 
 uninstall:
+	rm -vrf ~/.venv
 	rm -vrf ~/.zshrc
 	rm -vrf ~/.zsh
 	rm -vrf ~/.config
@@ -20,4 +22,7 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.zshrc: ../.zshrc
+	ln -sfnv $(abspath $<) $@
+
+~/.venv: ../.venv
 	ln -sfnv $(abspath $<) $@
