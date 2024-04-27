@@ -1,19 +1,34 @@
 #!/bin/bash -e
 
-a=$1
-b=$2
-shift 2  # Shift the file paths off the argument list
+# Read content from $1 and $2, treating them as potential process substitutions
+a=$(cat "$1")
+b=$(cat "$2")
 
 options=()
-word_diff=""
+minimal=false
+compact_summary=false
+word_diff=""  # Initialize word_diff as an empty string
 color_words=false
 function_context=false
 unified=3
 
+shift 2  # Shift the first two arguments off the list
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        -p|-u|--patch)
+            options+=("-p")
+            ;;
+        --minimal)
+            minimal=true
+            options+=("--minimal")
+            ;;
+        --compact-summary)
+            compact_summary=true
+            options+=("--compact-summary")
+            ;;
         --word-diff=*)
-            word_diff="--word-diff=${1#--word-diff=}"
+            word_diff="$1"  # Store the entire option with or without value
             options+=("$word_diff")
             ;;
         --color-words)
@@ -39,8 +54,11 @@ done
 DIRECTORY=$(mktemp --directory)
 cd $DIRECTORY
 git init > /dev/null
-cp $a diff.txt
+
+echo "$a" > diff.txt
 git add diff.txt
 git commit -m before > /dev/null
-cp $b diff.txt
+
+echo "$b" > diff.txt
+
 git diff "${options[@]}"
