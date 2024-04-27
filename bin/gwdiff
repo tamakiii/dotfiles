@@ -1,51 +1,46 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
-# Set up error handling
-set -o pipefail
-trap 'rm -rf "$temp_dir"' EXIT
+a=$1
+b=$2
+shift 2  # Shift the file paths off the argument list
 
-# Parse command-line arguments
-usage() {
-    echo "Usage: $0 [-w] file1 file2"
-    echo "  -w  Show word-by-word diff"
-}
+options=()
+word_diff=""
+color_words=false
+function_context=false
+unified=3
 
-word_diff=false
-while getopts "w" opt; do
-    case $opt in
-        w)
-            word_diff=true
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --word-diff=*)
+            word_diff="--word-diff=${1#--word-diff=}"
+            options+=("$word_diff")
+            ;;
+        --color-words)
+            color_words=true
+            options+=("--color-words")
+            ;;
+        --function-context)
+            function_context=true
+            options+=("-W")
+            ;;
+        --unified=*)
+            unified="${1#--unified=}"
+            options+=("-U$unified")
             ;;
         *)
-            usage
+            echo "Unknown option: $1"
             exit 1
             ;;
     esac
+    shift
 done
-shift $((OPTIND - 1))
 
-# Check if required arguments are provided
-if [ $# -ne 2 ]; then
-    usage
-    exit 1
-fi
-
-# Assign arguments to variables
-file1="$1"
-file2="$2"
-
-# Create a temporary directory
-temp_dir=$(mktemp -d)
-
-# Initialize a Git repository and perform the diff
-cd "$temp_dir"
-git init --quiet
-cp "$file1" diff.txt
+DIRECTORY=$(mktemp --directory)
+cd $DIRECTORY
+git init > /dev/null
+cp $a diff.txt
 git add diff.txt
-git commit --quiet --message "before"
-cp "$file2" diff.txt
-if $word_diff; then
-    git diff --word-diff
-else
-    git diff
-fi
+git commit -m before > /dev/null
+cp $b diff.txt
+git diff "${options[@]}"
