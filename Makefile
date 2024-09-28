@@ -21,8 +21,11 @@ uninstall:
 
 check:
 	test -L ~/.zsh
+	test -L ~/.zshrc
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
+	which zsh
+	which fzf
 
 .zsh:
 	mkdir $@
