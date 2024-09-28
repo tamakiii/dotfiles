@@ -7,6 +7,7 @@ install: \
 	.zsh \
 	.zsh/antigen.zsh \
 	~/.zsh \
+	~/.zshrc \
 	~/.config \
 	~/.config/tmux \
 	~/.config/helix
@@ -14,6 +15,8 @@ install: \
 uninstall:
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
+	rm -rf ~/.zshrc
+	rm -rf ~/.zsh
 	rm -rf .zsh
 
 check:
@@ -28,6 +31,9 @@ check:
 	curl -L git.io/antigen > $@
 
 ~/.zsh: .zsh
+	ln -sfnv $(abspath $<) $@
+
+~/.zshrc: .zshrc
 	ln -sfnv $(abspath $<) $@
 
 ~/.config:
