@@ -4,6 +4,9 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
+	.zsh \
+	.zsh/antigen.zsh \
+	~/.zsh \
 	~/.config \
 	~/.config/tmux \
 	~/.config/helix
@@ -11,10 +14,21 @@ install: \
 uninstall:
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
+	rm -rf .zsh
 
 check:
+	test -L ~/.zsh
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
+
+.zsh:
+	mkdir $@
+
+.zsh/antigen.zsh:
+	curl -L git.io/antigen > $@
+
+~/.zsh: .zsh
+	ln -sfnv $(abspath $<) $@
 
 ~/.config:
 	mkdir $@
