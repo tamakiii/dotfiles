@@ -1,6 +1,8 @@
 .PHONY: help install check check-dependency uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
+error-install := echo "[error] install '$$_'"; exit 1;
+check-dependency = which $(1) || { $(call error-install) }
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -19,15 +21,14 @@ check:
 	test -L ~/.zshrc
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
-	which zsh
-	which fzf
 
 
 check-dependency:
-	@which uv || { echo "[error] install '$_'"; exit 1; }
-	@which tmux || { echo "[error] install '$_'"; exit 1; }
-	@which hx || { echo "[error] install '$_'"; exit 1; }
-	@which fzf || { echo "[error] install '$_'"; exit 1; }
+	@$(call check-dependency,zsh)
+	@$(call check-dependency,tmux)
+	@$(call check-dependency,uv)
+	@$(call check-dependency,fzf)
+	@$(call check-dependency,hx)
 
 uninstall:
 	rm -vrf ~/.config/helix
