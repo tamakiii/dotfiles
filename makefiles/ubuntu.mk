@@ -10,7 +10,8 @@ help:
 install: update
 	apt install --no-install-recommends \
 		fzf \
-		zsh
+		zsh \
+		language-pack-en
 
 check:
 	@test "$$(which zsh)" = "$(call current-shell)" || { $(call exit,1,default shell should be zsh,$$_) }
