@@ -10,6 +10,7 @@ antigen apply
 umask 002
 bindkey -v
 bindkey -e
+HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
@@ -42,6 +43,7 @@ compinit
 
 # history
 setopt share_history
+setopt incappendhistory
 setopt append_history
 setopt inc_append_history
 setopt hist_no_store
