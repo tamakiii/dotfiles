@@ -1,4 +1,6 @@
-.PHONY: help install uninstall check
+.PHONY: help install check check-dependency uninstall
+
+SHELL := bash --noprofile --norc -eo pipefail
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -12,13 +14,6 @@ install: \
 	~/.config/tmux \
 	~/.config/helix
 
-uninstall:
-	rm -vrf ~/.config/helix
-	rm -vrf ~/.config/tmux
-	rm -rf ~/.zshrc
-	rm -rf ~/.zsh
-	rm -rf .zsh
-
 check:
 	test -L ~/.zsh
 	test -L ~/.zshrc
@@ -26,6 +21,20 @@ check:
 	test -L ~/.config/helix
 	which zsh
 	which fzf
+
+
+check-dependency:
+	@which uv || { echo "[error] install '$_'"; exit 1; }
+	@which tmux || { echo "[error] install '$_'"; exit 1; }
+	@which hx || { echo "[error] install '$_'"; exit 1; }
+	@which fzf || { echo "[error] install '$_'"; exit 1; }
+
+uninstall:
+	rm -vrf ~/.config/helix
+	rm -vrf ~/.config/tmux
+	rm -rf ~/.zshrc
+	rm -rf ~/.zsh
+	rm -rf .zsh
 
 .zsh:
 	mkdir $@
