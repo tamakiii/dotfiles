@@ -2,6 +2,7 @@ theme = "fleet_transparent"
 
 [editor]
 bufferline = "multiple"
+true-color = true
 
 [editor.cursor-shape]
 insert = "bar"
