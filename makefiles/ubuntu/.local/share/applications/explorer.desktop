@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Explorer
+Exec=explorer.exe %u
+Type=Application
+MimeType=inode/directory;

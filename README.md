@@ -2,7 +2,11 @@
 
 ## How to use
 ```sh
-make -C makefiles -f mac.mk install
-brew install ...
-make -C makefiles -f brew.mk -B ../Brewfile
+make check-dependency
+make install
+```
+
+### Ubuntu
+```sh
+make -C make -f ubuntu.mk install
 ```
