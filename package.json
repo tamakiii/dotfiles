@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "intelephense": "^1.10.4",
     "typescript-language-server": "^4.3.3"
   }
 }
