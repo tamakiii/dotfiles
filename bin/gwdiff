@@ -5,43 +5,22 @@ a=$(cat "$1")
 b=$(cat "$2")
 
 options=()
-minimal=false
-compact_summary=false
-word_diff=""  # Initialize word_diff as an empty string
-color_words=false
-function_context=false
-unified=3
 
 shift 2  # Shift the first two arguments off the list
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -p|-u|--patch)
-            options+=("-p")
-            ;;
-        --minimal)
-            minimal=true
-            options+=("--minimal")
-            ;;
-        --compact-summary)
-            compact_summary=true
-            options+=("--compact-summary")
-            ;;
-        --word-diff=*)
-            word_diff="$1"  # Store the entire option with or without value
-            options+=("$word_diff")
-            ;;
-        --color-words)
-            color_words=true
-            options+=("--color-words")
-            ;;
+        -p|-u|--patch| \
+        --minimal| \
+        --compact-summary| \
+        --word-diff=*| \
+        --word-diff| \
+        --color-words| \
         --function-context)
-            function_context=true
-            options+=("-W")
+            options+=("$1")
             ;;
         --unified=*)
-            unified="${1#--unified=}"
-            options+=("-U$unified")
+            options+=("-U${1#--unified=}")
             ;;
         *)
             echo "Unknown option: $1"
@@ -57,8 +36,7 @@ git init > /dev/null
 
 echo "$a" > diff.txt
 git add diff.txt
-git commit -m before > /dev/null
+git commit --allow-empty-message -m "" > /dev/null
 
 echo "$b" > diff.txt
-
 git diff "${options[@]}"
