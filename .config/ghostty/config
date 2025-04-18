@@ -446,22 +446,22 @@ minimum-contrast = 1
 # 
 # For definitions on the color indices and what they canonically map to,
 # [see this cheat sheet](https://www.ditig.com/256-colors-cheat-sheet).
-palette = 0=#1d1f21
-palette = 1=#d00033
+palette = 0=#e9e9ed
+palette = 1=#dd0033
 palette = 2=#008000
-palette = 3=#f0c674
-palette = 4=#81a2be
-palette = 5=#b294bb
-palette = 6=#8abeb7
-palette = 7=#c5c8c6
-palette = 8=#666666
-palette = 9=#d54e53
-palette = 10=#b9ca4a
-palette = 11=#e7c547
-palette = 12=#7aa6da
-palette = 13=#c397d8
-palette = 14=#70c0b1
-palette = 15=#eaeaea
+palette = 3=#c08000
+palette = 4=#2e7de9
+palette = 5=#9854f1
+palette = 6=#007197
+palette = 7=#6172b0
+palette = 8=#a1a6c5
+palette = 9=#f52a65
+palette = 10=#587539
+palette = 11=#8c6c3e
+palette = 12=#2e7de9
+palette = 13=#9854f1
+palette = 14=#007197
+palette = 15=#3760bf
 palette = 16=#000000
 palette = 17=#00005f
 palette = 18=#000087
