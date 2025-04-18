@@ -16,6 +16,7 @@ Add the following to your VS Code `settings.json` file to enable custom instruct
 {
     // ...
     "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.chat.generateTests.codeLens": true,
     "github.copilot.chat.codeGeneration.instructions": [
         {
             "file": "~/.llm/prompt/github-copilot/.copilot-codeGeneration-instructions.md",
@@ -47,8 +48,7 @@ Add the following to your VS Code `settings.json` file to enable custom instruct
         {
             "file": ".copilot-commitMessageGeneration-instructions.md"
         }
-    ],
-    "github.copilot.chat.generateTests.codeLens": true
+    ]
 }
 ```
 
