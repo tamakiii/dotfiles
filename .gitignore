@@ -10,5 +10,3 @@
 /.vim/.netrwhist
 /.local/
 /Brewfile.lock.json
-/.config/
-!/.config/helix/
