@@ -1,4 +1,4 @@
-theme = "light_transparent"
+theme = "tokyonight_day_transparent"
 
 [editor]
 bufferline = "multiple"
