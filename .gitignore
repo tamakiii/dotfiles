@@ -1,13 +1,7 @@
 /node_modules/
 /dependency/
 /dist/
-/.config/configstore/
 /.zsh/
-/.tmux/plugins/
-/.vim/autoload
-/.vim/plugged
-/.vim/swapfile
-/.vim/.netrwhist
-/.local/
-/Brewfile.lock.json
 /tmux-client-*.log
+/.config/iterm2/AppSupport
+/.config/.isolated-storage/
