@@ -401,11 +401,11 @@ theme = tokyonight-day
 
 # Background color for the window.
 # Specified as either hex (`#RRGGBB` or `RRGGBB`) or a named X11 color.
-# background = #282c34
+# background = 
 
 # Foreground color for the window.
 # Specified as either hex (`#RRGGBB` or `RRGGBB`) or a named X11 color.
-foreground = #406cc8
+# foreground = 
 
 # The foreground and background color for selection. If this is not set, then
 # the selection color is just the inverted window background and foreground
@@ -447,8 +447,8 @@ minimum-contrast = 1
 # For definitions on the color indices and what they canonically map to,
 # [see this cheat sheet](https://www.ditig.com/256-colors-cheat-sheet).
 palette = 0=#1d1f21
-palette = 1=#cc6666
-palette = 2=#b5bd68
+palette = 1=#d00033
+palette = 2=#008000
 palette = 3=#f0c674
 palette = 4=#81a2be
 palette = 5=#b294bb
