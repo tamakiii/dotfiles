@@ -1,8 +1,7 @@
 /dependency/
 /node_modules/
 /.config/configstore/
-/.zsh/antigen.zsh
-/.zsh/vendor/
+/.zsh/
 /.tmux/plugins/
 /.vim/autoload
 /.vim/plugged

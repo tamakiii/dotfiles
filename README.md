@@ -2,17 +2,11 @@
 
 ## How to use
 ```sh
-git clone git@github.com:tamakiii/dotfiles.git ~/.dotfiles
-make -C ~/.dotfiles install
+make check-dependency
+make install
 ```
 
-## Run on Docker
+### Ubuntu
 ```sh
-make -f docker.mk build shell
-make -C ~/.dotfiles install
-```
-
-## poetry add
-```sh
-python3 -m poetry add ...
+make -C make -f ubuntu.mk install
 ```

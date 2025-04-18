@@ -2,6 +2,7 @@ theme = "fleet_transparent"
 
 [editor]
 bufferline = "multiple"
+true-color = true
 
 [editor.cursor-shape]
 insert = "bar"
@@ -14,3 +15,6 @@ C-e = "scroll_down"
 C-y = "scroll_up"
 C-d = "half_page_down"
 C-u = "half_page_up"
+
+[keys.insert]
+"C-[" = "normal_mode"
