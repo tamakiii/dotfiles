@@ -1,4 +1,0 @@
-# inherits = "catppuccin_latte"
-inherits = "tokyonight_day"
-
-"ui.background" = { fg = "white"}
