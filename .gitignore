@@ -1,5 +1,6 @@
-/dependency/
 /node_modules/
+/dependency/
+/dist/
 /.config/configstore/
 /.zsh/
 /.tmux/plugins/
