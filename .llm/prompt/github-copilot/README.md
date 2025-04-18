@@ -16,17 +16,18 @@ Add the following to your VS Code `settings.json` file to enable custom instruct
 {
     // ...
     "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.chat.generateTests.codeLens": true,
     "github.copilot.chat.codeGeneration.instructions": [
         {
-            "file":"~/.llm/prompt/github-copilot/.copilot-codeGeneration-instructions.md",
+            "file": "~/.llm/prompt/github-copilot/.copilot-codeGeneration-instructions.md",
         },
         {
-            "file":".copilot-codeGeneration-instructions.md"
+            "file": ".copilot-codeGeneration-instructions.md"
         }
     ],
     "github.copilot.chat.testGeneration.instructions": [
         {
-            "file":"~/.llm/prompt/github-copilot/.copilot-testGeneration-instructions.md",
+            "file": "~/.llm/prompt/github-copilot/.copilot-testGeneration-instructions.md",
         },
         {
             "file": ".copilot-testGeneration-instructions.md"
@@ -34,7 +35,7 @@ Add the following to your VS Code `settings.json` file to enable custom instruct
     ],
     "github.copilot.chat.reviewSelection.instructions": [
         {
-            "file":"~/.llm/prompt/github-copilot/.copilot-review-instructions.md",
+            "file": "~/.llm/prompt/github-copilot/.copilot-review-instructions.md",
         },
         {
             "file": ".copilot-review-instructions.md"
@@ -42,13 +43,12 @@ Add the following to your VS Code `settings.json` file to enable custom instruct
     ],
     "github.copilot.chat.commitMessageGeneration.instructions": [
         {
-            "file":"~/.llm/prompt/github-copilot/.copilot-commitMessageGeneration-instructions.md",
+            "file": "~/.llm/prompt/github-copilot/.copilot-commitMessageGeneration-instructions.md",
         },
         {
             "file": ".copilot-commitMessageGeneration-instructions.md"
         }
-    ],
-    "github.copilot.chat.generateTests.codeLens": true
+    ]
 }
 ```
 

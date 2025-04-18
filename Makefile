@@ -22,7 +22,6 @@ check:
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
 
-
 check-dependency:
 	@$(call check-dependency,zsh)
 	@$(call check-dependency,tmux)
