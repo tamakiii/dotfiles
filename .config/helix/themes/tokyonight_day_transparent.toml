@@ -52,10 +52,10 @@ variable = { fg = "fg" }
 "markup.raw.inline" = { bg = "black", fg = "blue" }
 "markup.strikethrough" = { modifiers = ["crossed_out"] }
 
-"diff.delta" = { fg = "change" }
+"diff.delta" = { fg = "yellow" }
 "diff.delta.moved" = { fg = "blue" }
-"diff.minus" = { fg = "delete" }
-"diff.plus" = { fg = "add" }
+"diff.minus" = { fg = "red" }
+"diff.plus" = { fg = "green" }
 
 error = { fg = "error" }
 warning = { fg = "yellow" }
@@ -113,9 +113,9 @@ magenta = "#9854f1"
 comment = "#848cb5"
 black = "#a1a6c5"
 
-add = "#aecde6"
-change = "#d6d8e3"
-delete = "#dfccd4"
+# add = "#aecde6"
+# change = "#d6d8e3"
+# delete = "#dfccd4"
 
 error = "#c64343"
 hint = "#118c74"
