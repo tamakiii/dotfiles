@@ -10,3 +10,4 @@
 /.vim/.netrwhist
 /.local/
 /Brewfile.lock.json
+/tmux-client-*.log
