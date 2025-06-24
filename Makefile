@@ -60,7 +60,11 @@ uninstall:
 ~/.config/helix: .config/helix
 	ln -sfnv $(abspath $<) $@
 
+# Ensure ~/.claude directory exists
+~/.claude:
+	mkdir -p $@
+
 # Your home folder (~/.claude/CLAUDE.md), which applies it to all your claude sessions
 # https://www.anthropic.com/engineering/claude-code-best-practices#:~:text=in%20child%20directories-,Your%20home%20folder,-(~/.claude/CLAUDE
-~/.claude/CLAUDE.md: .claude/CLAUDE.md
+~/.claude/CLAUDE.md: .claude/CLAUDE.md ~/.claude
 	ln -sfnv $(abspath $<) $@
