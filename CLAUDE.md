@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this dotfiles repository.
+
+**Note**: This `CLAUDE.md` is repository-specific. The `.claude/CLAUDE.md` file in this repository gets symlinked to `~/.claude/CLAUDE.md` and applies globally to all Claude sessions.
 
 ## Repository Overview
 
@@ -33,10 +35,10 @@ make -C make -f ubuntu.mk install
 
 The repository follows a pattern where configuration files are stored in the repository and then symlinked to their expected locations:
 
-- `.zshrc` ’ `~/.zshrc` - Zsh configuration with antigen plugin manager
-- `.config/tmux/` ’ `~/.config/tmux/` - Tmux configuration
-- `.config/helix/` ’ `~/.config/helix/` - Helix editor configuration
-- `.config/claude/` ’ `~/.config/claude/` - Claude configuration including MCP settings
+- `.zshrc` ï¿½ `~/.zshrc` - Zsh configuration with antigen plugin manager
+- `.config/tmux/` ï¿½ `~/.config/tmux/` - Tmux configuration
+- `.config/helix/` ï¿½ `~/.config/helix/` - Helix editor configuration
+- `.config/claude/` ï¿½ `~/.config/claude/` - Claude configuration including MCP settings
 
 ## Important Implementation Details
 
