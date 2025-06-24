@@ -1,6 +1,6 @@
 .PHONY: help build clean
 
-APP_BUNDLE = ../../bin/Notification Center.app
+APP_BUNDLE = ../../bin/NotificationCenter.app
 APP_EXECUTABLE = $(APP_BUNDLE)/Contents/MacOS/notification-center
 WRAPPER_SCRIPT = ../../bin/notification-center
 
