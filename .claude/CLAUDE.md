@@ -92,6 +92,11 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - YOU MUST execute `play /System/Library/Sounds/Glass.aiff vol 2` once upon completing a task
 - YOU MUST execute `play /System/Library/Sounds/Purr.aiff vol 2` before prompting the user
 
+## Visual Notifications
+
+- YOU MUST execute `~/.dotfiles/bin/swift-notify complete` once upon completing a task
+- YOU MUST execute `~/.dotfiles/bin/swift-notify prompt` before prompting the user
+
 ## Project Integration
 
 When working in a project with its own CLAUDE.md:
