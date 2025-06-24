@@ -60,7 +60,6 @@ uninstall:
 ~/.config/helix: .config/helix
 	ln -sfnv $(abspath $<) $@
 
-# Ensure ~/.claude directory exists
 ~/.claude:
 	mkdir -p $@
 
