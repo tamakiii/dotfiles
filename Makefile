@@ -14,13 +14,15 @@ install: \
 	~/.zshrc \
 	~/.config \
 	~/.config/tmux \
-	~/.config/helix
+	~/.config/helix \
+	~/.claude/CLAUDE.md
 
 check:
 	test -L ~/.zsh
 	test -L ~/.zshrc
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
+	test -L ~/.claude/CLAUDE.md
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -30,6 +32,7 @@ check-dependency:
 	@$(call check-dependency,hx)
 
 uninstall:
+	rm -vrf ~/.claude/CLAUDE.md
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
 	rm -rf ~/.zshrc
@@ -55,4 +58,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/helix: .config/helix
+	ln -sfnv $(abspath $<) $@
+
+# Your home folder (~/.claude/CLAUDE.md), which applies it to all your claude sessions
+# https://www.anthropic.com/engineering/claude-code-best-practices#:~:text=in%20child%20directories-,Your%20home%20folder,-(~/.claude/CLAUDE
+~/.claude/CLAUDE.md: .claude/CLAUDE.md
 	ln -sfnv $(abspath $<) $@
