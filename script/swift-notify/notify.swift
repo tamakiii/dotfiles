@@ -11,31 +11,73 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         let arguments = CommandLine.arguments
         
         guard arguments.count > 1 else {
-            print("Usage: swift-notify <type> [message]")
-            print("Types: complete, prompt")
+            printUsage()
             exit(1)
         }
         
-        let notificationType = arguments[1]
-        let customMessage = arguments.count > 2 ? arguments[2] : nil
+        // Parse arguments with flags like terminal-notifier
+        var notificationType: String?
+        var customTitle: String?
+        var customMessage: String?
+        
+        var i = 1
+        while i < arguments.count {
+            let arg = arguments[i]
+            
+            switch arg {
+            case "-title":
+                if i + 1 < arguments.count {
+                    customTitle = arguments[i + 1]
+                    i += 1
+                }
+            case "-message":
+                if i + 1 < arguments.count {
+                    customMessage = arguments[i + 1]
+                    i += 1
+                }
+            case "complete", "prompt":
+                notificationType = arg
+            default:
+                // If no flag, treat as message for backwards compatibility
+                if notificationType != nil && customMessage == nil {
+                    customMessage = arg
+                }
+            }
+            i += 1
+        }
+        
+        guard let type = notificationType else {
+            printUsage()
+            exit(1)
+        }
         
         var title: String
         var message: String
         
-        switch notificationType {
+        switch type {
         case "complete":
-            title = "✅ Task Complete"
+            title = customTitle ?? "✅ Task Complete"
             message = customMessage ?? "Claude Code has finished the task."
         case "prompt":
-            title = "🤔 Claude Code"
+            title = customTitle ?? "🤔 Claude Code"
             message = customMessage ?? "Claude Code is asking for input."
         default:
-            print("Unknown notification type: \(notificationType)")
-            print("Types: complete, prompt")
+            printUsage()
             exit(1)
         }
         
         deliverNotification(title: title, message: message)
+    }
+    
+    func printUsage() {
+        print("Usage: swift-notify <type> [message]")
+        print("       swift-notify <type> -title \"Custom Title\" -message \"Custom Message\"")
+        print("")
+        print("Types: complete, prompt")
+        print("")
+        print("Examples:")
+        print("  swift-notify complete \"Task finished successfully\"")
+        print("  swift-notify prompt -title \"Confirm\" -message \"Do you want to continue?\"")
     }
     
     func deliverNotification(title: String, message: String) {
