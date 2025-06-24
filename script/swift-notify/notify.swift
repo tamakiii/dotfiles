@@ -1,74 +1,70 @@
 import Foundation
-import UserNotifications
+import Cocoa
 
-// Minimal Swift notification tool inspired by terminal-notifier
-// Uses UNUserNotificationCenter with proper app bundle
+// Swift notification tool inspired by terminal-notifier
+// Uses NSUserNotificationCenter like terminal-notifier for compatibility
 
-func showNotification(title: String, message: String, completion: @escaping () -> Void) {
-    let center = UNUserNotificationCenter.current()
+class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
     
-    center.requestAuthorization(options: [.alert, .sound]) { granted, error in
-        if let error = error {
-            print("Authorization error: \(error)")
-            completion()
-            return
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Parse command line arguments
+        let arguments = CommandLine.arguments
+        
+        guard arguments.count > 1 else {
+            print("Usage: swift-notify <type> [message]")
+            print("Types: complete, prompt")
+            exit(1)
         }
         
-        if granted {
-            let content = UNMutableNotificationContent()
-            content.title = title
-            content.body = message
-            content.sound = .default
-            
-            let request = UNNotificationRequest(
-                identifier: UUID().uuidString,
-                content: content,
-                trigger: nil
-            )
-            
-            center.add(request) { error in
-                if let error = error {
-                    print("Notification error: \(error)")
-                }
-                completion()
-            }
-        } else {
-            print("🔒 Notification permission not granted")
-            completion()
+        let notificationType = arguments[1]
+        let customMessage = arguments.count > 2 ? arguments[2] : nil
+        
+        var title: String
+        var message: String
+        
+        switch notificationType {
+        case "complete":
+            title = "✅ Task Complete"
+            message = customMessage ?? "Claude Code has finished the task."
+        case "prompt":
+            title = "🤔 Claude Code"
+            message = customMessage ?? "Claude Code is asking for input."
+        default:
+            print("Unknown notification type: \(notificationType)")
+            print("Types: complete, prompt")
+            exit(1)
         }
+        
+        deliverNotification(title: title, message: message)
+    }
+    
+    func deliverNotification(title: String, message: String) {
+        let userNotification = NSUserNotification()
+        userNotification.title = title
+        userNotification.informativeText = message
+        userNotification.soundName = NSUserNotificationDefaultSoundName
+        
+        let center = NSUserNotificationCenter.default
+        center.delegate = self
+        center.deliver(userNotification)
+    }
+    
+    // NSUserNotificationCenterDelegate methods
+    func userNotificationCenter(_ center: NSUserNotificationCenter, shouldPresent notification: NSUserNotification) -> Bool {
+        return true
+    }
+    
+    // Exit after notification is delivered, like terminal-notifier
+    func userNotificationCenter(_ center: NSUserNotificationCenter, didDeliver notification: NSUserNotification) {
+        exit(0)
     }
 }
 
-// Parse command line arguments
-guard CommandLine.arguments.count > 1 else {
-    print("Usage: swift-notify <type> [message]")
-    print("Types: complete, prompt")
-    exit(1)
-}
+// Main entry point - create NSApplication and run
+let app = NSApplication.shared
+let delegate = AppDelegate()
+app.delegate = delegate
 
-let notificationType = CommandLine.arguments[1]
-let customMessage = CommandLine.arguments.count > 2 ? CommandLine.arguments[2] : nil
-
-let semaphore = DispatchSemaphore(value: 0)
-
-switch notificationType {
-case "complete":
-    let title = "✅ Task Complete"
-    let message = customMessage ?? "Claude Code has finished the task."
-    showNotification(title: title, message: message) {
-        semaphore.signal()
-    }
-case "prompt":
-    let title = "🤔 Claude Code"
-    let message = customMessage ?? "Claude Code is asking for input."
-    showNotification(title: title, message: message) {
-        semaphore.signal()
-    }
-default:
-    print("Unknown notification type: \(notificationType)")
-    print("Types: complete, prompt")
-    exit(1)
-}
-
-// Wait for notification to complete
-_ = semaphore.wait(timeout: .now() + 5)
+// Required for command-line apps to properly initialize Cocoa
+app.setActivationPolicy(.accessory)
+app.run()

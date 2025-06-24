@@ -23,4 +23,6 @@ $(WRAPPER_SCRIPT): $(APP_EXECUTABLE)
 	echo '#!/bin/bash' > $@
 	echo 'exec "$(abspath $(APP_EXECUTABLE))" "$$@"' >> $@
 	chmod u+x $@
+	# Register app bundle with Launch Services so it appears in System Settings
+	/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f $(abspath $(APP_BUNDLE))
 
