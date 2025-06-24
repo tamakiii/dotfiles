@@ -35,10 +35,10 @@ make -C make -f ubuntu.mk install
 
 The repository follows a pattern where configuration files are stored in the repository and then symlinked to their expected locations:
 
-- `.zshrc` � `~/.zshrc` - Zsh configuration with antigen plugin manager
-- `.config/tmux/` � `~/.config/tmux/` - Tmux configuration
-- `.config/helix/` � `~/.config/helix/` - Helix editor configuration
-- `.config/claude/` � `~/.config/claude/` - Claude configuration including MCP settings
+- `.zshrc`: `~/.zshrc` - Zsh configuration with antigen plugin manager
+- `.config/tmux/`: `~/.config/tmux/` - Tmux configuration
+- `.config/helix/`: `~/.config/helix/` - Helix editor configuration
+- `.config/claude/`: `~/.config/claude/` - Claude configuration including MCP settings
 
 ## Important Implementation Details
 
