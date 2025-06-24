@@ -52,6 +52,9 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 
 ## Common Commands
 
+### Build Tools
+- Always use `make -C` option to specify directory when running make commands
+
 ### Version Control
 - Always check git status before committing
 - Write clear, concise commit messages
