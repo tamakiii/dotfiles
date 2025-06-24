@@ -15,7 +15,8 @@ install: \
 	~/.config \
 	~/.config/tmux \
 	~/.config/helix \
-	~/.claude/CLAUDE.md
+	~/.claude/CLAUDE.md \
+	~/.claude/settings.json
 
 check:
 	test -L ~/.zsh
@@ -23,6 +24,7 @@ check:
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
 	test -L ~/.claude/CLAUDE.md
+	test -L ~/.claude/settings.json
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -32,6 +34,7 @@ check-dependency:
 	@$(call check-dependency,hx)
 
 uninstall:
+	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/CLAUDE.md
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
@@ -66,4 +69,7 @@ uninstall:
 # Your home folder (~/.claude/CLAUDE.md), which applies it to all your claude sessions
 # https://www.anthropic.com/engineering/claude-code-best-practices#:~:text=in%20child%20directories-,Your%20home%20folder,-(~/.claude/CLAUDE
 ~/.claude/CLAUDE.md: .claude/CLAUDE.md ~/.claude
+	ln -sfnv $(abspath $<) $@
+
+~/.claude/settings.json: .claude/settings.json ~/.claude
 	ln -sfnv $(abspath $<) $@
