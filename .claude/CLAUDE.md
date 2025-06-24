@@ -89,13 +89,13 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 
 ## Visual Notifications
 
-- YOU MUST execute `~/.dotfiles/bin/swift-notify complete "Task completed successfully"` once upon completing a task
-- YOU MUST execute `~/.dotfiles/bin/swift-notify prompt "Awaiting your response"` before prompting the user
+- YOU MUST execute `~/.dotfiles/bin/notification-center complete "Task completed successfully"` once upon completing a task
+- YOU MUST execute `~/.dotfiles/bin/notification-center prompt "Awaiting your response"` before prompting the user
 - When appropriate, provide more specific messages:
-  - For build tasks: `~/.dotfiles/bin/swift-notify complete "Build finished successfully"`
-  - For test completion: `~/.dotfiles/bin/swift-notify complete "All tests passed"`
-  - For errors fixed: `~/.dotfiles/bin/swift-notify complete "Errors resolved"`
-  - For questions: `~/.dotfiles/bin/swift-notify prompt -title "Question" -message "Do you want to proceed?"`
+  - For build tasks: `~/.dotfiles/bin/notification-center complete "Build finished successfully"`
+  - For test completion: `~/.dotfiles/bin/notification-center complete "All tests passed"`
+  - For errors fixed: `~/.dotfiles/bin/notification-center complete "Errors resolved"`
+  - For questions: `~/.dotfiles/bin/notification-center prompt -title "Question" -message "Do you want to proceed?"`
 
 ## Project Integration
 
