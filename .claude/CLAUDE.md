@@ -87,11 +87,6 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - One-word answers when appropriate
 - Include file_path:line_number references for code locations
 
-## Audio Notifications
-
-- YOU MUST execute `play /System/Library/Sounds/Glass.aiff vol 2` once upon completing a task
-- YOU MUST execute `play /System/Library/Sounds/Purr.aiff vol 2` before prompting the user
-
 ## Visual Notifications
 
 - YOU MUST execute `~/.dotfiles/bin/swift-notify complete "Task completed successfully"` once upon completing a task
