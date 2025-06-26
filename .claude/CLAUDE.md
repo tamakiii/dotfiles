@@ -87,15 +87,18 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - One-word answers when appropriate
 - Include file_path:line_number references for code locations
 
-## Visual Notifications
+## Human-in-the-Loop
 
-- YOU MUST execute `~/.dotfiles/bin/notification-center complete "Task completed successfully"` once upon completing a task
-- YOU MUST execute `~/.dotfiles/bin/notification-center prompt "Awaiting your response"` before prompting the user
-- When appropriate, provide more specific messages:
-  - For build tasks: `~/.dotfiles/bin/notification-center complete "Build finished successfully"`
-  - For test completion: `~/.dotfiles/bin/notification-center complete "All tests passed"`
-  - For errors fixed: `~/.dotfiles/bin/notification-center complete "Errors resolved"`
-  - For questions: `~/.dotfiles/bin/notification-center prompt -title "Question" -message "Do you want to proceed?"`
+- Use the `ask_human` tool when you need information only the user would know
+- This includes personal preferences, project-specific context, local environment details, or non-public information
+- Be specific and provide context in your questions to help the user understand what information you need
+- Use this tool proactively when:
+  - Clarification is needed on ambiguous requirements
+  - Decisions require user preferences or approval
+  - You need access to information not available in the codebase
+  - Multiple valid approaches exist and user input would help
+  - An automation tool has started successfully and is waiting for manual action
+  - You need to ask "Would you like me to run it again" or similar re-run questions
 
 ## Project Integration
 
