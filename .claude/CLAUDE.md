@@ -99,7 +99,12 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
   - Multiple valid approaches exist and user input would help
   - An automation tool has started successfully and is waiting for manual action
   - You need to ask "Would you like me to run it again" or similar re-run questions
-  - You encounter a prompt asking "Do you want to proceed?" with options like "Yes", "Yes, and don't ask again", or "No, and tell Claude what to do differently"
+  - You encounter ANY interactive prompt or dialog with options to proceed, especially:
+    - "Do you want to proceed?" with Yes/No options
+    - "Perfect! Now you can run the export automation commands"
+    - Any bash command confirmation dialog
+    - Any automation tool waiting for user input
+  - CRITICAL: When you see a command ready to run but waiting for confirmation, ALWAYS use ask_human instead of proceeding automatically
 
 ## Project Integration
 
