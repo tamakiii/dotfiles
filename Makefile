@@ -16,7 +16,8 @@ install: \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.claude/CLAUDE.md \
-	~/.claude/settings.json
+	~/.claude/settings.json \
+	~/.claude/commands
 
 check:
 	test -L ~/.zsh
@@ -25,6 +26,7 @@ check:
 	test -L ~/.config/helix
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
+	test -L ~/.claude/commands
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -34,6 +36,7 @@ check-dependency:
 	@$(call check-dependency,hx)
 
 uninstall:
+	rm -vrf ~/.claude/commands
 	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/CLAUDE.md
 	rm -vrf ~/.config/helix
@@ -72,4 +75,7 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.claude/settings.json: .claude/settings.json ~/.claude
+	ln -sfnv $(abspath $<) $@
+
+~/.claude/commands: .claude/commands ~/.claude
 	ln -sfnv $(abspath $<) $@
