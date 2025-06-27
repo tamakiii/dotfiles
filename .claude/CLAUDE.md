@@ -99,6 +99,7 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
   - Multiple valid approaches exist and user input would help
   - An automation tool has started successfully and is waiting for manual action
   - You need to ask "Would you like me to run it again" or similar re-run questions
+  - You encounter a prompt asking "Do you want to proceed?" with options like "Yes", "Yes, and don't ask again", or "No, and tell Claude what to do differently"
 
 ## Project Integration
 
