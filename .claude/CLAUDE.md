@@ -52,6 +52,9 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 
 ## Common Commands
 
+### Build Tools
+- Always use `make -C` option to specify directory when running make commands
+
 ### Version Control
 - Always check git status before committing
 - Write clear, concise commit messages
@@ -83,6 +86,19 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - No unnecessary preambles or postambles
 - One-word answers when appropriate
 - Include file_path:line_number references for code locations
+
+## Human-in-the-Loop
+
+- Use the `ask_human` tool when you need information only the user would know
+- This includes personal preferences, project-specific context, local environment details, or non-public information
+- Be specific and provide context in your questions to help the user understand what information you need
+- Use this tool proactively when:
+  - Clarification is needed on ambiguous requirements
+  - Decisions require user preferences or approval
+  - You need access to information not available in the codebase
+  - Multiple valid approaches exist and user input would help
+  - An automation tool has started successfully and is waiting for manual action
+  - You need to ask "Would you like me to run it again" or similar re-run questions
 
 ## Project Integration
 

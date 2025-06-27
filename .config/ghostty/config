@@ -50,6 +50,8 @@
 # Changing this configuration at runtime will only affect new terminals, i.e.
 # new windows, tabs, etc.
 font-family = "Monaco"
+# font-family = "Hiragino Sans"
+font-family = "PT Mono"
 
 font-family-bold = 
 font-family-italic = 
@@ -125,7 +127,7 @@ font-synthetic-style = bold,italic,bold-italic
 # [fontdrop.info](https://fontdrop.info).
 # 
 # To generally disable most ligatures, use `-calt, -liga, -dlig`.
-font-feature = 
+font-feature = -dlig
 
 # Font size in points. This value can be a non-integer and the nearest integer
 # pixel size will be selected. If you have a high dpi display where 1pt = 2px
