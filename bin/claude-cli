@@ -4,13 +4,16 @@ MCP_CONFIGS=(
     ~/.config/claude/mcp.json
 )
 
+# Default arguments with our MCP config
+ARGUMENTS=(--mcp-config "${MCP_CONFIGS[@]}" "$@")
+
 # Check if --mcp-config is already provided in arguments
 for arg in "$@"; do
     if [[ "$arg" == "--mcp-config" ]]; then
         # User provided their own --mcp-config, don't add ours
-        exec claude "$@"
+        ARGUMENTS=("$@")
+        break
     fi
 done
 
-# No --mcp-config provided, use our default
-claude --mcp-config "${MCP_CONFIGS[@]}" "$@"
+claude "${ARGUMENTS[@]}"
