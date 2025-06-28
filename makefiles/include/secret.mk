@@ -1,9 +1,7 @@
-ifndef help
-.PHONY: help
+.PHONY: @help
 
-help:
+@help:
 	@echo "Secret makefile - contains sensitive configuration"
-endif
 
 # Detect operating system
 OS_NAME := $(shell uname)
