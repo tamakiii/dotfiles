@@ -106,6 +106,13 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
     - Any automation tool waiting for user input
   - CRITICAL: When you see a command ready to run but waiting for confirmation, ALWAYS use ask_human instead of proceeding automatically
 
+## MCP Configuration
+
+- MCP (Model Context Protocol) servers are configured in `~/.claude/mcp.json`
+- For projects outside of dotfiles, you can create `~/.config/claude/mcp.json` for MCP configuration
+- The dotfiles installation automatically populates GitHub tokens from the macOS keychain
+- MCP servers enable enhanced capabilities like GitHub integration
+
 ## Project Integration
 
 When working in a project with its own CLAUDE.md:
