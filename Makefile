@@ -84,4 +84,4 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.claude/mcp.json: .claude/mcp.json ~/.claude
-	ln -sfnv $(abspath $<) $@
+	cp -v $< $@
