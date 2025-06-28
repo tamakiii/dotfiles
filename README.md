@@ -21,21 +21,28 @@ The repository automatically sets up MCP configuration for GitHub integration:
 - Creates `~/.config/claude/mcp.json` for general use across workspaces
 - Retrieves GitHub tokens securely from macOS keychain using `envsubst`
 
-### Usage Examples
+### Claude CLI Wrapper
+
+The repository includes a `bin/claude-cli` wrapper script that automatically loads the MCP configuration:
 
 ```sh
-# Launch Claude with MCP configuration
-claude --mcp-config ~/.config/claude/mcp.json
+# The wrapper automatically includes --mcp-config ~/.config/claude/mcp.json
+claude-cli
 
 # Verify MCP servers are loaded
-claude --mcp-config ~/.config/claude/mcp.json /mcp
+claude-cli /mcp
 
 # Example: Analyze a specific commit
-claude -p "Describe this commit: https://github.com/mojombo/grit/commit/634396b2f541a9f2d58b00be1a07f0c358b999b3"
+claude-cli -p "Describe this commit: https://github.com/mojombo/grit/commit/634396b2f541a9f2d58b00be1a07f0c358b999b3"
 
 # Example: Review a file from a repository
-claude -p "Please review the copilot-instruction: https://github.com/tamakiii/meta/blob/main/.github/copilot-instructions.md"
+claude-cli -p "Please review the copilot-instruction: https://github.com/tamakiii/meta/blob/main/.github/copilot-instructions.md"
 ```
+
+The wrapper script:
+- Automatically adds `--mcp-config ~/.config/claude/mcp.json` to all commands
+- Allows manual override if you provide your own `--mcp-config` parameter
+- Uses XDG_CONFIG_HOME if set, otherwise defaults to `~/.config`
 
 ## MCP Servers
 
