@@ -4,4 +4,13 @@ MCP_CONFIGS=(
     ~/.config/claude/mcp.json
 )
 
+# Check if --mcp-config is already provided in arguments
+for arg in "$@"; do
+    if [[ "$arg" == "--mcp-config" ]]; then
+        # User provided their own --mcp-config, don't add ours
+        exec claude "$@"
+    fi
+done
+
+# No --mcp-config provided, use our default
 claude --mcp-config "${MCP_CONFIGS[@]}" "$@"
