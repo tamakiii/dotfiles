@@ -20,7 +20,9 @@ install: \
 	~/.claude/CLAUDE.md \
 	~/.claude/settings.json \
 	~/.claude/commands \
-	~/.claude/mcp.json
+	~/.claude/mcp.json \
+	~/.config/claude \
+	~/.config/claude/mcp.json
 
 check:
 	test -L ~/.zsh
@@ -30,7 +32,9 @@ check:
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
 	test -L ~/.claude/commands
-	test -L ~/.claude/mcp.json
+	test -f ~/.claude/mcp.json
+	test -d ~/.config/claude
+	test -f ~/.config/claude/mcp.json
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -44,6 +48,8 @@ uninstall:
 	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/mcp.json
 	rm -vrf ~/.claude/CLAUDE.md
+	rm -vrf ~/.config/claude/mcp.json
+	rm -vrf ~/.config/claude
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
 	rm -rf ~/.zshrc
@@ -86,4 +92,10 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.claude/mcp.json: .claude/mcp.json ~/.claude
+	envsubst < $< > $@
+
+~/.config/claude: ~/.config
+	mkdir -p $@
+
+~/.config/claude/mcp.json: .claude/mcp.json ~/.config/claude
 	envsubst < $< > $@
