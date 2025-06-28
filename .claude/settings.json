@@ -2,7 +2,16 @@
   "enableAllProjectMcpServers": false,
   "permissions": {
     "allow": [
-      "Bash(play:*)"
+      "Bash(play:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(make:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
