@@ -106,6 +106,16 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
     - Any automation tool waiting for user input
   - CRITICAL: When you see a command ready to run but waiting for confirmation, ALWAYS use ask_human instead of proceeding automatically
 
+### Custom Commands for ask_human
+
+To ensure proper use of ask_human, custom slash commands are available:
+- `/confirm` - Use when encountering confirmation prompts
+- `/rerun` - Use when asking to run something again
+- `/automation-ready` - Use when automation tools are ready
+- `/interactive` - Use for any interactive prompt requiring input
+
+These commands are defined in `~/.claude/commands/` and explicitly enforce the use of ask_human tool.
+
 ## MCP Configuration
 
 - MCP (Model Context Protocol) servers are configured in `~/.claude/mcp.json`
