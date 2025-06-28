@@ -30,6 +30,6 @@
 # Current user for keychain lookups
 KEYCHAIN_USER := $(shell whoami)
 
-# Discord environment variables from macOS Keychain
-export DISCORD_CHANNEL_ID_CLAUDE ?= $(shell security find-generic-password -s DISCORD_CHANNEL_ID_CLAUDE -a $(KEYCHAIN_USER) -w)
-export DISCORD_USER_ID ?= $(shell security find-generic-password -s DISCORD_USER_ID -a $(KEYCHAIN_USER) -w)
+# Discord variables from macOS Keychain
+DISCORD_CHANNEL_ID_CLAUDE ?= $(shell security find-generic-password -s DISCORD_CHANNEL_ID_CLAUDE -a $(KEYCHAIN_USER) -w)
+DISCORD_USER_ID ?= $(shell security find-generic-password -s DISCORD_USER_ID -a $(KEYCHAIN_USER) -w)
