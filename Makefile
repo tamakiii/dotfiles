@@ -84,4 +84,5 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.claude/mcp.json: .claude/mcp.json ~/.claude
-	cp -v $< $@
+	@export GITHUB_PERSONAL_ACCESS_TOKEN="$$(security find-generic-password -s GITHUB_TOKEN -a $$(whoami) -w)" && \
+	envsubst '$$GITHUB_PERSONAL_ACCESS_TOKEN' < $< > $@
