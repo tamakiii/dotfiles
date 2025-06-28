@@ -91,11 +91,11 @@ uninstall:
 ~/.claude/commands: .claude/commands ~/.claude
 	ln -sfnv $(abspath $<) $@
 
-~/.claude/mcp.json: .claude/mcp.json ~/.claude
+~/.claude/mcp.json: .config/claude/mcp.json ~/.claude
 	envsubst < $< > $@
 
 ~/.config/claude: ~/.config
 	mkdir -p $@
 
-~/.config/claude/mcp.json: .claude/mcp.json ~/.config/claude
+~/.config/claude/mcp.json: .config/claude/mcp.json ~/.config/claude
 	envsubst < $< > $@
