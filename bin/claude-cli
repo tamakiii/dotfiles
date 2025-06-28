@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-MCP_CONFIGS=(
-    ~/.config/claude/mcp.json
-)
+# Use XDG_CONFIG_HOME or default to ~/.config
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 # Default arguments with our MCP config
-ARGUMENTS=(--mcp-config "${MCP_CONFIGS[@]}" "$@")
+ARGUMENTS=(
+    --mcp-config "$XDG_CONFIG_HOME/claude/mcp.json"
+    "$@"
+)
 
 # Check if --mcp-config is already provided in arguments
 for arg in "$@"; do
