@@ -4,6 +4,8 @@ SHELL := bash --noprofile --norc -eo pipefail
 error-install := echo "[error] install '$$_'"; exit 1;
 check-dependency = which $(1) || { $(call error-install) }
 
+export GITHUB_PERSONAL_ACCESS_TOKEN ?= $(shell security find-generic-password -s GITHUB_TOKEN -a $$(whoami) -w)
+
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
@@ -83,6 +85,5 @@ uninstall:
 ~/.claude/commands: .claude/commands ~/.claude
 	ln -sfnv $(abspath $<) $@
 
-~/.claude/mcp.json: .claude/mcp.json.template ~/.claude
-	GITHUB_PERSONAL_ACCESS_TOKEN="$$(security find-generic-password -s GITHUB_TOKEN -a $$(whoami) -w)" \
+~/.claude/mcp.json: .claude/mcp.json ~/.claude
 	envsubst < $< > $@
