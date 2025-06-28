@@ -11,32 +11,46 @@ make install
 make -C make -f ubuntu.mk install
 ```
 
-## claude-cli
-(TBW)
+## Claude Code Setup
 
-## MCP servers
+This repository includes configuration for Claude Code with MCP (Model Context Protocol) server integration.
 
-### Remote GitHub MCP Server
-* https://github.com/github/github-mcp-server
+### MCP Configuration
+
+The repository automatically sets up MCP configuration for GitHub integration:
+- Creates `~/.config/claude/mcp.json` for general use across workspaces
+- Retrieves GitHub tokens securely from macOS keychain using `envsubst`
+
+### Usage Examples
 
 ```sh
-claude-cli -p "Describe this commit: https://github.com/mojombo/grit/commit/634396b2f541a9f2d58b00be1a07f0c358b999b3"
-claude-cli -p "Please review the copilot-instruction: https://github.com/tamakiii/meta/blob/main/.github/copilot-instructions.md"
+# Launch Claude with MCP configuration
+claude --mcp-config ~/.config/claude/mcp.json
+
+# Verify MCP servers are loaded
+claude --mcp-config ~/.config/claude/mcp.json /mcp
+
+# Example: Analyze a specific commit
+claude -p "Describe this commit: https://github.com/mojombo/grit/commit/634396b2f541a9f2d58b00be1a07f0c358b999b3"
+
+# Example: Review a file from a repository
+claude -p "Please review the copilot-instruction: https://github.com/tamakiii/meta/blob/main/.github/copilot-instructions.md"
 ```
 
+## MCP Servers
 
-#### cross-repository issue references directly through the resource syntax
-⏺ Based on the MCP documentation and the empty resources list, it appears that the GitHub MCP server in
-  your current setup may not support cross-repository issue references directly through the resource
-  syntax.
+### GitHub MCP Server
 
-  The standard format @github:issue://114 would typically reference issue #114 in the current repository
-  context. For cross-repository references, you might need to:
+The GitHub MCP server enables Claude to interact with GitHub repositories, issues, and pull requests.
 
-  1. Configure the MCP GitHub server to have access to the tamakiii/meta repository
-  2. Or use the full GitHub URL: https://github.com/tamakiii/meta/issues/114
+- **Repository**: https://github.com/github/github-mcp-server
+- **Configuration**: Automatically set up in `~/.config/claude/mcp.json`
 
-  Without seeing specific MCP server documentation for the GitHub integration, I cannot confirm if there's
-   a syntax like @github:issue://tamakiii/meta/114 or similar for cross-repository references.
+### MCP Resource References
 
-See also: https://docs.anthropic.com/en/docs/claude-code/mcp#reference-mcp-resources
+The GitHub MCP server supports referencing resources using the `@` syntax:
+- `@github:issue://114` - References issue #114 in the current repository context
+
+**Note on Cross-Repository References**: Currently, the standard MCP resource syntax doesn't support direct cross-repository issue references. For issues in other repositories, use the full GitHub URL instead of the resource syntax.
+
+See also: [Claude Code MCP Documentation](https://docs.anthropic.com/en/docs/claude-code/mcp#reference-mcp-resources)
