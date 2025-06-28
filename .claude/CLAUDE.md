@@ -118,10 +118,12 @@ These commands are defined in `~/.claude/commands/` and explicitly enforce the u
 
 ## MCP Configuration
 
-- MCP (Model Context Protocol) servers are configured in `~/.claude/mcp.json`
-- For projects outside of dotfiles, you can create `~/.config/claude/mcp.json` for MCP configuration
-- The dotfiles installation automatically populates GitHub tokens from the macOS keychain
-- MCP servers enable enhanced capabilities like GitHub integration
+- MCP (Model Context Protocol) servers should be added using `claude mcp add` command with appropriate scope
+- Use `claude mcp add -s user` to make servers available across all projects
+- Use `claude mcp add -s project` to add servers to current project only
+- Use `claude mcp add -s local` for project-specific user settings
+- The dotfiles repository includes MCP JSON templates for manual configuration if needed
+- MCP servers enable enhanced capabilities like GitHub integration and human-in-the-loop functionality
 
 ## Project Integration
 
