@@ -24,7 +24,6 @@ install: \
 	~/.claude/CLAUDE.md \
 	~/.claude/settings.json \
 	~/.claude/commands \
-	~/.claude/mcp.json \
 	~/.config/claude \
 	~/.config/claude/mcp.json
 
@@ -36,7 +35,6 @@ check:
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
 	test -L ~/.claude/commands
-	test -f ~/.claude/mcp.json
 	test -d ~/.config/claude
 	test -f ~/.config/claude/mcp.json
 
@@ -50,7 +48,6 @@ check-dependency:
 uninstall:
 	rm -vrf ~/.claude/commands
 	rm -vrf ~/.claude/settings.json
-	rm -vrf ~/.claude/mcp.json
 	rm -vrf ~/.claude/CLAUDE.md
 	rm -vrf ~/.config/claude/mcp.json
 	rm -vrf ~/.config/claude
@@ -94,9 +91,6 @@ uninstall:
 
 ~/.claude/commands: .claude/commands ~/.claude
 	ln -sfnv $(abspath $<) $@
-
-~/.claude/mcp.json: .config/claude/mcp.json ~/.claude
-	envsubst < $< > $@
 
 ~/.config/claude: ~/.config
 	mkdir -p $@
