@@ -1,6 +1,8 @@
 .PHONY: help install check check-dependency uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
+
+include makefiles/include/secret.mk
 error-install := echo "[error] install '$$_'"; exit 1;
 check-dependency = which $(1) || { $(call error-install) }
 
