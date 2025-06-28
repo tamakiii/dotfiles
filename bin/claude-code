@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
-claude --mcp-config ~/.config/claude/mcp.json
+MCP_CONFIGS=(
+    ~/.config/claude/mcp.json
+)
+
+claude --mcp-config "${MCP_CONFIGS[@]}" "$@"
