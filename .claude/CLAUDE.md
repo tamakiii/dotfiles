@@ -11,6 +11,9 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Never create files unless absolutely necessary
 - Prefer editing existing files over creating new ones
 - Never proactively create documentation unless explicitly requested
+- Do not prefer to shorten if there's no necessity (for example deps -> dependency)
+- Prefer not to use plural names for directories unless necessary (for example, use "dependency" instead of "dependencies")
+- However, naming a directory "makefiles" can make sense, since "Makefile" is the default file name for GNU Make, and this allows you to store multiple makefiles in one directory
 
 ## Code Quality Standards
 
