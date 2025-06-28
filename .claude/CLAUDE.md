@@ -116,14 +116,6 @@ To ensure proper use of ask_human, custom slash commands are available:
 
 These commands are defined in `~/.claude/commands/` and explicitly enforce the use of ask_human tool.
 
-## MCP Configuration
-
-- MCP (Model Context Protocol) servers are configured using JSON files that can be version controlled
-- Use `claude --mcp-config ~/.config/claude/mcp.json` to load MCP configuration from a specific file
-- The dotfiles installation creates `~/.config/claude/mcp.json` with GitHub integration
-- This approach allows version control of MCP configurations while keeping secrets secure via environment variables
-- MCP servers enable enhanced capabilities like GitHub integration and human-in-the-loop functionality
-- Avoid using `claude mcp add` as it stores configuration in `~/.claude.json` which shouldn't be version controlled
 
 ## Project Integration
 
