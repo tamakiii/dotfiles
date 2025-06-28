@@ -26,3 +26,10 @@
 # - Supports service-specific password storage
 # - Allows secure retrieval and management of secrets
 # - Integrates with system keychain for credential management
+
+# Current user for keychain lookups
+KEYCHAIN_USER := $(shell whoami)
+
+# Discord environment variables from macOS Keychain
+export DISCORD_CHANNEL_ID_CLAUDE ?= $(shell security find-generic-password -s DISCORD_CHANNEL_ID_CLAUDE -a $(KEYCHAIN_USER) -w)
+export DISCORD_USER_ID ?= $(shell security find-generic-password -s DISCORD_USER_ID -a $(KEYCHAIN_USER) -w)
