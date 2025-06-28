@@ -2,7 +2,6 @@
   "enableAllProjectMcpServers": false,
   "permissions": {
     "allow": [
-      "Bash(play:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(mkdir:*)",
