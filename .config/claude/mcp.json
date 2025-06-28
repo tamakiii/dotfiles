@@ -13,6 +13,13 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
+    },
+    "human-in-the-loop": {
+      "command": "human-in-the-loop",
+      "args": [
+        "--discord-channel-id", "${DISCORD_CHANNEL_ID}",
+        "--discord-user-id", "${DISCORD_USER_ID}"
+      ]
     }
   }
 }

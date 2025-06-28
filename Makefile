@@ -7,6 +7,8 @@ error-install := echo "[error] install '$$_'"; exit 1;
 check-dependency = which $(1) || { $(call error-install) }
 
 export GITHUB_PERSONAL_ACCESS_TOKEN ?= $(shell security find-generic-password -s GITHUB_TOKEN -a $$(whoami) -w)
+export DISCORD_CHANNEL_ID ?= $(DISCORD_CHANNEL_ID_CLAUDE)
+export DISCORD_USER_ID ?= $(DISCORD_USER_ID)
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -71,7 +73,7 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config:
-	mkdir $@
+	mkdir -p $@
 
 ~/.config/tmux: .config/tmux
 	ln -sfnv $(abspath $<) $@
