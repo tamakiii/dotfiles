@@ -11,6 +11,11 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Never create files unless absolutely necessary
 - Prefer editing existing files over creating new ones
 - Never proactively create documentation unless explicitly requested
+- Avoid shortening names unnecessarily (for example deps -> dependency)
+- Avoid using plural names for directories unless necessary (for example, use "dependency" instead of "dependencies")
+- However, naming a directory "makefiles" can make sense, since "Makefile" is the default file name for GNU Make, and this allows you to store multiple makefiles in one directory
+- Always use the most secure approach - never expose secrets, credentials, or sensitive information
+- Prefer defensive programming and error handling
 
 ## Code Quality Standards
 
@@ -80,6 +85,12 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Preserve exact indentation when editing
 - Never include line numbers in edit strings
 
+### MCP Integration
+- Use GitHub MCP server for repository operations when available
+- Reference MCP resources with @ syntax when appropriate
+- Prefer MCP tools over direct API calls when functionality overlaps
+- Use human-in-the-loop MCP server for confirmation prompts and interactive decisions
+
 ## Communication Style
 
 - Answer concisely (under 4 lines unless detail requested)
@@ -99,6 +110,23 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
   - Multiple valid approaches exist and user input would help
   - An automation tool has started successfully and is waiting for manual action
   - You need to ask "Would you like me to run it again" or similar re-run questions
+  - You encounter ANY interactive prompt or dialog with options to proceed, especially:
+    - "Do you want to proceed?" with Yes/No options
+    - "Perfect! Now you can run the export automation commands"
+    - Any bash command confirmation dialog
+    - Any automation tool waiting for user input
+  - CRITICAL: When you see a command ready to run but waiting for confirmation, ALWAYS use ask_human instead of proceeding automatically
+
+### Custom Commands for ask_human
+
+To ensure proper use of ask_human, custom slash commands are available:
+- `/confirm` - Use when encountering confirmation prompts
+- `/rerun` - Use when asking to run something again
+- `/automation-ready` - Use when automation tools are ready
+- `/interactive` - Use for any interactive prompt requiring input
+
+These commands are defined in `~/.claude/commands/` and explicitly enforce the use of ask_human tool.
+
 
 ## Project Integration
 

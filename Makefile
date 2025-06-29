@@ -1,8 +1,15 @@
 .PHONY: help install check check-dependency uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
+
+include makefiles/include/secret.mk
 error-install := echo "[error] install '$$_'"; exit 1;
 check-dependency = which $(1) || { $(call error-install) }
+
+export GITHUB_PERSONAL_ACCESS_TOKEN ?= $(GITHUB_PERSONAL_ACCESS_TOKEN)
+export DISCORD_CHANNEL_ID ?= $(DISCORD_CHANNEL_ID_CLAUDE)
+export DISCORD_USER_ID ?= $(DISCORD_USER_ID)
+export DISCORD_TOKEN ?= $(DISCORD_TOKEN)
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -16,7 +23,10 @@ install: \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.claude/CLAUDE.md \
-	~/.claude/settings.json
+	~/.claude/settings.json \
+	~/.claude/commands \
+	~/.config/claude \
+	~/.config/claude/mcp.json
 
 check:
 	test -L ~/.zsh
@@ -25,6 +35,9 @@ check:
 	test -L ~/.config/helix
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
+	test -L ~/.claude/commands
+	test -d ~/.config/claude
+	test -f ~/.config/claude/mcp.json
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -34,8 +47,11 @@ check-dependency:
 	@$(call check-dependency,hx)
 
 uninstall:
+	rm -vrf ~/.claude/commands
 	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/CLAUDE.md
+	rm -vrf ~/.config/claude/mcp.json
+	rm -vrf ~/.config/claude
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
 	rm -rf ~/.zshrc
@@ -55,7 +71,7 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config:
-	mkdir $@
+	mkdir -p $@
 
 ~/.config/tmux: .config/tmux
 	ln -sfnv $(abspath $<) $@
@@ -73,3 +89,12 @@ uninstall:
 
 ~/.claude/settings.json: .claude/settings.json ~/.claude
 	ln -sfnv $(abspath $<) $@
+
+~/.claude/commands: .claude/commands ~/.claude
+	ln -sfnv $(abspath $<) $@
+
+~/.config/claude: ~/.config
+	mkdir -p $@
+
+~/.config/claude/mcp.json: .config/claude/mcp.json ~/.config/claude
+	envsubst < $< > $@

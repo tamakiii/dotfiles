@@ -2,7 +2,31 @@
   "enableAllProjectMcpServers": false,
   "permissions": {
     "allow": [
-      "Bash(play:*)"
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(make:*)",
+      "Bash(npm:*)",
+      "Bash(yarn:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(uv:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(go:*)",
+      "Bash(node:*)",
+      "Bash(deno:*)",
+      "Bash(bun:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:crates.io)",
+      "WebFetch(domain:npmjs.com)",
+      "mcp__human-in-the-loop__ask_human"
     ]
   }
 }
