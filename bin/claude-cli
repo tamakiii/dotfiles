@@ -3,19 +3,23 @@
 # Use XDG_CONFIG_HOME or default to ~/.config
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
-# Default arguments with our MCP config
-ARGUMENTS=(
-    --mcp-config "$XDG_CONFIG_HOME/claude/mcp.json"
-    "$@"
-)
+# Default arguments
+DEFAULT_ARGS=(--mcp-config "$XDG_CONFIG_HOME/claude/mcp.json")
 
-# Check if --mcp-config is already provided in arguments
-for arg in "$@"; do
-    if [[ "$arg" == "--mcp-config" ]]; then
-        # User provided their own --mcp-config, don't add ours
-        ARGUMENTS=("$@")
-        break
+# Start building final arguments
+ARGS=()
+
+# Add defaults that aren't already provided by user
+i=0
+while [ $i -lt ${#DEFAULT_ARGS[@]} ]; do
+    option="${DEFAULT_ARGS[$i]}"
+    if [[ ! " $* " =~ " $option " ]]; then
+        ARGS+=("${DEFAULT_ARGS[$i]}" "${DEFAULT_ARGS[$((i+1))]}")
     fi
+    ((i+=2))
 done
 
-claude "${ARGUMENTS[@]}"
+# Add all user arguments
+ARGS+=("$@")
+
+claude "${ARGS[@]}"
