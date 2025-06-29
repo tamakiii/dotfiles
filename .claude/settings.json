@@ -9,8 +9,24 @@
       "Bash(mv:*)",
       "Bash(cp:*)",
       "Bash(make:*)",
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(yarn:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(uv:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(go:*)",
+      "Bash(node:*)",
+      "Bash(deno:*)",
+      "Bash(bun:*)",
       "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:crates.io)",
+      "WebFetch(domain:npmjs.com)"
     ]
   }
 }

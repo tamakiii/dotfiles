@@ -14,6 +14,8 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Avoid shortening names unnecessarily (for example deps -> dependency)
 - Avoid using plural names for directories unless necessary (for example, use "dependency" instead of "dependencies")
 - However, naming a directory "makefiles" can make sense, since "Makefile" is the default file name for GNU Make, and this allows you to store multiple makefiles in one directory
+- Always use the most secure approach - never expose secrets, credentials, or sensitive information
+- Prefer defensive programming and error handling
 
 ## Code Quality Standards
 
@@ -82,6 +84,12 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Use MultiEdit for multiple changes to the same file
 - Preserve exact indentation when editing
 - Never include line numbers in edit strings
+
+### MCP Integration
+- Use GitHub MCP server for repository operations when available
+- Reference MCP resources with @ syntax when appropriate
+- Prefer MCP tools over direct API calls when functionality overlaps
+- Use human-in-the-loop MCP server for confirmation prompts and interactive decisions
 
 ## Communication Style
 

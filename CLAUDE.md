@@ -62,11 +62,11 @@ The repository follows a pattern where configuration files are stored in the rep
 This dotfiles repository includes MCP server configuration to enable enhanced Claude Code capabilities.
 
 ### Configuration Files
-- `.config/claude/mcp.json` - MCP server configuration template with GitHub integration
+- `.config/claude/mcp.json` - MCP server configuration template with GitHub and human-in-the-loop integration
 - Installation creates:
-  - `~/.claude/mcp.json` - For dotfiles workspace
-  - `~/.config/claude/mcp.json` - For other workspaces
-- The Makefile automatically populates GitHub tokens from macOS keychain using `security find-generic-password`
+  - `~/.claude/mcp.json` - For dotfiles workspace (not currently implemented)
+  - `~/.config/claude/mcp.json` - For general workspace usage
+- The Makefile automatically populates secrets from macOS keychain using environment variable substitution
 
 ### Usage
 To use MCP servers in any workspace:
