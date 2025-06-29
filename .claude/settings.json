@@ -9,7 +9,6 @@
       "Bash(mv:*)",
       "Bash(cp:*)",
       "Bash(make:*)",
-      "Bash(git:*)",
       "Bash(npm:*)",
       "Bash(yarn:*)",
       "Bash(python:*)",
