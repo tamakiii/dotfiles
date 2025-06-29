@@ -25,7 +25,8 @@
       "WebFetch(domain:docs.github.com)",
       "WebFetch(domain:pypi.org)",
       "WebFetch(domain:crates.io)",
-      "WebFetch(domain:npmjs.com)"
+      "WebFetch(domain:npmjs.com)",
+      "mcp__human-in-the-loop__ask_human"
     ]
   }
 }
