@@ -36,3 +36,4 @@ GITHUB_PERSONAL_ACCESS_TOKEN ?= $(shell security find-generic-password -s GITHUB
 # Discord variables from macOS Keychain
 DISCORD_CHANNEL_ID_CLAUDE ?= $(shell security find-generic-password -s DISCORD_CHANNEL_ID_CLAUDE -a $(KEYCHAIN_USER) -w)
 DISCORD_USER_ID ?= $(shell security find-generic-password -s DISCORD_USER_ID -a $(KEYCHAIN_USER) -w)
+DISCORD_TOKEN ?= $(shell security find-generic-password -s DISCORD_TOKEN -a $(KEYCHAIN_USER) -w)

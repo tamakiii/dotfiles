@@ -12,7 +12,10 @@
       "args": [
         "--discord-channel-id", "${DISCORD_CHANNEL_ID}",
         "--discord-user-id", "${DISCORD_USER_ID}"
-      ]
+      ],
+      "env": {
+        "DISCORD_TOKEN": "${DISCORD_TOKEN}"
+      }
     }
   }
 }

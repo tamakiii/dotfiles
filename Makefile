@@ -9,6 +9,7 @@ check-dependency = which $(1) || { $(call error-install) }
 export GITHUB_PERSONAL_ACCESS_TOKEN ?= $(GITHUB_PERSONAL_ACCESS_TOKEN)
 export DISCORD_CHANNEL_ID ?= $(DISCORD_CHANNEL_ID_CLAUDE)
 export DISCORD_USER_ID ?= $(DISCORD_USER_ID)
+export DISCORD_TOKEN ?= $(DISCORD_TOKEN)
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
