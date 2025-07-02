@@ -3,24 +3,20 @@
 # Use XDG_CONFIG_HOME or default to ~/.config
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
-# Default options as key-value pairs
-declare -A OPTIONS=(
-    ["--mcp-config"]="$XDG_CONFIG_HOME/claude/mcp.json"
-)
-
-# Process user arguments to check for overrides
+# Check if user provided --mcp-config
+HAS_MCP_CONFIG=false
 for arg in "$@"; do
-    if [[ -n "${OPTIONS[$arg]}" ]]; then
-        # User provided this option, remove from defaults
-        unset OPTIONS["$arg"]
+    if [[ "$arg" == "--mcp-config" ]]; then
+        HAS_MCP_CONFIG=true
+        break
     fi
 done
 
-# Build final arguments: defaults first, then user args
+# Build arguments
 ARGS=()
-for opt in "${!OPTIONS[@]}"; do
-    ARGS+=("$opt" "${OPTIONS[$opt]}")
-done
+if [[ "$HAS_MCP_CONFIG" == "false" ]]; then
+    ARGS+=("--mcp-config" "$XDG_CONFIG_HOME/claude/mcp.json")
+fi
 ARGS+=("$@")
 
 claude "${ARGS[@]}"
