@@ -127,7 +127,6 @@ To ensure proper use of ask_human, custom slash commands are available:
 
 These commands are defined in `~/.claude/commands/` and explicitly enforce the use of ask_human tool.
 
-
 ## Project Integration
 
 When working in a project with its own CLAUDE.md:
@@ -155,3 +154,9 @@ When working in a project with its own CLAUDE.md:
 - Assist with defensive security tasks only
 - Follow these instructions as overrides to default behavior
 - Be proactive within requested tasks, not beyond
+
+## Software Versioning
+
+- When choosing software versions, prefer the latest stable release
+- Use https://endoflife.date/ to verify current software lifecycle status
+- Example: Prefer Node.js 22+ over outdated versions like Node.js 18+
