@@ -26,7 +26,8 @@ install: \
 	~/.claude/settings.json \
 	~/.claude/commands \
 	~/.config/claude \
-	~/.config/claude/mcp.json
+	~/.config/claude/mcp.json \
+	$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
 
 check:
 	test -L ~/.zsh
@@ -38,6 +39,7 @@ check:
 	test -L ~/.claude/commands
 	test -d ~/.config/claude
 	test -f ~/.config/claude/mcp.json
+	test -f $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -47,6 +49,7 @@ check-dependency:
 	@$(call check-dependency,hx)
 
 uninstall:
+	rm -vfr $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
 	rm -vrf ~/.claude/commands
 	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/CLAUDE.md
@@ -98,3 +101,6 @@ uninstall:
 
 ~/.config/claude/mcp.json: .config/claude/mcp.json ~/.config/claude
 	envsubst < $< > $@
+
+$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json: Library/Application\ Support/Claude/claude_desktop_config.json
+	envsubst < "$<" > "$@"
