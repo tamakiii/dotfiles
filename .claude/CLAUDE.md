@@ -90,6 +90,7 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Reference MCP resources with @ syntax when appropriate
 - Prefer MCP tools over direct API calls when functionality overlaps
 - Use human-in-the-loop MCP server for confirmation prompts and interactive decisions
+- When implementing MCP server tools, follow naming conventions: string should match pattern '^[a-zA-Z0-9_-]{1,128}$'
 
 ## Communication Style
 
