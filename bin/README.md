@@ -59,6 +59,78 @@ scriptty --filter logfile        # Strip ANSI codes
 
 **For comprehensive documentation, see [../document/bin/scriptty/README.md](../document/bin/scriptty/README.md).**
 
+### claude-worktree
+
+Manage parallel Claude Code sessions using git worktrees for isolated development workflows.
+
+**Overview:**
+`claude-worktree` enables running multiple Claude Code sessions in parallel by creating isolated git worktrees. Each session gets its own branch and working directory, allowing you to work on different features simultaneously without conflicts.
+
+**Key Features:**
+- **Parallel Sessions**: Multiple Claude Code instances in isolated worktrees
+- **Session Management**: Create, resume, list, and cleanup sessions
+- **Git Integration**: Automatic branch creation and merge workflows
+- **Scriptty Integration**: Optional session recording with `--record` flag
+- **Smart Cleanup**: Automated worktree and branch cleanup
+
+**Quick Start:**
+```bash
+# Start new Claude session in isolated worktree
+claude-worktree start
+
+# Start session with recording
+claude-worktree start --record
+
+# Commit work in current session
+claude-worktree commit "Add new feature"
+
+# List all sessions
+claude-worktree list
+
+# Resume existing session
+claude-worktree resume 20250712T143022Z
+```
+
+**Session Workflow:**
+```bash
+# 1. Create and enter new session
+claude-worktree start
+# (Claude Code launches in isolated worktree)
+
+# 2. After Claude work, commit changes
+claude-worktree commit "Implement user authentication"
+
+# 3. Merge back to main branch
+claude-worktree merge
+
+# 4. Cleanup session
+claude-worktree cleanup
+```
+
+**Advanced Usage:**
+```bash
+# Custom worktree directory
+claude-worktree start --dir ~/dev/worktrees
+
+# Dry run to see what would happen
+claude-worktree merge --dry-run
+
+# Check current session status
+claude-worktree status
+
+# Cleanup specific session
+claude-worktree cleanup 20250712T143022Z
+```
+
+**Session Management:**
+```
+/tmp/git-worktree/
+├── 20250712T143022Z/     # Session timestamp ID
+│   └── my-project/       # Repository worktree
+└── 20250712T150145Z/     # Another session
+    └── my-project/
+```
+
 ## Script Integration
 
 ### PATH Configuration

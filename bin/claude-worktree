@@ -1,0 +1,481 @@
+#!/usr/bin/env bash
+#
+# claude-worktree - Manage parallel Claude Code sessions using git worktrees
+#
+# Usage: claude-worktree COMMAND [OPTIONS] [ARGS...]
+#
+# Commands:
+#   start [--dir DIR]           Create new worktree session and launch Claude Code
+#   commit [MESSAGE]            Commit changes in current worktree session
+#   merge [SESSION_ID]          Merge session branch back to main
+#   cleanup [SESSION_ID]        Remove worktree and branch
+#   list                        List available worktree sessions
+#   resume [SESSION_ID]         Resume existing worktree session
+#   status                      Show current worktree session status
+#
+# Options:
+#   --dir DIR                   Custom base directory for worktrees (default: /tmp/git-worktree)
+#   --record                    Record session with scriptty
+#   --dry-run                   Show what would be done without executing
+#   -h, --help                  Show this help message
+#
+# Examples:
+#   claude-worktree start                    # Create new session with timestamp ID
+#   claude-worktree start --record           # Create session with scriptty recording
+#   claude-worktree commit "Add new feature" # Commit work in current session
+#   claude-worktree merge 20250712T143022Z   # Merge specific session to main
+#   claude-worktree cleanup                  # Cleanup current session
+#   claude-worktree list                     # Show all available sessions
+#   claude-worktree resume 20250712T143022Z  # Resume specific session
+
+set -euo pipefail
+
+# Default configuration
+DEFAULT_WORKTREE_DIR="/tmp/git-worktree"
+WORKTREE_DIR="$DEFAULT_WORKTREE_DIR"
+RECORD_SESSION=false
+DRY_RUN=false
+VERBOSE=false
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to display usage
+show_help() {
+    sed -n '3,19p' "$0" | sed 's/^# //' | sed 's/^#//'
+    exit 0
+}
+
+# Function to log messages
+log() {
+    local level="$1"
+    shift
+    case "$level" in
+        ERROR)   echo -e "${RED}[ERROR]${NC} $*" >&2 ;;
+        WARN)    echo -e "${YELLOW}[WARN]${NC} $*" >&2 ;;
+        INFO)    echo -e "${BLUE}[INFO]${NC} $*" ;;
+        OK)      echo -e "${GREEN}[OK]${NC} $*" ;;
+        *)       echo "$*" ;;
+    esac
+}
+
+# Function to execute commands with dry-run support
+execute() {
+    if [[ "$DRY_RUN" == true ]]; then
+        log INFO "DRY-RUN: $*"
+        return 0
+    else
+        if [[ "$VERBOSE" == true ]]; then
+            log INFO "Executing: $*"
+        fi
+        "$@"
+    fi
+}
+
+# Function to check if we're in a git repository
+check_git_repo() {
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        log ERROR "Not in a git repository"
+        log INFO "Navigate to a git repository before using claude-worktree"
+        exit 1
+    fi
+}
+
+# Function to check dependencies
+check_dependencies() {
+    local missing_deps=()
+    
+    if ! command -v git >/dev/null 2>&1; then
+        missing_deps+=("git")
+    fi
+    
+    if ! command -v git-url >/dev/null 2>&1; then
+        missing_deps+=("git-url")
+    fi
+    
+    if ! command -v claude >/dev/null 2>&1; then
+        missing_deps+=("claude")
+    fi
+    
+    if [[ "$RECORD_SESSION" == true ]] && ! command -v scriptty >/dev/null 2>&1; then
+        missing_deps+=("scriptty")
+    fi
+    
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        log ERROR "Missing required dependencies: ${missing_deps[*]}"
+        log INFO "Please install missing tools and try again"
+        exit 1
+    fi
+}
+
+# Function to generate session identifier
+generate_session_id() {
+    date -u +%Y%m%dT%H%M%SZ
+}
+
+# Function to get repository name from git remote
+get_repo_name() {
+    if ! git remote get-url origin >/dev/null 2>&1; then
+        log ERROR "No git remote 'origin' found"
+        log INFO "Please add a remote origin or run from a repository with remotes"
+        exit 1
+    fi
+    
+    local repo_path
+    repo_path=$(git remote get-url origin | git-url | jq -r '.path' | sed 's/\.git$//')
+    
+    if [[ "$repo_path" == "null" ]] || [[ -z "$repo_path" ]]; then
+        log ERROR "Failed to parse repository path from remote URL"
+        exit 1
+    fi
+    
+    echo "$repo_path"
+}
+
+# Function to get current git branch
+get_current_branch() {
+    git branch --show-current
+}
+
+# Function to create worktree session
+create_worktree_session() {
+    local session_id="$1"
+    local repo_name="$2"
+    local current_branch
+    current_branch=$(get_current_branch)
+    
+    local worktree_path="${WORKTREE_DIR}/${session_id}/${repo_name}"
+    
+    log INFO "Creating worktree session"
+    log INFO "Session ID: $session_id"
+    log INFO "Repository: $repo_name"
+    log INFO "Worktree path: $worktree_path"
+    
+    # Create base directory
+    execute mkdir -p "$(dirname "$worktree_path")"
+    
+    # Create worktree with new branch
+    if [[ "$DRY_RUN" != true ]]; then
+        if ! git worktree add "$worktree_path" -b "$session_id" 2>/dev/null; then
+            log ERROR "Failed to create worktree"
+            log INFO "This might happen if branch '$session_id' already exists"
+            log INFO "Try: git branch -d '$session_id' or use a different session ID"
+            exit 1
+        fi
+    else
+        log INFO "DRY-RUN: git worktree add $worktree_path -b $session_id"
+    fi
+    
+    echo "$worktree_path"
+}
+
+# Function to enter worktree session
+enter_worktree_session() {
+    local worktree_path="$1"
+    local session_id="$2"
+    
+    if [[ ! -d "$worktree_path" ]]; then
+        log ERROR "Worktree path does not exist: $worktree_path"
+        exit 1
+    fi
+    
+    log OK "Entering worktree session: $session_id"
+    log INFO "Worktree: $worktree_path"
+    log INFO "Starting Claude Code..."
+    
+    if [[ "$RECORD_SESSION" == true ]]; then
+        log INFO "Recording session with scriptty"
+        execute scriptty -d "/tmp/dev" "claude-session-${session_id}" -- bash -c "cd '$worktree_path' && claude"
+    else
+        execute bash -c "cd '$worktree_path' && claude"
+    fi
+}
+
+# Function to commit session changes
+commit_session() {
+    local message="$1"
+    local session_id
+    
+    # Check if we're in a worktree
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        log ERROR "Not in a git worktree"
+        exit 1
+    fi
+    
+    # Get current branch (should be our session ID)
+    session_id=$(get_current_branch)
+    
+    if [[ -z "$message" ]]; then
+        message="Claude edits from session $session_id"
+    fi
+    
+    log INFO "Committing changes in session: $session_id"
+    log INFO "Commit message: $message"
+    
+    execute git add .
+    execute git commit -m "$message"
+    
+    log OK "Changes committed successfully"
+}
+
+# Function to merge session back to main
+merge_session() {
+    local session_id="$1"
+    local current_dir="$PWD"
+    local main_branch="main"
+    
+    # Try to determine the main branch
+    if git show-ref --verify --quiet refs/heads/master; then
+        main_branch="master"
+    elif git show-ref --verify --quiet refs/heads/main; then
+        main_branch="main"
+    else
+        log ERROR "Cannot find main branch (tried 'main' and 'master')"
+        exit 1
+    fi
+    
+    # Find the original repository root
+    local original_repo
+    if [[ "$PWD" == *"/tmp/git-worktree/"* ]]; then
+        # We're in a worktree, need to find the original repo
+        local git_common_dir
+        git_common_dir=$(git rev-parse --git-common-dir)
+        original_repo=$(dirname "$git_common_dir")
+    else
+        # We're already in the original repo
+        original_repo="$PWD"
+    fi
+    
+    log INFO "Merging session '$session_id' to '$main_branch'"
+    log INFO "Original repository: $original_repo"
+    
+    execute bash -c "cd '$original_repo' && git checkout '$main_branch'"
+    execute bash -c "cd '$original_repo' && git merge --no-ff '$session_id' -m 'Merge from Claude session $session_id'"
+    
+    log OK "Session merged successfully"
+    log INFO "You can now cleanup the session with: claude-worktree cleanup $session_id"
+}
+
+# Function to cleanup session
+cleanup_session() {
+    local session_id="$1"
+    local repo_name
+    repo_name=$(get_repo_name)
+    
+    local worktree_path="${WORKTREE_DIR}/${session_id}/${repo_name}"
+    
+    log INFO "Cleaning up session: $session_id"
+    log INFO "Worktree path: $worktree_path"
+    
+    # Remove worktree
+    if [[ -d "$worktree_path" ]]; then
+        execute git worktree remove "$worktree_path"
+        log OK "Worktree removed"
+    else
+        log WARN "Worktree not found: $worktree_path"
+    fi
+    
+    # Remove branch
+    if git show-ref --verify --quiet "refs/heads/$session_id"; then
+        execute git branch -d "$session_id"
+        log OK "Branch removed"
+    else
+        log WARN "Branch not found: $session_id"
+    fi
+    
+    # Cleanup empty directory structure
+    local session_dir="${WORKTREE_DIR}/${session_id}"
+    if [[ -d "$session_dir" ]] && [[ -z "$(ls -A "$session_dir")" ]]; then
+        execute rmdir "$session_dir"
+        log OK "Session directory removed"
+    fi
+}
+
+# Function to list sessions
+list_sessions() {
+    log INFO "Available worktree sessions:"
+    
+    if [[ ! -d "$WORKTREE_DIR" ]]; then
+        log INFO "No sessions found (directory doesn't exist: $WORKTREE_DIR)"
+        return 0
+    fi
+    
+    local sessions_found=false
+    
+    for session_dir in "$WORKTREE_DIR"/*; do
+        if [[ -d "$session_dir" ]]; then
+            local session_id
+            session_id=$(basename "$session_dir")
+            
+            echo -e "  ${GREEN}${session_id}${NC}"
+            
+            for repo_dir in "$session_dir"/*; do
+                if [[ -d "$repo_dir" ]]; then
+                    local repo_name
+                    repo_name=$(basename "$repo_dir")
+                    local size
+                    size=$(du -sh "$repo_dir" 2>/dev/null | cut -f1)
+                    echo "    └── $repo_name ($size)"
+                    sessions_found=true
+                fi
+            done
+        fi
+    done
+    
+    if [[ "$sessions_found" != true ]]; then
+        log INFO "No active sessions found"
+    fi
+    
+    echo
+    log INFO "Git worktrees:"
+    git worktree list 2>/dev/null || log WARN "No git worktrees found"
+}
+
+# Function to resume session
+resume_session() {
+    local session_id="$1"
+    local repo_name
+    repo_name=$(get_repo_name)
+    
+    local worktree_path="${WORKTREE_DIR}/${session_id}/${repo_name}"
+    
+    if [[ ! -d "$worktree_path" ]]; then
+        log ERROR "Session not found: $session_id"
+        log INFO "Available sessions:"
+        list_sessions
+        exit 1
+    fi
+    
+    log INFO "Resuming session: $session_id"
+    enter_worktree_session "$worktree_path" "$session_id"
+}
+
+# Function to show status
+show_status() {
+    local current_branch
+    current_branch=$(get_current_branch)
+    
+    log INFO "Current git status:"
+    echo "  Branch: $current_branch"
+    echo "  Repository: $(git rev-parse --show-toplevel)"
+    
+    if git rev-parse --git-dir | grep -q worktrees; then
+        echo "  Type: Worktree"
+        local worktree_info
+        worktree_info=$(git worktree list | grep "$(git rev-parse --show-toplevel)")
+        echo "  Worktree: $worktree_info"
+    else
+        echo "  Type: Main repository"
+    fi
+    
+    echo
+    git status --short
+}
+
+# Parse command line arguments
+COMMAND=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        start|commit|merge|cleanup|list|resume|status)
+            COMMAND="$1"
+            shift
+            break
+            ;;
+        --dir)
+            WORKTREE_DIR="$2"
+            shift 2
+            ;;
+        --record)
+            RECORD_SESSION=true
+            shift
+            ;;
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -h|--help)
+            show_help
+            ;;
+        *)
+            log ERROR "Unknown option: $1"
+            log INFO "Use -h or --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+# Validate command
+if [[ -z "$COMMAND" ]]; then
+    log ERROR "No command specified"
+    show_help
+fi
+
+# Execute command
+case "$COMMAND" in
+    start)
+        check_git_repo
+        check_dependencies
+        
+        session_id=$(generate_session_id)
+        repo_name=$(get_repo_name)
+        worktree_path=$(create_worktree_session "$session_id" "$repo_name")
+        enter_worktree_session "$worktree_path" "$session_id"
+        ;;
+        
+    commit)
+        message="${1:-}"
+        commit_session "$message"
+        ;;
+        
+    merge)
+        session_id="${1:-}"
+        if [[ -z "$session_id" ]]; then
+            session_id=$(get_current_branch)
+        fi
+        check_git_repo
+        merge_session "$session_id"
+        ;;
+        
+    cleanup)
+        session_id="${1:-}"
+        if [[ -z "$session_id" ]]; then
+            session_id=$(get_current_branch)
+        fi
+        check_git_repo
+        cleanup_session "$session_id"
+        ;;
+        
+    list)
+        list_sessions
+        ;;
+        
+    resume)
+        session_id="${1:-}"
+        if [[ -z "$session_id" ]]; then
+            log ERROR "Session ID required for resume command"
+            log INFO "Use 'claude-worktree list' to see available sessions"
+            exit 1
+        fi
+        check_git_repo
+        check_dependencies
+        resume_session "$session_id"
+        ;;
+        
+    status)
+        check_git_repo
+        show_status
+        ;;
+        
+    *)
+        log ERROR "Unknown command: $COMMAND"
+        show_help
+        ;;
+esac
