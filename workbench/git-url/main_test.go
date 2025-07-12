@@ -19,63 +19,84 @@ func TestGitURLParsing(t *testing.T) {
 			name: "GitHub SSH URL",
 			url:  "git@github.com:user/repo.git",
 			expected: Endpoint{
-				Protocol: "ssh",
-				User:     "git",
-				Host:     "github.com",
-				Port:     22,
-				Path:     "user/repo.git",
+				Protocol:        "ssh",
+				User:            "git",
+				Password:        "",
+				Host:            "github.com",
+				Port:            22,
+				Path:            "user/repo.git",
+				InsecureSkipTLS: false,
+				CaBundle:        nil,
 			},
 		},
 		{
 			name: "GitHub HTTPS URL",
 			url:  "https://github.com/user/repo.git",
 			expected: Endpoint{
-				Protocol: "https",
-				Host:     "github.com",
-				Path:     "/user/repo.git",
+				Protocol:        "https",
+				User:            "",
+				Password:        "",
+				Host:            "github.com",
+				Port:            0,
+				Path:            "/user/repo.git",
+				InsecureSkipTLS: false,
+				CaBundle:        nil,
 			},
 		},
 		{
 			name: "GitHub HTTPS URL with auth",
 			url:  "https://token@github.com/user/repo.git",
 			expected: Endpoint{
-				Protocol: "https",
-				User:     "token",
-				Host:     "github.com",
-				Path:     "/user/repo.git",
+				Protocol:        "https",
+				User:            "token",
+				Password:        "",
+				Host:            "github.com",
+				Port:            0,
+				Path:            "/user/repo.git",
+				InsecureSkipTLS: false,
+				CaBundle:        nil,
 			},
 		},
 		{
 			name: "GitLab SSH URL",
 			url:  "git@gitlab.com:group/project.git",
 			expected: Endpoint{
-				Protocol: "ssh",
-				User:     "git",
-				Host:     "gitlab.com",
-				Port:     22,
-				Path:     "group/project.git",
+				Protocol:        "ssh",
+				User:            "git",
+				Password:        "",
+				Host:            "gitlab.com",
+				Port:            22,
+				Path:            "group/project.git",
+				InsecureSkipTLS: false,
+				CaBundle:        nil,
 			},
 		},
 		{
 			name: "Custom SSH with port",
 			url:  "ssh://git@example.com:2222/path/to/repo.git",
 			expected: Endpoint{
-				Protocol: "ssh",
-				User:     "git",
-				Host:     "example.com",
-				Port:     2222,
-				Path:     "/path/to/repo.git",
+				Protocol:        "ssh",
+				User:            "git",
+				Password:        "",
+				Host:            "example.com",
+				Port:            2222,
+				Path:            "/path/to/repo.git",
+				InsecureSkipTLS: false,
+				CaBundle:        nil,
 			},
 		},
 		{
 			name: "SCP-like format",
 			url:  "user@host.example.com:path/to/repo.git",
 			expected: Endpoint{
-				Protocol: "ssh",
-				User:     "user",
-				Host:     "host.example.com",
-				Port:     22,
-				Path:     "path/to/repo.git",
+				Protocol:        "ssh",
+				User:            "user",
+				Password:        "",
+				Host:            "host.example.com",
+				Port:            22,
+				Path:            "path/to/repo.git",
+				InsecureSkipTLS: false,
+				CaBundle:        nil,
 			},
 		},
 	}
@@ -105,6 +126,9 @@ func TestGitURLParsing(t *testing.T) {
 			if result.User != tt.expected.User {
 				t.Errorf("User mismatch for %s: got %s, want %s", tt.url, result.User, tt.expected.User)
 			}
+			if result.Password != tt.expected.Password {
+				t.Errorf("Password mismatch for %s: got %s, want %s", tt.url, result.Password, tt.expected.Password)
+			}
 			if result.Host != tt.expected.Host {
 				t.Errorf("Host mismatch for %s: got %s, want %s", tt.url, result.Host, tt.expected.Host)
 			}
@@ -113,6 +137,12 @@ func TestGitURLParsing(t *testing.T) {
 			}
 			if result.Path != tt.expected.Path {
 				t.Errorf("Path mismatch for %s: got %s, want %s", tt.url, result.Path, tt.expected.Path)
+			}
+			if result.InsecureSkipTLS != tt.expected.InsecureSkipTLS {
+				t.Errorf("InsecureSkipTLS mismatch for %s: got %t, want %t", tt.url, result.InsecureSkipTLS, tt.expected.InsecureSkipTLS)
+			}
+			if string(result.CaBundle) != string(tt.expected.CaBundle) {
+				t.Errorf("CaBundle mismatch for %s: got %v, want %v", tt.url, result.CaBundle, tt.expected.CaBundle)
 			}
 		})
 	}
@@ -187,30 +217,42 @@ func TestJSONMarshaling(t *testing.T) {
 }
 
 func TestErrorHandling(t *testing.T) {
-	// Test that URL parsing errors are handled gracefully
-	// This tests the log.Printf behavior from main()
-	endpoint, err := transport.NewEndpoint("")
-	if err != nil {
-		// Empty string should cause an error, which is expected
-		return
+	// Test that JSON marshaling works for all endpoint types
+	// Since the go-git transport library is quite permissive, we test JSON marshaling robustness
+	testURLs := []string{
+		"",
+		"git@github.com:user/repo.git",
+		"https://github.com/user/repo.git",
+		"file:///path/to/repo",
 	}
 	
-	// If no error, verify we can still create the struct
-	result := Endpoint{
-		Protocol:        endpoint.Protocol,
-		User:           endpoint.User,
-		Password:       endpoint.Password,
-		Host:           endpoint.Host,
-		Port:           endpoint.Port,
-		Path:           endpoint.Path,
-		InsecureSkipTLS: endpoint.InsecureSkipTLS,
-		CaBundle:       endpoint.CaBundle,
-	}
-	
-	// Verify JSON marshaling works (should never fail with our simple struct)
-	_, err = json.Marshal(result)
-	if err != nil {
-		t.Errorf("Unexpected JSON marshaling error: %v", err)
+	for _, url := range testURLs {
+		if url == "" {
+			continue // Skip empty URLs as they get filtered out by main()
+		}
+		
+		endpoint, err := transport.NewEndpoint(url)
+		if err != nil {
+			// Some URLs might fail parsing, which is okay
+			continue
+		}
+		
+		result := Endpoint{
+			Protocol:        endpoint.Protocol,
+			User:           endpoint.User,
+			Password:       endpoint.Password,
+			Host:           endpoint.Host,
+			Port:           endpoint.Port,
+			Path:           endpoint.Path,
+			InsecureSkipTLS: endpoint.InsecureSkipTLS,
+			CaBundle:       endpoint.CaBundle,
+		}
+		
+		// Verify JSON marshaling always works (should never fail with our simple struct)
+		_, err = json.Marshal(result)
+		if err != nil {
+			t.Errorf("Unexpected JSON marshaling error for URL %s: %v", url, err)
+		}
 	}
 }
 

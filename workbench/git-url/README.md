@@ -21,19 +21,14 @@ The tool outputs JSON with all endpoint fields:
 
 ```json
 {
-  "caBundle": null,
-  "host": "github.com", 
-  "insecureSkipTLS": false,
-  "password": "",
-  "path": "user/repo.git",
-  "port": 22,
   "protocol": "ssh",
-  "proxy": {
-    "URL": "",
-    "Username": "",
-    "Password": ""
-  },
-  "user": "git"
+  "user": "git",
+  "password": "",
+  "host": "github.com",
+  "port": 22,
+  "path": "user/repo.git",
+  "insecureSkipTLS": false,
+  "caBundle": null
 }
 ```
 
