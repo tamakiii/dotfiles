@@ -4,34 +4,61 @@ Enhanced terminal session recorder using the GNU `script` command with npx-style
 
 ##  Important: GNU Script Requirement
 
-**scriptty requires the GNU version of the `script` command, not the BSD version included with macOS.**
+**scriptty works best with the GNU version of the `script` command, not the BSD version included with macOS.**
 
-The GNU `script` command provides essential features that scriptty depends on:
+The GNU `script` command provides enhanced features that scriptty can utilize:
 - Advanced timing support for session replay
 - Consistent flush behavior across platforms  
 - Better command-line option compatibility
 - More reliable output handling
 
+**Note**: scriptty will work with BSD script (the macOS default) but with reduced functionality. For the best experience, install GNU script via Nix or MacPorts.
+
 ## Installation
 
 ### 1. Install GNU Script (macOS)
 
-Choose one of these methods:
+⚠️ **Important Update**: Homebrew's util-linux package excludes the `script` command on macOS. Use one of these alternatives:
 
+#### Option A: Nix Package Manager (Recommended)
 ```bash
-brew install util-linux
+# Install Nix
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
+
+# Install util-linux with GNU script
+nix-env -iA nixpkgs.util-linux
+# Or temporarily: nix shell nixpkgs#util-linux
 ```
-This installs GNU script as `gscript` to avoid conflicts with BSD script.
+
+#### Option B: MacPorts
+```bash
+sudo port install util-linux
+```
+Note: The script command may have limited functionality on macOS.
+
+#### Option C: Use BSD Script (Limited Features)
+scriptty will work with BSD script but with reduced functionality.
+
+#### Option D: Alternative - unbuffer (For TTY Simulation)
+```bash
+brew install expect
+# Use unbuffer for some TTY-dependent commands:
+unbuffer -p command
+```
 
 ### 2. Verify Installation
 
 ```bash
-# Check GNU script is available
-gscript --version
-# Should show: script from util-linux 2.39.x
+# For Nix installation:
+script --version
+# Should show: script from util-linux 2.x.x
 
-# Test scriptty can find GNU script
+# For MacPorts:
+/opt/local/bin/script --version
+
+# Test scriptty detection:
 scriptty --help
+# Should show minimal warnings if GNU script is found
 ```
 
 ### 3. Setup scriptty
@@ -208,13 +235,30 @@ scriptty automatically detects the platform and script version:
 ### GNU Script Not Found
 
 ```bash
-# Error: scriptty requires GNU script
-[ERROR] GNU script not found. Please install util-linux.
-        macOS: brew install util-linux
-        Linux: sudo apt install util-linux (usually pre-installed)
+# Error: scriptty requires script command
+[ERROR] No script command found in PATH
+        Please install a script command for terminal recording
+        macOS options:
+          - Nix: nix-env -iA nixpkgs.util-linux
+          - MacPorts: sudo port install util-linux
+          - BSD script is built-in but limited
+        Linux: sudo apt install util-linux
 ```
 
-**Solution**: Install util-linux package as described in Installation section.
+**Solution**: 
+1. **Nix (Recommended)**: Install Nix package manager and util-linux as shown in Installation section
+2. **MacPorts**: Install via MacPorts if available
+3. **BSD Script**: Use the built-in BSD script (limited features but functional)
+
+### Homebrew util-linux Issue
+
+```bash
+# Homebrew excludes script command on macOS
+brew install util-linux
+# No gscript or script command available
+```
+
+**Solution**: Homebrew's util-linux deliberately excludes the script command on macOS. Use Nix or MacPorts instead.
 
 ### Permission Issues
 

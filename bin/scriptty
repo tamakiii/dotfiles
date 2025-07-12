@@ -60,6 +60,15 @@ SCRIPT_CMD="script"
 if command -v gscript >/dev/null 2>&1; then
     SCRIPT_CMD="gscript"
     IS_GNU_SCRIPT=true
+elif [[ -x "/opt/local/bin/script" ]]; then
+    # MacPorts installation
+    SCRIPT_CMD="/opt/local/bin/script"
+    if /opt/local/bin/script --version 2>&1 | grep -q "util-linux"; then
+        IS_GNU_SCRIPT=true
+    else
+        IS_GNU_SCRIPT=false
+        SHOW_GNU_WARNING=true
+    fi
 elif command -v script >/dev/null 2>&1; then
     # Check if it's GNU script by testing for GNU-specific option
     if script --version 2>&1 | grep -q "util-linux"; then
@@ -70,8 +79,11 @@ elif command -v script >/dev/null 2>&1; then
     fi
 else
     echo "[ERROR] No script command found in PATH"
-    echo "        Please install util-linux package for GNU script"
-    echo "        macOS: brew install util-linux"
+    echo "        Please install a script command for terminal recording"
+    echo "        macOS options:"
+    echo "          - Nix: nix-env -iA nixpkgs.util-linux"
+    echo "          - MacPorts: sudo port install util-linux"
+    echo "          - BSD script is built-in but limited"
     echo "        Linux: sudo apt install util-linux"
     exit 1
 fi
