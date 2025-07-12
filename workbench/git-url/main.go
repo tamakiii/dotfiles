@@ -1,14 +1,57 @@
+package main
+
 import (
-    "github.com/go-git/go-git/v5"
+    "bufio"
+    "encoding/json"
+    "fmt"
+    "log"
+    "os"
+    "strings"
+
     "github.com/go-git/go-git/v5/plumbing/transport"
 )
 
-repo, _ := git.PlainOpen(".")
-remote, _ := repo.Remote("origin")
-for _, url := range remote.Config().URLs {
-    endpoint, _ := transport.NewEndpoint(url)
-    fmt.Println(endpoint.Host)
-    fmt.Println(endpoint.Path)
+type GitURL struct {
+    Host string `json:"host"`
+    Path string `json:"path"`
 }
 
-// TODO: output JSON by default
+func main() {
+    scanner := bufio.NewScanner(os.Stdin)
+    
+    for scanner.Scan() {
+        line := strings.TrimSpace(scanner.Text())
+        if line == "" {
+            continue
+        }
+        
+        endpoint, err := transport.NewEndpoint(line)
+        if err != nil {
+            log.Printf("Error parsing URL %s: %v", line, err)
+            continue
+        }
+        
+        result := map[string]interface{}{
+            "protocol":         endpoint.Protocol,
+            "user":            endpoint.User,
+            "password":        endpoint.Password,
+            "host":            endpoint.Host,
+            "port":            endpoint.Port,
+            "path":            endpoint.Path,
+            "insecureSkipTLS": endpoint.InsecureSkipTLS,
+            "caBundle":        endpoint.CaBundle,
+            "proxy":           endpoint.Proxy,
+        }
+        
+        output, err := json.MarshalIndent(result, "", "  ")
+        if err != nil {
+            log.Fatal(err)
+        }
+        
+        fmt.Println(string(output))
+    }
+    
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+}
