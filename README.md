@@ -13,6 +13,8 @@ This repository sets up a complete development environment with:
 | **helix** | Modern modal text editor | `.config/helix/` |
 | **Claude Code** | AI coding assistant with MCP integration | `.claude/`, `.config/claude/` |
 | **ghostty** | GPU-accelerated terminal emulator | `.config/ghostty/` |
+| **scriptty** | Enhanced terminal session recorder | `bin/scriptty` |
+| **git-url** | Git URL parser utility | `workbench/git-url/` |
 | **git** | Version control configuration | `.config/git/` |
 | **GitHub Copilot** | AI code completion with custom prompts | `.llm/prompt/github-copilot/` |
 
@@ -40,6 +42,7 @@ The following tools must be installed before running `make install`:
 - `uv` - Fast Python package installer
 - `fzf` - Command-line fuzzy finder
 - `hx` - Helix editor
+- `go` - Go programming language (for workbench tools)
 
 ## 🛠️ Installation
 
@@ -93,12 +96,86 @@ claude-cli -p "Please review: https://github.com/tamakiii/meta/blob/main/.github
 
 For detailed MCP configuration, see [MCP.md](MCP.md).
 
+## Development Tools
+
+### Terminal Recording with scriptty
+
+The repository includes `scriptty`, an enhanced wrapper around macOS's BSD `script` command that provides modern UX for terminal session recording:
+
+```sh
+# Record interactive sessions
+scriptty
+
+# Record specific commands with timing data
+scriptty -k make build
+
+# Live streaming for long-running processes
+scriptty -f npm test
+
+# List and manage recorded sessions
+scriptty -l
+scriptty --view session-file
+```
+
+Key features:
+- **npx-style execution**: `scriptty command` instead of `script file command`
+- **Smart file organization**: Timestamped logs with descriptive names
+- **BSD script modes**: Keylogging (`-k`), live streaming (`-f`), raw recording (`-r`)
+- **Session management**: Resume sessions, check status, duration tracking
+- **Security features**: Private mode with sensitive data scanning
+
+For comprehensive documentation, see [document/bin/scriptty/README.md](document/bin/scriptty/README.md).
+
+### Workbench Development Environment
+
+The `workbench/` directory contains development tools and utilities:
+
+```sh
+# Build all workbench tools
+make -C workbench build
+
+# Build specific tools
+make -C workbench/git-url build
+```
+
+#### git-url Utility
+
+Parses Git URLs from stdin and outputs detailed endpoint information as JSON:
+
+```sh
+# Parse git remote URL
+git remote get-url origin | git-url
+
+# Parse any Git URL
+echo "git@github.com:user/repo.git" | git-url
+```
+
+For detailed workbench documentation, see [workbench/README.md](workbench/README.md).
+
+### Shell Snippets Reference
+
+Quick access to commonly used shell commands and workflows:
+
+```sh
+# Interactive file selection with fzf
+ls | fzf --select-1 --exit-0
+
+# Navigate to git repository root
+cd "$(basename $(git remote get-url origin) .git)"
+
+# Standard git commit workflow
+git add . && git commit -m "your commit message"
+```
+
+For the complete collection, see [document/snippets.md](document/snippets.md).
+
 ## Configuration Details
 
-### Global Claude Configuration
+### Claude Code Configuration
 - `~/.claude/CLAUDE.md` - Global AI assistant preferences
 - `~/.claude/settings.json` - Claude Code permissions and settings
-- `~/.claude/commands/` - Custom slash commands
+- `~/.claude/commands/` - Custom slash commands including:
+  - `/confirm`, `/rerun` - Human-in-the-loop interaction helpers
 - `~/.config/claude/mcp.json` - MCP server configuration
 
 ### Shell Configuration
