@@ -13,5 +13,8 @@ clean:
 bin:
 	mkdir -p bin
 
-bin/git-url: git-url/main.go git-url/go.mod
-	cd git-url && go build -o ../bin/git-url .
+bin/git-url: git-url/bin/git-url
+	ln -sf ../git-url/bin/git-url bin/
+
+git-url/bin/git-url:
+	make -C git-url build
