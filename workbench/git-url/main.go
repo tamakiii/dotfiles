@@ -50,7 +50,8 @@ func main() {
         
         output, err := json.MarshalIndent(result, "", "  ")
         if err != nil {
-            log.Fatal(err)
+            log.Printf("Error marshaling JSON for URL %s: %v", line, err)
+            continue
         }
         
         fmt.Println(string(output))

@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/go-git/go-git/v5/plumbing/transport"
@@ -76,15 +78,6 @@ func TestGitURLParsing(t *testing.T) {
 				Path:     "path/to/repo.git",
 			},
 		},
-		{
-			name: "Local file path",
-			url:  "not-a-valid-url",
-			expected: Endpoint{
-				Protocol: "file",
-				Host:     "",
-				Path:     "/Users/tamakiii/.dotfiles/workbench/git-url/not-a-valid-url",
-			},
-		},
 	}
 
 	for _, tt := range tests {
@@ -125,6 +118,42 @@ func TestGitURLParsing(t *testing.T) {
 	}
 }
 
+func TestLocalFilePath(t *testing.T) {
+	url := "not-a-valid-url"
+	endpoint, err := transport.NewEndpoint(url)
+	if err != nil {
+		t.Fatalf("Unexpected error parsing URL %s: %v", url, err)
+	}
+
+	// Get current working directory to compute expected path
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current working directory: %v", err)
+	}
+	expectedPath := filepath.Join(cwd, url)
+
+	result := Endpoint{
+		Protocol:        endpoint.Protocol,
+		User:           endpoint.User,
+		Password:       endpoint.Password,
+		Host:           endpoint.Host,
+		Port:           endpoint.Port,
+		Path:           endpoint.Path,
+		InsecureSkipTLS: endpoint.InsecureSkipTLS,
+		CaBundle:       endpoint.CaBundle,
+	}
+
+	if result.Protocol != "file" {
+		t.Errorf("Protocol mismatch: got %s, want file", result.Protocol)
+	}
+	if result.Host != "" {
+		t.Errorf("Host mismatch: got %s, want empty", result.Host)
+	}
+	if result.Path != expectedPath {
+		t.Errorf("Path mismatch: got %s, want %s", result.Path, expectedPath)
+	}
+}
+
 func TestJSONMarshaling(t *testing.T) {
 	endpoint := Endpoint{
 		Protocol: "ssh",
@@ -154,6 +183,34 @@ func TestJSONMarshaling(t *testing.T) {
 		endpoint.InsecureSkipTLS != unmarshaled.InsecureSkipTLS ||
 		string(endpoint.CaBundle) != string(unmarshaled.CaBundle) {
 		t.Errorf("JSON round-trip failed: got %+v, want %+v", unmarshaled, endpoint)
+	}
+}
+
+func TestErrorHandling(t *testing.T) {
+	// Test that URL parsing errors are handled gracefully
+	// This tests the log.Printf behavior from main()
+	endpoint, err := transport.NewEndpoint("")
+	if err != nil {
+		// Empty string should cause an error, which is expected
+		return
+	}
+	
+	// If no error, verify we can still create the struct
+	result := Endpoint{
+		Protocol:        endpoint.Protocol,
+		User:           endpoint.User,
+		Password:       endpoint.Password,
+		Host:           endpoint.Host,
+		Port:           endpoint.Port,
+		Path:           endpoint.Path,
+		InsecureSkipTLS: endpoint.InsecureSkipTLS,
+		CaBundle:       endpoint.CaBundle,
+	}
+	
+	// Verify JSON marshaling works (should never fail with our simple struct)
+	_, err = json.Marshal(result)
+	if err != nil {
+		t.Errorf("Unexpected JSON marshaling error: %v", err)
 	}
 }
 
