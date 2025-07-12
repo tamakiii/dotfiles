@@ -160,3 +160,7 @@ When working in a project with its own CLAUDE.md:
 
 - When choosing software versions, prefer the latest stable release
 - Example: Prefer Node.js 22+ over outdated versions like Node.js 18+
+
+## Version Control Preferences
+
+- I don't want to include "Co-Authored-By: Claude <noreply@anthropic.com>." things
