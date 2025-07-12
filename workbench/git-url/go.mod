@@ -1,4 +1,4 @@
-module git-url
+module github.com/tamakiii/dotfiles/workbench/git-url
 
 go 1.24.4
 

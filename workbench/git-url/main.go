@@ -11,9 +11,15 @@ import (
     "github.com/go-git/go-git/v5/plumbing/transport"
 )
 
-type GitURL struct {
-    Host string `json:"host"`
-    Path string `json:"path"`
+type Endpoint struct {
+    Protocol         string `json:"protocol"`
+    User             string `json:"user"`
+    Password         string `json:"password"`
+    Host             string `json:"host"`
+    Port             int    `json:"port"`
+    Path             string `json:"path"`
+    InsecureSkipTLS  bool   `json:"insecureSkipTLS"`
+    CaBundle         []byte `json:"caBundle"`
 }
 
 func main() {
@@ -31,16 +37,15 @@ func main() {
             continue
         }
         
-        result := map[string]interface{}{
-            "protocol":         endpoint.Protocol,
-            "user":            endpoint.User,
-            "password":        endpoint.Password,
-            "host":            endpoint.Host,
-            "port":            endpoint.Port,
-            "path":            endpoint.Path,
-            "insecureSkipTLS": endpoint.InsecureSkipTLS,
-            "caBundle":        endpoint.CaBundle,
-            "proxy":           endpoint.Proxy,
+        result := Endpoint{
+            Protocol:         endpoint.Protocol,
+            User:             endpoint.User,
+            Password:         endpoint.Password,
+            Host:             endpoint.Host,
+            Port:             endpoint.Port,
+            Path:             endpoint.Path,
+            InsecureSkipTLS:  endpoint.InsecureSkipTLS,
+            CaBundle:         endpoint.CaBundle,
         }
         
         output, err := json.MarshalIndent(result, "", "  ")
