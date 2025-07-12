@@ -163,8 +163,8 @@ ls | fzf --select-1 --exit-0
 # Navigate to git repository root
 cd "$(basename $(git remote get-url origin) .git)"
 
-# AI-assisted git commit
-claude --model sonnet -p '/git-commit'
+# Standard git commit workflow
+git add . && git commit -m "your commit message"
 ```
 
 For the complete collection, see [document/snippets.md](document/snippets.md).
@@ -175,8 +175,6 @@ For the complete collection, see [document/snippets.md](document/snippets.md).
 - `~/.claude/CLAUDE.md` - Global AI assistant preferences
 - `~/.claude/settings.json` - Claude Code permissions and settings
 - `~/.claude/commands/` - Custom slash commands including:
-  - `/git-commit` - AI-assisted commit message generation
-  - `/git-commit-impl` - Validated commit execution
   - `/confirm`, `/rerun` - Human-in-the-loop interaction helpers
 - `~/.config/claude/mcp.json` - MCP server configuration
 

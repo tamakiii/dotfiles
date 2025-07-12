@@ -44,33 +44,6 @@ Use for any interactive prompt or menu that requires user input.
 /interactive: menu selection required
 ```
 
-### `/git-commit-impl`
-Execute git commit with a validated message provided as argument.
-
-**Example usage:**
-```
-/git-commit-impl fix: resolve authentication type errors
-/git-commit-impl feat: add user profile management
-```
-
-**Validation:**
-- Rejects empty messages
-- Rejects placeholder text like `<YOUR_COMMIT_MESSAGE>`, `[placeholder]`, etc.
-
-### `/git-commit`
-AI-assisted commit message generation with automatic validation.
-
-**Example usage:**
-```
-/git-commit
-```
-
-**Features:**
-- Analyzes staged changes automatically
-- Generates appropriate commit messages
-- Uses `/git-commit-impl` for validation
-- Follows conventional commit format
-
 ## How It Works
 
 Each command file:
