@@ -55,6 +55,27 @@ case "$PLATFORM" in
     *)      IS_MACOS=false ;;
 esac
 
+# Script command detection - prefer GNU script
+SCRIPT_CMD="script"
+if command -v gscript >/dev/null 2>&1; then
+    SCRIPT_CMD="gscript"
+    IS_GNU_SCRIPT=true
+elif command -v script >/dev/null 2>&1; then
+    # Check if it's GNU script by testing for GNU-specific option
+    if script --version 2>&1 | grep -q "util-linux"; then
+        IS_GNU_SCRIPT=true
+    else
+        IS_GNU_SCRIPT=false
+        SHOW_GNU_WARNING=true
+    fi
+else
+    echo "[ERROR] No script command found in PATH"
+    echo "        Please install util-linux package for GNU script"
+    echo "        macOS: brew install util-linux"
+    echo "        Linux: sudo apt install util-linux"
+    exit 1
+fi
+
 # Function to display usage
 show_help() {
     sed -n '3,25p' "$0" | sed 's/^# //' | sed 's/^#//'
@@ -400,7 +421,9 @@ if [[ "$QUIET_MODE" == true ]]; then
     SCRIPT_OPTS+=("-q")
 fi
 if [[ "$FORCE_FLUSH" == true ]]; then
-    if [[ "$IS_MACOS" == true ]]; then
+    if [[ "$IS_GNU_SCRIPT" == true ]]; then
+        SCRIPT_OPTS+=("-f")
+    elif [[ "$IS_MACOS" == true ]]; then
         SCRIPT_OPTS+=("-F")
     else
         SCRIPT_OPTS+=("-f")
@@ -408,6 +431,14 @@ if [[ "$FORCE_FLUSH" == true ]]; then
 fi
 if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
     SCRIPT_OPTS+=("-a")
+fi
+
+# GNU script warning
+if [[ "${SHOW_GNU_WARNING:-false}" == true ]] && [[ "$IS_MACOS" == true ]] && [[ "$QUIET_MODE" != true ]]; then
+    echo "[WARNING] Using BSD script instead of GNU script"
+    echo "          For best results, install GNU script: brew install util-linux"
+    echo "          Some features may be limited with BSD script"
+    echo ""
 fi
 
 # Private mode warning
@@ -442,11 +473,11 @@ fi
 EXIT_CODE=0
 if [[ -n "$COMMAND_TO_RUN" ]]; then
     # Execute the specified command
-    script "${SCRIPT_OPTS[@]}" "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
+    "$SCRIPT_CMD" "${SCRIPT_OPTS[@]}" "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
     EXIT_CODE=$?
 else
     # Interactive shell mode
-    script "${SCRIPT_OPTS[@]}" "$LOG_FILE"
+    "$SCRIPT_CMD" "${SCRIPT_OPTS[@]}" "$LOG_FILE"
     EXIT_CODE=$?
 fi
 
