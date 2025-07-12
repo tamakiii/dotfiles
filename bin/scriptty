@@ -1,3 +1,186 @@
 #!/usr/bin/env bash
+#
+# scriptty - Enhanced terminal session recorder using the 'script' command
+#
+# Usage: scriptty [OPTIONS]
+#
+# Records terminal sessions to timestamped log files for later review.
+# By default, logs are saved to /tmp/dev/<tty>_<timestamp>
+#
+# Options:
+#   -d, --dir DIR      Custom log directory (default: /tmp/dev)
+#   -a, --append       Append to existing log file instead of creating new
+#   -s, --status       Check if a script session is currently active
+#   -l, --list         List recent session logs
+#   -h, --help         Show this help message
+#
+# Examples:
+#   scriptty                    # Start recording with default settings
+#   scriptty -d ~/logs         # Save logs to custom directory
+#   scriptty -s                # Check if recording is active
+#   scriptty -l                # List recent session logs
 
-TTY_ID=$(ps -p $$ -o tty= | xargs); [[ "$TTY_ID" != "??" && -n "$TTY_ID" ]] && script /tmp/dev/$TTY_ID || echo "❌ No valid TTY detected"
+set -euo pipefail
+
+# Default configuration
+DEFAULT_LOG_DIR="/tmp/dev"
+LOG_DIR="$DEFAULT_LOG_DIR"
+APPEND_MODE=false
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to display usage
+show_help() {
+    sed -n '3,20p' "$0" | sed 's/^# //' | sed 's/^#//'
+    exit 0
+}
+
+# Function to get current TTY
+get_tty() {
+    local tty_id
+    tty_id=$(ps -p $$ -o tty= | xargs)
+    
+    if [[ "$tty_id" == "??" ]] || [[ -z "$tty_id" ]]; then
+        echo ""
+        return 1
+    fi
+    
+    echo "$tty_id"
+    return 0
+}
+
+# Function to check if script is already running
+check_script_status() {
+    if [[ -n "${SCRIPT:-}" ]]; then
+        echo -e "${GREEN}✓${NC} Script session is currently active"
+        echo -e "  Recording to: ${BLUE}$SCRIPT${NC}"
+        return 0
+    else
+        echo -e "${YELLOW}○${NC} No active script session"
+        return 1
+    fi
+}
+
+# Function to list recent logs
+list_logs() {
+    local search_dir="${1:-$DEFAULT_LOG_DIR}"
+    
+    if [[ ! -d "$search_dir" ]]; then
+        echo -e "${YELLOW}○${NC} No logs found (directory doesn't exist: $search_dir)"
+        return 1
+    fi
+    
+    local logs
+    logs=$(find "$search_dir" -name "*_*" -type f 2>/dev/null | sort -r | head -10)
+    
+    if [[ -z "$logs" ]]; then
+        echo -e "${YELLOW}○${NC} No session logs found in $search_dir"
+        return 1
+    fi
+    
+    echo -e "${BLUE}Recent session logs:${NC}"
+    echo "$logs" | while read -r log; do
+        local size
+        size=$(ls -lh "$log" | awk '{print $5}')
+        local modified
+        modified=$(ls -l "$log" | awk '{print $6, $7, $8}')
+        echo -e "  ${GREEN}•${NC} $(basename "$log") (${size}, ${modified})"
+    done
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -d|--dir)
+            LOG_DIR="$2"
+            shift 2
+            ;;
+        -a|--append)
+            APPEND_MODE=true
+            shift
+            ;;
+        -s|--status)
+            check_script_status
+            exit $?
+            ;;
+        -l|--list)
+            list_logs "${2:-$DEFAULT_LOG_DIR}"
+            exit $?
+            ;;
+        -h|--help)
+            show_help
+            ;;
+        *)
+            echo -e "${RED}❌${NC} Unknown option: $1"
+            echo "Use -h or --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+# Check if script is already running
+if [[ -n "${SCRIPT:-}" ]]; then
+    echo -e "${YELLOW}⚠${NC} Script session already active!"
+    echo -e "  Recording to: ${BLUE}$SCRIPT${NC}"
+    echo -e "  Exit the current session before starting a new one"
+    exit 1
+fi
+
+# Get TTY information
+TTY_ID=$(get_tty)
+if [[ -z "$TTY_ID" ]]; then
+    echo -e "${RED}❌${NC} No valid TTY detected"
+    echo "  This command must be run in an interactive terminal"
+    exit 1
+fi
+
+# Create log directory if it doesn't exist
+if [[ ! -d "$LOG_DIR" ]]; then
+    mkdir -p "$LOG_DIR" || {
+        echo -e "${RED}❌${NC} Failed to create log directory: $LOG_DIR"
+        exit 1
+    }
+fi
+
+# Determine log file path
+if [[ "$APPEND_MODE" == true ]]; then
+    # Find the most recent log file for this TTY
+    LOG_FILE=$(find "$LOG_DIR" -name "${TTY_ID}_*" -type f 2>/dev/null | sort -r | head -1)
+    
+    if [[ -z "$LOG_FILE" ]]; then
+        # No existing log file, create a new one
+        LOG_FILE="${LOG_DIR}/${TTY_ID}_${TIMESTAMP}"
+        echo -e "${YELLOW}○${NC} No existing log found, creating new file"
+    else
+        echo -e "${GREEN}✓${NC} Appending to existing log"
+    fi
+else
+    LOG_FILE="${LOG_DIR}/${TTY_ID}_${TIMESTAMP}"
+fi
+
+# Start script session
+echo -e "${GREEN}▶${NC} Starting terminal recording"
+echo -e "  TTY: ${BLUE}$TTY_ID${NC}"
+echo -e "  Log: ${BLUE}$LOG_FILE${NC}"
+echo -e "  ${YELLOW}Type 'exit' or press Ctrl+D to stop recording${NC}"
+echo ""
+
+# Run script command
+if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
+    script -a "$LOG_FILE"
+else
+    script "$LOG_FILE"
+fi
+
+# Post-session information
+echo ""
+echo -e "${GREEN}✓${NC} Recording session ended"
+echo -e "  Log saved to: ${BLUE}$LOG_FILE${NC}"
+echo -e "  Size: $(ls -lh "$LOG_FILE" | awk '{print $5}')"
+echo -e "  View with: ${YELLOW}cat '$LOG_FILE'${NC}"
