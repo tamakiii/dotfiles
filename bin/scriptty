@@ -2,7 +2,7 @@
 #
 # scriptty - Enhanced terminal session recorder using the 'script' command
 #
-# Usage: scriptty [OPTIONS]
+# Usage: scriptty [OPTIONS] [-- COMMAND [ARGS...]]
 #
 # Records terminal sessions to timestamped log files for later review.
 # By default, logs are saved to /tmp/dev/<tty>_<timestamp>
@@ -15,10 +15,13 @@
 #   -h, --help         Show this help message
 #
 # Examples:
-#   scriptty                    # Start recording with default settings
+#   scriptty                    # Start recording interactive shell
 #   scriptty -d ~/logs         # Save logs to custom directory
 #   scriptty -s                # Check if recording is active
 #   scriptty -l                # List recent session logs
+#   scriptty -- claude         # Record a claude session
+#   scriptty -- npm test       # Record npm test output
+#   scriptty -d ~/logs -- make # Record make with custom log dir
 
 set -euo pipefail
 
@@ -37,7 +40,7 @@ NC='\033[0m' # No Color
 
 # Function to display usage
 show_help() {
-    sed -n '3,20p' "$0" | sed 's/^# //' | sed 's/^#//'
+    sed -n '3,25p' "$0" | sed 's/^# //' | sed 's/^#//'
     exit 0
 }
 
@@ -94,6 +97,10 @@ list_logs() {
     done
 }
 
+# Variables for command execution
+COMMAND_TO_RUN=""
+COMMAND_ARGS=()
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -115,6 +122,16 @@ while [[ $# -gt 0 ]]; do
             ;;
         -h|--help)
             show_help
+            ;;
+        --)
+            # Everything after -- is the command to run
+            shift
+            if [[ $# -gt 0 ]]; then
+                COMMAND_TO_RUN="$1"
+                shift
+                COMMAND_ARGS=("$@")
+            fi
+            break
             ;;
         *)
             echo -e "${RED}❌${NC} Unknown option: $1"
@@ -155,27 +172,56 @@ if [[ "$APPEND_MODE" == true ]]; then
     
     if [[ -z "$LOG_FILE" ]]; then
         # No existing log file, create a new one
-        LOG_FILE="${LOG_DIR}/${TTY_ID}_${TIMESTAMP}"
+        if [[ -n "$COMMAND_TO_RUN" ]]; then
+            # Include command name in filename (sanitize it first)
+            SAFE_CMD=$(basename "$COMMAND_TO_RUN" | tr -cd '[:alnum:]._-')
+            LOG_FILE="${LOG_DIR}/${TTY_ID}_${SAFE_CMD}_${TIMESTAMP}"
+        else
+            LOG_FILE="${LOG_DIR}/${TTY_ID}_${TIMESTAMP}"
+        fi
         echo -e "${YELLOW}○${NC} No existing log found, creating new file"
     else
         echo -e "${GREEN}✓${NC} Appending to existing log"
     fi
 else
-    LOG_FILE="${LOG_DIR}/${TTY_ID}_${TIMESTAMP}"
+    if [[ -n "$COMMAND_TO_RUN" ]]; then
+        # Include command name in filename (sanitize it first)
+        SAFE_CMD=$(basename "$COMMAND_TO_RUN" | tr -cd '[:alnum:]._-')
+        LOG_FILE="${LOG_DIR}/${TTY_ID}_${SAFE_CMD}_${TIMESTAMP}"
+    else
+        LOG_FILE="${LOG_DIR}/${TTY_ID}_${TIMESTAMP}"
+    fi
 fi
 
 # Start script session
 echo -e "${GREEN}▶${NC} Starting terminal recording"
 echo -e "  TTY: ${BLUE}$TTY_ID${NC}"
 echo -e "  Log: ${BLUE}$LOG_FILE${NC}"
-echo -e "  ${YELLOW}Type 'exit' or press Ctrl+D to stop recording${NC}"
+if [[ -n "$COMMAND_TO_RUN" ]]; then
+    echo -e "  Command: ${BLUE}$COMMAND_TO_RUN${NC}"
+    if [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
+        echo -e "  Args: ${BLUE}${COMMAND_ARGS[*]}${NC}"
+    fi
+else
+    echo -e "  ${YELLOW}Type 'exit' or press Ctrl+D to stop recording${NC}"
+fi
 echo ""
 
 # Run script command
-if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
-    script -a "$LOG_FILE"
+if [[ -n "$COMMAND_TO_RUN" ]]; then
+    # Execute the specified command
+    if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
+        script -a "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
+    else
+        script "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
+    fi
 else
-    script "$LOG_FILE"
+    # Interactive shell mode
+    if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
+        script -a "$LOG_FILE"
+    else
+        script "$LOG_FILE"
+    fi
 fi
 
 # Post-session information
