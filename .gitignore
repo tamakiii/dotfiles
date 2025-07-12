@@ -5,4 +5,4 @@
 /tmux-client-*.log
 /.config/iterm2/AppSupport
 /.config/.isolated-storage/
-/workbench/bin/
+/workbench/**/bin/
