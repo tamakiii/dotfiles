@@ -13,11 +13,7 @@ description: Commit staged changes automatically
 3. Commit automatically using a simple command format
 
 Replace `[YOUR_COMMIT_MESSAGE]` with the actual commit message and run:
-!`git commit -m "[YOUR_COMMIT_MESSAGE]
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"`
+!`git commit -m "[YOUR_COMMIT_MESSAGE]"`
 
 ## Guidelines
 - Create concise, descriptive commit messages
