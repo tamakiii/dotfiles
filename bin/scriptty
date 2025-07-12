@@ -24,12 +24,14 @@
 #
 # Examples:
 #   scriptty                    # Start recording interactive shell
+#   scriptty claude             # Record a claude session  
 #   scriptty -d ~/logs         # Save logs to custom directory
 #   scriptty -s                # Check if recording is active
 #   scriptty -l                # List recent session logs
-#   scriptty -- claude         # Record a claude session
-#   scriptty -- npm test       # Record npm test output
-#   scriptty -d ~/logs -- make # Record make with custom log dir
+#   scriptty -- claude         # Record a claude session (explicit)
+#   scriptty npm test          # Record npm test output
+#   scriptty -q claude --help  # Quiet mode, record claude --help
+#   scriptty -d ~/logs make    # Record make with custom log dir
 
 set -euo pipefail
 
@@ -315,10 +317,17 @@ while [[ $# -gt 0 ]]; do
             fi
             break
             ;;
-        *)
+        -*)
             echo "[ERROR] Unknown option: $1"
             echo "        Use -h or --help for usage information"
             exit 1
+            ;;
+        *)
+            # First non-option argument is the command to run
+            COMMAND_TO_RUN="$1"
+            shift
+            COMMAND_ARGS=("$@")
+            break
             ;;
     esac
 done
