@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+TTY_ID=$(ps -p $$ -o tty= | xargs); [[ "$TTY_ID" != "??" && -n "$TTY_ID" ]] && script /tmp/dev/$TTY_ID || echo "❌ No valid TTY detected"
