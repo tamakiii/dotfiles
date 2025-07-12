@@ -13,7 +13,7 @@ description: Commit staged changes automatically
 3. Commit automatically using a simple command format
 
 Generate a descriptive commit message based on the staged changes and commit using:
-/git-commit-impl: <your generated commit message here>
+/git-commit-impl <your generated commit message here>
 
 ## Guidelines
 - Create concise, descriptive commit messages

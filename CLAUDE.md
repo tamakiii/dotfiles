@@ -118,7 +118,7 @@ The repository includes enhanced Claude Code slash commands in `.claude/commands
 
 ### Git Operations
 - `/git-commit` - Analyzes staged changes and generates appropriate commit messages using `/git-commit-impl` for validation
-- `/git-commit-impl: <message>` - Validates commit message and executes git commit, rejecting placeholder text
+- `/git-commit-impl <message>` - Validates commit message and executes git commit, rejecting placeholder text
 
 ### Human-in-the-Loop Commands
 - `/confirm: <context>` - Ensures ask_human tool usage for confirmation prompts

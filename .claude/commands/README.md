@@ -49,8 +49,8 @@ Execute git commit with a validated message provided as argument.
 
 **Example usage:**
 ```
-/git-commit-impl: fix: resolve authentication type errors
-/git-commit-impl: feat: add user profile management
+/git-commit-impl fix: resolve authentication type errors
+/git-commit-impl feat: add user profile management
 ```
 
 **Validation:**
