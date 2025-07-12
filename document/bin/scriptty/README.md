@@ -2,7 +2,7 @@
 
 Enhanced terminal session recorder using the GNU `script` command with npx-style command execution.
 
-##   Important: GNU Script Requirement
+##  Important: GNU Script Requirement
 
 **scriptty requires the GNU version of the `script` command, not the BSD version included with macOS.**
 
@@ -18,27 +18,10 @@ The GNU `script` command provides essential features that scriptty depends on:
 
 Choose one of these methods:
 
-#### Homebrew (Recommended)
 ```bash
 brew install util-linux
 ```
 This installs GNU script as `gscript` to avoid conflicts with BSD script.
-
-#### MacPorts
-```bash
-sudo port install util-linux
-```
-
-#### Manual Installation
-```bash
-# Download and compile util-linux from source
-curl -O https://www.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.tar.gz
-tar -xzf util-linux-2.39.tar.gz
-cd util-linux-2.39
-./configure --prefix=/usr/local
-make script
-sudo cp script /usr/local/bin/gscript
-```
 
 ### 2. Verify Installation
 
