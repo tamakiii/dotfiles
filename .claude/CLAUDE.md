@@ -163,4 +163,4 @@ When working in a project with its own CLAUDE.md:
 
 ## Version Control Preferences
 
-- I don't want to include "Co-Authored-By: Claude <noreply@anthropic.com>." things
+- I don't want to include "Generated with Claude Code" and "Co-Authored-By: Claude" type shit
