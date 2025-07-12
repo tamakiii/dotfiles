@@ -1,10 +1,8 @@
 # tamakiii/dotfiles
 
-![macOS](https://img.shields.io/badge/macOS-supported-green) ![Ubuntu](https://img.shields.io/badge/Ubuntu-supported-green) ![Shell](https://img.shields.io/badge/shell-zsh-blue)
+Personal dotfiles repository that manages configuration files for development tools including zsh, tmux, helix editor, and Claude Code with MCP server integration.
 
-Personal dotfiles repository that automates development environment setup with modern tools and AI-powered workflows.
-
-## 🚀 What's Included
+## What's Included
 
 This repository sets up a complete development environment with:
 
@@ -18,48 +16,20 @@ This repository sets up a complete development environment with:
 | **git** | Version control configuration | `.config/git/` |
 | **GitHub Copilot** | AI code completion with custom prompts | `.llm/prompt/github-copilot/` |
 
-## 📋 Table of Contents
-
-- [Quick Start](#quick-start)
-- [System Requirements](#system-requirements)
-- [Installation](#installation)
-- [Claude Code & AI Integration](#claude-code--ai-integration)
-- [Development Workflow](#development-workflow)
-- [Configuration Details](#configuration-details)
-- [Troubleshooting](#troubleshooting)
-- [Backup & Updates](#backup--updates)
-- [Security](#security)
-
-## ⚡ Quick Start
-
-```sh
-# 1. Verify dependencies
-make check-dependency
-
-# 2. Install dotfiles and create symlinks
-make install
-
-# 3. Verify installation
-make check
-
-# 4. Start using your enhanced shell
-zsh
-```
-
 ### Ubuntu Installation
 ```sh
 make -C make -f ubuntu.mk install
 ```
 
-## 🖥️ System Requirements
+## System Requirements
 
 ### macOS
-- macOS 10.15+ (Catalina or newer)
+- macOS 15.5+ (Sequoia or newer)
 - Homebrew package manager
 - Xcode Command Line Tools
 
 ### Ubuntu
-- Ubuntu 20.04+ or compatible distribution
+- Ubuntu 24.04+ or compatible distribution
 - Package manager (apt)
 - Build essentials
 
@@ -82,15 +52,7 @@ make install           # Install configurations
 make check             # Verify installation success
 ```
 
-### What Gets Installed
-The installation process:
-1. Downloads and configures antigen for zsh plugin management
-2. Creates symbolic links for all configuration files
-3. Sets up Claude Code with MCP server integration
-4. Configures keychain-based secret management
-5. Installs custom shell commands and aliases
-
-## 🤖 Claude Code & AI Integration
+## Claude Code & AI Integration
 
 This repository includes comprehensive AI tooling setup for modern development workflows.
 
@@ -131,35 +93,7 @@ claude-cli -p "Please review: https://github.com/tamakiii/meta/blob/main/.github
 
 For detailed MCP configuration, see [MCP.md](MCP.md).
 
-## 🔄 Development Workflow
-
-### Daily Usage
-```sh
-# Start a new tmux session
-tmux new -s work
-
-# Open project in helix
-hx ~/projects/myapp
-
-# Use Claude for code review
-claude-cli -p "Review the changes in this file: $(pwd)/src/main.rs"
-
-# Quick fuzzy file search
-fzf
-```
-
-### Shell Features
-- **Auto-completion**: Enhanced tab completion for commands and paths
-- **History search**: Fuzzy search through command history with fzf
-- **Git integration**: Branch info and status in prompt
-- **Custom aliases**: Shortcuts for common development tasks
-
-### Editor Features (Helix)
-- **Language servers**: Configured for multiple programming languages
-- **Tree-sitter**: Syntax highlighting and code navigation
-- **Custom keybindings**: Optimized for productivity
-
-## ⚙️ Configuration Details
+## Configuration Details
 
 ### Global Claude Configuration
 - `~/.claude/CLAUDE.md` - Global AI assistant preferences
@@ -178,7 +112,7 @@ fzf
 ### Editor Configuration
 - `.config/helix/` - Helix editor configuration and themes
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -230,19 +164,7 @@ ls -la ~/.dotfiles/.zsh/antigen.zsh
 source ~/.zshrc
 ```
 
-### Getting Help
-- Check the [Issues](https://github.com/tamakiii/dotfiles/issues) page
-- Review tool-specific documentation in respective config directories
-- Use `make check` to verify installation integrity
-
-## 💾 Backup & Updates
-
-### Before Making Changes
-```sh
-# Backup current configurations
-cp ~/.zshrc ~/.zshrc.backup
-cp -r ~/.config ~/.config.backup
-```
+## Backup & Updates
 
 ### Updating Dotfiles
 ```sh
@@ -256,7 +178,7 @@ make check
 ### Safe Configuration Testing
 ```sh
 # Create a test branch for experiments
-git checkout -b test-config
+git switch -c test-config
 
 # Make changes and test
 # ...
@@ -266,7 +188,7 @@ git checkout main
 git merge test-config
 ```
 
-## 🔐 Security
+## Security
 
 All secrets are stored securely in macOS keychain and accessed via environment variables:
 
@@ -290,7 +212,7 @@ make install
 
 Use the commands in `makefiles/include/secret.macos.mk` for advanced keychain management.
 
-## 📚 References
+## References
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
 - [Claude Code MCP Documentation](https://docs.anthropic.com/en/docs/claude-code/mcp)
