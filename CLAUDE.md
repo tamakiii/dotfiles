@@ -53,6 +53,24 @@ make -C workbench build    # Build all tools
 make -C workbench clean    # Clean artifacts
 ```
 
+### Environment Profile Management
+
+The repository includes a template-based approach for managing environment-specific configurations:
+
+```bash
+make install  # Generates ~/.zprofile from os/macos/.zprofile
+```
+
+**Key Files:**
+- `os/macos/.zprofile` - macOS-specific profile template with documented environment setup
+- `~/.zprofile` - Generated file containing actual environment configuration
+- The template is processed during installation using `envsubst` for environment variable substitution
+
+**Security Notes:**
+- Environment-specific values can be sourced from environment variables or keychain
+- The template provides context and documentation without exposing sensitive information
+- Generated `.zprofile` is not version controlled but the template structure is documented
+
 ### Custom Scripts
 Utility scripts are located in `bin/` and added to PATH via `.zshrc`:
 - `scriptty` - Terminal recording with BSD script enhancement

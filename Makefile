@@ -19,6 +19,7 @@ install: \
 	.zsh/antigen.zsh \
 	~/.zsh \
 	~/.zshrc \
+	~/.zprofile \
 	~/.config \
 	~/.config/tmux \
 	~/.config/helix \
@@ -33,6 +34,7 @@ install: \
 check:
 	test -L ~/.zsh
 	test -L ~/.zshrc
+	test -f ~/.zprofile
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
 	test -L ~/.config/ghostty
@@ -60,6 +62,7 @@ uninstall:
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
 	rm -vrf ~/.config/ghostty
+	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh
 	rm -rf .zsh
@@ -75,6 +78,9 @@ uninstall:
 
 ~/.zshrc: .zshrc
 	ln -sfnv $(abspath $<) $@
+
+~/.zprofile: os/macos/.zprofile
+	envsubst < $< > $@
 
 ~/.config:
 	mkdir -p $@
