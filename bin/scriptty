@@ -10,8 +10,16 @@
 # Options:
 #   -d, --dir DIR      Custom log directory (default: /tmp/dev)
 #   -a, --append       Append to existing log file instead of creating new
+#   -q, --quiet        Suppress script start and stop messages
+#   -e, --exit-code    Return exit code of recorded command
+#   -f, --flush        Force flush output after each write
+#   --private          Warn about sensitive data recording and scan logs
+#   --resume           Resume the most recent session for this TTY
 #   -s, --status       Check if a script session is currently active
 #   -l, --list         List recent session logs
+#   --view FILE        View a log file with less (strips ANSI codes)
+#   --clean [DAYS]     Remove log files older than DAYS (default: 30)
+#   --filter FILE      Display log file with ANSI codes stripped
 #   -h, --help         Show this help message
 #
 # Examples:
@@ -29,7 +37,21 @@ set -euo pipefail
 DEFAULT_LOG_DIR="/tmp/dev"
 LOG_DIR="$DEFAULT_LOG_DIR"
 APPEND_MODE=false
+QUIET_MODE=false
+RETURN_EXIT_CODE=false
+FORCE_FLUSH=false
+PRIVATE_MODE=false
+RESUME_MODE=false
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+START_TIME=$(date +%s)
+
+# Platform detection
+PLATFORM=$(uname -s)
+case "$PLATFORM" in
+    Darwin) IS_MACOS=true ;;
+    Linux)  IS_MACOS=false ;;
+    *)      IS_MACOS=false ;;
+esac
 
 # Function to display usage
 show_help() {
@@ -90,6 +112,135 @@ list_logs() {
     done
 }
 
+# Function to view log file with ANSI filtering
+view_log() {
+    local log_file="$1"
+    
+    if [[ ! -f "$log_file" ]]; then
+        echo "[ERROR] Log file not found: $log_file"
+        return 1
+    fi
+    
+    # Use col -b to remove backspace characters and filter ANSI codes
+    if command -v col >/dev/null 2>&1; then
+        col -b < "$log_file" | less
+    else
+        # Fallback: use sed to strip basic ANSI codes
+        sed 's/\x1b\[[0-9;]*m//g' "$log_file" | less
+    fi
+}
+
+# Function to filter ANSI codes from log file
+filter_log() {
+    local log_file="$1"
+    
+    if [[ ! -f "$log_file" ]]; then
+        echo "[ERROR] Log file not found: $log_file"
+        return 1
+    fi
+    
+    # Use col -b to remove backspace characters and filter ANSI codes
+    if command -v col >/dev/null 2>&1; then
+        col -b < "$log_file"
+    else
+        # Fallback: use sed to strip basic ANSI codes
+        sed 's/\x1b\[[0-9;]*m//g' "$log_file"
+    fi
+}
+
+# Function to clean old log files
+clean_logs() {
+    local search_dir="${1:-$DEFAULT_LOG_DIR}"
+    local days="${2:-30}"
+    
+    if [[ ! -d "$search_dir" ]]; then
+        echo "[INFO] No logs directory found: $search_dir"
+        return 1
+    fi
+    
+    local count
+    count=$(find "$search_dir" -name "*_*" -type f -mtime +"$days" 2>/dev/null | wc -l | tr -d ' ')
+    
+    if [[ "$count" -eq 0 ]]; then
+        echo "[INFO] No log files older than $days days found"
+        return 0
+    fi
+    
+    echo "[INFO] Found $count log files older than $days days"
+    find "$search_dir" -name "*_*" -type f -mtime +"$days" -print
+    
+    read -p "Delete these files? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        find "$search_dir" -name "*_*" -type f -mtime +"$days" -delete
+        echo "[OK] Deleted $count old log files"
+    else
+        echo "[INFO] No files deleted"
+    fi
+}
+
+# Function to scan for potential sensitive data
+scan_for_sensitive_data() {
+    local log_file="$1"
+    
+    if [[ ! -f "$log_file" ]]; then
+        return 0
+    fi
+    
+    local warnings=()
+    
+    # Check for potential password patterns
+    if grep -q -i "password\|passwd\|pwd" "$log_file" 2>/dev/null; then
+        warnings+=("Password-related text detected")
+    fi
+    
+    # Check for potential SSH key patterns
+    if grep -q "BEGIN.*PRIVATE KEY" "$log_file" 2>/dev/null; then
+        warnings+=("Private key detected")
+    fi
+    
+    # Check for potential API key patterns
+    if grep -q -E "[A-Za-z0-9]{32,}" "$log_file" 2>/dev/null; then
+        warnings+=("Long alphanumeric strings (potential API keys) detected")
+    fi
+    
+    if [[ ${#warnings[@]} -gt 0 ]]; then
+        echo "[WARNING] Potential sensitive data found in log:"
+        for warning in "${warnings[@]}"; do
+            echo "          - $warning"
+        done
+        echo "          Consider reviewing: $log_file"
+        echo ""
+    fi
+}
+
+# Function to find the most recent log for resume
+find_resume_log() {
+    local tty_id="$1"
+    local search_dir="$2"
+    
+    find "$search_dir" -name "${tty_id}_*" -type f 2>/dev/null | sort -r | head -1
+}
+
+# Function to calculate session duration
+calculate_duration() {
+    local start_time="$1"
+    local end_time="$(date +%s)"
+    local duration=$((end_time - start_time))
+    
+    local hours=$((duration / 3600))
+    local minutes=$(((duration % 3600) / 60))
+    local seconds=$((duration % 60))
+    
+    if [[ $hours -gt 0 ]]; then
+        echo "${hours}h ${minutes}m ${seconds}s"
+    elif [[ $minutes -gt 0 ]]; then
+        echo "${minutes}m ${seconds}s"
+    else
+        echo "${seconds}s"
+    fi
+}
+
 # Variables for command execution
 COMMAND_TO_RUN=""
 COMMAND_ARGS=()
@@ -105,12 +256,50 @@ while [[ $# -gt 0 ]]; do
             APPEND_MODE=true
             shift
             ;;
+        -q|--quiet)
+            QUIET_MODE=true
+            shift
+            ;;
+        -e|--exit-code)
+            RETURN_EXIT_CODE=true
+            shift
+            ;;
+        -f|--flush)
+            FORCE_FLUSH=true
+            shift
+            ;;
+        --private)
+            PRIVATE_MODE=true
+            shift
+            ;;
+        --resume)
+            RESUME_MODE=true
+            shift
+            ;;
         -s|--status)
             check_script_status
             exit $?
             ;;
         -l|--list)
             list_logs "${2:-$DEFAULT_LOG_DIR}"
+            exit $?
+            ;;
+        --view)
+            view_log "$2"
+            exit $?
+            ;;
+        --filter)
+            filter_log "$2"
+            exit $?
+            ;;
+        --clean)
+            if [[ -n "$2" ]] && [[ "$2" != -* ]]; then
+                clean_logs "$DEFAULT_LOG_DIR" "$2"
+                shift 2
+            else
+                clean_logs "$DEFAULT_LOG_DIR"
+                shift
+            fi
             exit $?
             ;;
         -h|--help)
@@ -159,7 +348,17 @@ if [[ ! -d "$LOG_DIR" ]]; then
 fi
 
 # Determine log file path
-if [[ "$APPEND_MODE" == true ]]; then
+if [[ "$RESUME_MODE" == true ]]; then
+    # Resume mode: find most recent log and append
+    LOG_FILE=$(find_resume_log "$TTY_ID" "$LOG_DIR")
+    if [[ -z "$LOG_FILE" ]]; then
+        echo "[ERROR] No existing log file found for TTY $TTY_ID to resume"
+        echo "        Use 'scriptty -l' to see available logs"
+        exit 1
+    fi
+    APPEND_MODE=true
+    echo "[OK] Resuming session from: $(basename "$LOG_FILE")"
+elif [[ "$APPEND_MODE" == true ]]; then
     # Find the most recent log file for this TTY
     LOG_FILE=$(find "$LOG_DIR" -name "${TTY_ID}_*" -type f 2>/dev/null | sort -r | head -1)
     
@@ -186,40 +385,82 @@ else
     fi
 fi
 
-# Start script session
-echo "[OK] Starting terminal recording"
-echo "     TTY: $TTY_ID"
-echo "     Log: $LOG_FILE"
-if [[ -n "$COMMAND_TO_RUN" ]]; then
-    echo "     Command: $COMMAND_TO_RUN"
-    if [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
-        echo "     Args: ${COMMAND_ARGS[*]}"
-    fi
-else
-    echo "     Type 'exit' or press Ctrl+D to stop recording"
+# Prepare script command options
+SCRIPT_OPTS=()
+if [[ "$QUIET_MODE" == true ]]; then
+    SCRIPT_OPTS+=("-q")
 fi
-echo ""
+if [[ "$FORCE_FLUSH" == true ]]; then
+    if [[ "$IS_MACOS" == true ]]; then
+        SCRIPT_OPTS+=("-F")
+    else
+        SCRIPT_OPTS+=("-f")
+    fi
+fi
+if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
+    SCRIPT_OPTS+=("-a")
+fi
+
+# Private mode warning
+if [[ "$PRIVATE_MODE" == true ]] && [[ "$QUIET_MODE" != true ]]; then
+    echo "[WARNING] Private mode enabled - be cautious of sensitive data!"
+    echo "          Avoid typing passwords, API keys, or confidential information"
+    echo "          Log will be scanned for potential sensitive data after recording"
+    echo ""
+fi
+
+# Start script session
+if [[ "$QUIET_MODE" != true ]]; then
+    if [[ "$RESUME_MODE" == true ]]; then
+        echo "[OK] Resuming terminal recording"
+    else
+        echo "[OK] Starting terminal recording"
+    fi
+    echo "     TTY: $TTY_ID"
+    echo "     Log: $LOG_FILE"
+    if [[ -n "$COMMAND_TO_RUN" ]]; then
+        echo "     Command: $COMMAND_TO_RUN"
+        if [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
+            echo "     Args: ${COMMAND_ARGS[*]}"
+        fi
+    else
+        echo "     Type 'exit' or press Ctrl+D to stop recording"
+    fi
+    echo ""
+fi
 
 # Run script command
+EXIT_CODE=0
 if [[ -n "$COMMAND_TO_RUN" ]]; then
     # Execute the specified command
-    if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
-        script -a "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
-    else
-        script "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
-    fi
+    script "${SCRIPT_OPTS[@]}" "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
+    EXIT_CODE=$?
 else
     # Interactive shell mode
-    if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
-        script -a "$LOG_FILE"
-    else
-        script "$LOG_FILE"
-    fi
+    script "${SCRIPT_OPTS[@]}" "$LOG_FILE"
+    EXIT_CODE=$?
 fi
 
 # Post-session information
-echo ""
-echo "[OK] Recording session ended"
-echo "     Log saved to: $LOG_FILE"
-echo "     Size: $(ls -lh "$LOG_FILE" | awk '{print $5}')"
-echo "     View with: cat '$LOG_FILE'"
+if [[ "$QUIET_MODE" != true ]]; then
+    local duration
+    duration=$(calculate_duration "$START_TIME")
+    
+    echo ""
+    echo "[OK] Recording session ended"
+    echo "     Duration: $duration"
+    echo "     Log saved to: $LOG_FILE"
+    echo "     Size: $(ls -lh "$LOG_FILE" | awk '{print $5}')"
+    echo "     View with: scriptty --view '$LOG_FILE'"
+    echo "     Or filtered: scriptty --filter '$LOG_FILE'"
+fi
+
+# Scan for sensitive data if in private mode
+if [[ "$PRIVATE_MODE" == true ]]; then
+    scan_for_sensitive_data "$LOG_FILE"
+fi
+
+# Return appropriate exit code
+if [[ "$RETURN_EXIT_CODE" == true ]]; then
+    exit $EXIT_CODE
+fi
