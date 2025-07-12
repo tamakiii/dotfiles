@@ -12,11 +12,11 @@ description: Commit staged changes automatically
 2. Validate that the message is descriptive and not a placeholder
 3. Commit automatically using a simple command format
 
-Replace `<YOUR_COMMIT_MESSAGE>` with the actual commit message and run:
-!`git commit -m "<YOUR_COMMIT_MESSAGE>"`
+Generate a descriptive commit message based on the staged changes and commit using:
+/git-commit-impl: <your generated commit message here>
 
 ## Guidelines
 - Create concise, descriptive commit messages
 - Focus on what changed and why
-- Never use placeholder text like "<YOUR_COMMIT_MESSAGE>", "placeholder", etc.
+- The /git-commit-impl command will automatically validate against placeholder text
 - Ensure message accurately reflects the staged changes
