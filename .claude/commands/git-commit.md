@@ -16,16 +16,12 @@ description: Commit staged changes with proper message validation
 ```bash
 git commit -m "$(cat <<'EOF'
 [USER_APPROVED_MESSAGE]
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 ```
 
 ## Validation Rules
-- Reject placeholder text like "<your message>", "placeholder", "TODO", etc.
+- Reject placeholder text like "<your message>", "placeholder", etc.
 - Ensure message is not empty or whitespace only
 - Confirm message accurately describes the staged changes
 - Get explicit user approval before committing
