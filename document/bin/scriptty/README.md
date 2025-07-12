@@ -1,295 +1,333 @@
 # scriptty
 
-Enhanced terminal session recorder using the GNU `script` command with npx-style command execution.
+Enhanced terminal session recorder that supercharges macOS's built-in `script` command with modern UX and powerful features.
 
-##  Important: GNU Script Requirement
+## Overview
 
-**scriptty works best with the GNU version of the `script` command, not the BSD version included with macOS.**
+scriptty is a user-friendly wrapper around the BSD `script` command that comes with macOS. While the native `script` command is powerful, it has a cryptic interface and basic file management. scriptty adds:
 
-The GNU `script` command provides enhanced features that scriptty can utilize:
-- Advanced timing support for session replay
-- Consistent flush behavior across platforms  
-- Better command-line option compatibility
-- More reliable output handling
+- **npx-style command execution**: `scriptty claude` instead of `script output.txt claude`
+- **Smart file organization**: Timestamped logs with descriptive names in organized directories
+- **Session management**: Resume sessions, check status, duration tracking
+- **Enhanced log management**: Easy viewing, filtering, and cleanup
+- **BSD script superpowers**: Access to keylogging, live streaming, and raw recording modes
+- **Security features**: Private mode with sensitive data scanning
 
-**Note**: scriptty will work with BSD script (the macOS default) but with reduced functionality. For the best experience, install GNU script via Nix or MacPorts.
+## Key Features
+
+### 🚀 **npx-Style Command Execution**
+```bash
+# Old way (BSD script)
+script /tmp/mylog.txt npm test
+
+# New way (scriptty)
+scriptty npm test
+```
+
+### 📊 **BSD Script Enhanced Modes**
+```bash
+scriptty -k make build      # Keylog mode: Records timing data for replay
+scriptty -f npm test        # Live streaming: Real-time output
+scriptty -r debug-session   # Raw mode: No post-processing
+```
+
+### 📁 **Smart File Management**
+- Automatic timestamped filenames: `ttys002_npm_20231201_143022`
+- Organized log directory structure
+- Easy log viewing with ANSI filtering
+- Bulk cleanup of old logs
+
+### 🎮 **Session Management**
+- Resume interrupted sessions
+- Check active recording status
+- Track session duration
+- Handle multiple concurrent sessions
 
 ## Installation
 
-### 1. Install GNU Script (macOS)
+scriptty works with macOS's built-in BSD `script` command - no additional installation required!
 
-⚠️ **Important Update**: Homebrew's util-linux package excludes the `script` command on macOS. Use one of these alternatives:
-
-#### Option A: Nix Package Manager (Recommended)
-```bash
-# Install Nix
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
-
-# Install util-linux with GNU script
-nix-env -iA nixpkgs.util-linux
-# Or temporarily: nix shell nixpkgs#util-linux
-```
-
-#### Option B: MacPorts
-```bash
-sudo port install util-linux
-```
-Note: The script command may have limited functionality on macOS.
-
-#### Option C: Use BSD Script (Limited Features)
-scriptty will work with BSD script but with reduced functionality.
-
-#### Option D: Alternative - unbuffer (For TTY Simulation)
-```bash
-brew install expect
-# Use unbuffer for some TTY-dependent commands:
-unbuffer -p command
-```
-
-### 2. Verify Installation
-
-```bash
-# For Nix installation:
-script --version
-# Should show: script from util-linux 2.x.x
-
-# For MacPorts:
-/opt/local/bin/script --version
-
-# Test scriptty detection:
-scriptty --help
-# Should show minimal warnings if GNU script is found
-```
-
-### 3. Setup scriptty
-
-scriptty is designed to automatically detect and use GNU script (`gscript`) when available, falling back to system script with warnings.
+Simply clone the dotfiles repository or copy the `scriptty` script to your PATH.
 
 ## Usage
 
-### Basic Usage
+### Basic Recording
 
 ```bash
-# Start interactive recording session
+# Interactive session
 scriptty
 
-# Record a specific command (npx-style)
+# Record a specific command  
 scriptty claude
 scriptty npm test
 scriptty make build
 
 # With options
-scriptty -q claude --help          # Quiet mode
-scriptty -d ~/logs make            # Custom directory
-scriptty --private sensitive-cmd   # Private mode with data scanning
+scriptty -q npm test        # Quiet mode
+scriptty -d ~/logs claude   # Custom directory
 ```
 
-### Command Line Options
+### BSD Script Enhanced Modes
 
+```bash
+# Keylog mode - records timing data for keystroke analysis
+scriptty -k interactive-debug
+
+# Live streaming - shows output in real-time  
+scriptty -f long-running-process
+
+# Raw mode - no post-processing of output
+scriptty -r system-diagnostics
+
+# Combinations work too
+scriptty -qk npm test       # Quiet + keylog mode
 ```
-Usage: scriptty [OPTIONS] [COMMAND [ARGS...]]
 
-Options:
-  -d, --dir DIR      Custom log directory (default: /tmp/dev)
-  -a, --append       Append to existing log file instead of creating new
-  -q, --quiet        Suppress script start and stop messages
-  -e, --exit-code    Return exit code of recorded command
-  -f, --flush        Force flush output after each write
-  --private          Warn about sensitive data recording and scan logs
-  --resume           Resume the most recent session for this TTY
-  -s, --status       Check if a script session is currently active
-  -l, --list         List recent session logs
-  --view FILE        View a log file with less (strips ANSI codes)
-  --clean [DAYS]     Remove log files older than DAYS (default: 30)
-  --filter FILE      Display log file with ANSI codes stripped
-  -h, --help         Show this help message
+### Session Management
+
+```bash
+# Check what's currently recording
+scriptty -s
+
+# Resume the most recent session
+scriptty --resume
+
+# List recent session logs
+scriptty -l
+
+# View a session log (with ANSI filtering)
+scriptty --view /tmp/dev/ttys002_npm_20231201_143022
 ```
 
 ### Log Management
 
 ```bash
-# List recent session logs
-scriptty -l
-
-# View a log file (filtered)
-scriptty --view /tmp/dev/ttys002_claude_20231201_143022
-
-# Clean old logs (30+ days)
+# Clean logs older than 30 days (default)
 scriptty --clean
 
 # Clean logs older than 7 days
 scriptty --clean 7
 
-# Filter ANSI codes from a log
+# Filter ANSI codes from a log file
 scriptty --filter logfile.txt
 ```
 
-## Features
+## Command Line Options
 
-### NPX-Style Command Execution
+```
+Usage: scriptty [OPTIONS] [COMMAND [ARGS...]]
 
-scriptty supports intuitive command execution without requiring `--` separators:
+Core Options:
+  -d, --dir DIR      Custom log directory (default: /tmp/dev)
+  -a, --append       Append to existing log file instead of creating new
+  -q, --quiet        Suppress script start and stop messages
+  -e, --exit-code    Return exit code of recorded command
 
-```bash
-# These are equivalent:
-scriptty claude
-scriptty -- claude
+BSD Script Enhanced Modes:
+  -f, --flush        Live streaming mode (real-time output)
+  -k, --keylog       Record timing data for keystroke replay  
+  -r, --raw          Raw recording mode (no post-processing)
 
-# Complex commands work naturally:
-scriptty -q npm test --verbose
-scriptty -d ~/logs python -m pytest
+Session Management:
+  --resume           Resume the most recent session for this TTY
+  -s, --status       Check if a script session is currently active
+
+Log Management:
+  -l, --list         List recent session logs
+  --view FILE        View a log file with less (strips ANSI codes)
+  --clean [DAYS]     Remove log files older than DAYS (default: 30)
+  --filter FILE      Display log file with ANSI codes stripped
+
+Security:
+  --private          Warn about sensitive data recording and scan logs
+
+Other:
+  -h, --help         Show this help message
 ```
 
-### Session Management
+## BSD Script Features Explained
 
-- **Resume**: Continue previous sessions with `--resume`
-- **Status**: Check active sessions with `--status`  
-- **Duration tracking**: Shows session length on completion
-- **Smart naming**: Includes command names in log filenames
+### Keylog Mode (`-k`)
+Records timing information for each keystroke, enabling analysis of typing patterns and session replay capabilities.
 
-### Security Features
+```bash
+scriptty -k debugging-session
+# Creates both output log and timing data
+```
 
-- **Private mode**: Warns about sensitive data and scans logs
-- **Pattern detection**: Identifies potential passwords, keys, tokens
-- **Safe defaults**: Encourages security-conscious recording
+### Live Streaming (`-f`) 
+Forces real-time output flushing, perfect for monitoring long-running processes.
 
-### Platform Optimization
+```bash
+scriptty -f npm run build
+# See build output as it happens
+```
 
-- **Automatic detection**: Prefers GNU script over BSD script
-- **Smart options**: Uses appropriate flags based on script version
-- **Cross-platform**: Works consistently across Linux and macOS
+### Raw Mode (`-r`)
+Disables post-processing, capturing exactly what the terminal sees without any cleanup.
 
-## Examples
+```bash
+scriptty -r system-diagnostics  
+# Raw terminal data, useful for debugging display issues
+```
+
+## Use Cases
 
 ### Development Workflows
 
 ```bash
-# Record a build process
-scriptty make clean all
+# Record build processes for troubleshooting
+scriptty -k make clean all
 
-# Debug a failing test
-scriptty --private npm test -- --debug
+# Monitor deployment scripts in real-time
+scriptty -f ansible-playbook deploy.yml
 
-# Document a deployment
-scriptty -d ~/deployment-logs ansible-playbook deploy.yml
+# Capture test output for analysis
+scriptty npm test -- --verbose
 ```
 
 ### Learning and Documentation
 
 ```bash
-# Record a tutorial session
-scriptty -q --private learn-kubernetes
+# Record tutorial sessions with timing data
+scriptty -k learn-kubernetes
 
-# Capture command outputs for documentation
-scriptty --filter kubectl get pods > docs/pod-status.txt
+# Capture command demonstrations
+scriptty -q --private demo-commands
+
+# Document deployment procedures
+scriptty -d ~/deployment-docs production-deploy
 ```
 
-### Troubleshooting
+### System Debugging
 
 ```bash
-# Resume a long-running process
-scriptty --resume
+# Raw system diagnostics
+scriptty -r system-health-check
 
-# Check what's currently recording
-scriptty --status
+# Live monitoring of system processes  
+scriptty -f top
 
-# Review recent sessions
-scriptty -l
-scriptty --view /tmp/dev/ttys002_debug_20231201_143022
+# Detailed debugging session with timing
+scriptty -k debug-memory-leak
 ```
 
-## Technical Details
+## Log File Format
 
-### GNU vs BSD Script Differences
-
-| Feature | GNU script | BSD script (macOS) | Impact |
-|---------|------------|-------------------|---------|
-| Timing data | `-t, -T` flags | Not supported | No replay capability |
-| Flush behavior | `-f` flag | `-F` flag | Inconsistent options |
-| Input logging | `-I` flag | Limited | Reduced debugging info |
-| Exit codes | Reliable | Inconsistent | Poor error handling |
-
-### Log File Format
-
-scriptty creates timestamped logs with descriptive filenames:
+scriptty creates organized, descriptive log files:
 
 ```
 Format: {tty}_{command}_{timestamp}
 Examples:
-  ttys002_claude_20231201_143022
-  ttys001_npm_20231201_144530
-  ttys003_20231201_150000        # Interactive session
+  ttys002_npm_20231201_143022      # npm command
+  ttys001_claude_20231201_144530   # claude session  
+  ttys003_20231201_150000          # Interactive session
 ```
 
-### Platform Detection
+### Directory Structure
+```
+/tmp/dev/                    # Default log directory
+├── ttys002_npm_20231201_143022
+├── ttys002_make_20231201_144500
+└── ttys001_claude_20231201_145000
+```
 
-scriptty automatically detects the platform and script version:
+## BSD vs GNU Script
 
-1. **Prefers GNU script**: Checks for `gscript` first
-2. **Falls back gracefully**: Uses system script with warnings
-3. **Optimizes flags**: Adjusts options based on detected version
-4. **Warns users**: Alerts when GNU script features unavailable
+scriptty is designed specifically for BSD script (macOS default) and takes advantage of its unique features:
+
+| Feature | BSD Script (scriptty) | GNU Script |
+|---------|----------------------|------------|
+| **Keylog mode** | ✅ `-k` flag | ❌ No equivalent |
+| **Live streaming** | ✅ `-F` flag | Limited |
+| **Raw recording** | ✅ `-r` flag | Different approach |
+| **Built-in availability** | ✅ macOS default | Requires installation |
+| **Replay tools** | Manual/custom | scriptreplay available |
 
 ## Troubleshooting
 
-### GNU Script Not Found
-
+### Script Command Not Found
 ```bash
-# Error: scriptty requires script command
-[ERROR] No script command found in PATH
-        Please install a script command for terminal recording
-        macOS options:
-          - Nix: nix-env -iA nixpkgs.util-linux
-          - MacPorts: sudo port install util-linux
-          - BSD script is built-in but limited
-        Linux: sudo apt install util-linux
+[ERROR] script command not found in PATH
+        The script command should be available on macOS by default
+        If missing, try: xcode-select --install
 ```
 
-**Solution**: 
-1. **Nix (Recommended)**: Install Nix package manager and util-linux as shown in Installation section
-2. **MacPorts**: Install via MacPorts if available
-3. **BSD Script**: Use the built-in BSD script (limited features but functional)
-
-### Homebrew util-linux Issue
-
-```bash
-# Homebrew excludes script command on macOS
-brew install util-linux
-# No gscript or script command available
-```
-
-**Solution**: Homebrew's util-linux deliberately excludes the script command on macOS. Use Nix or MacPorts instead.
+**Solution**: Install Xcode command line tools.
 
 ### Permission Issues
-
 ```bash
-# Error: Cannot create log directory
 [ERROR] Failed to create log directory: /tmp/dev
 ```
 
-**Solution**: Check directory permissions or use custom directory:
+**Solution**: Use custom directory with proper permissions:
 ```bash
 scriptty -d ~/scriptty-logs command
 ```
 
 ### Active Session Conflicts
-
 ```bash
-# Error: Script session already active
 [WARNING] Script session already active!
 ```
 
-**Solution**: Exit current session or use different terminal.
+**Solution**: Exit current session or use a different terminal window.
+
+## Advanced Features
+
+### Private Mode
+```bash
+scriptty --private sensitive-command
+```
+- Warns about recording sensitive data
+- Scans logs for potential passwords, keys, API tokens
+- Provides security recommendations
+
+### Session Resume
+```bash
+scriptty --resume
+```
+- Continues the most recent session for the current TTY
+- Maintains session continuity across interruptions
+- Preserves log file naming and organization
+
+### Bulk Log Management
+```bash
+# Clean up old logs
+scriptty --clean 14    # Remove logs older than 14 days
+
+# View recent sessions
+scriptty -l           # List with timestamps and sizes
+```
+
+## Integration with Other Tools
+
+### With Development Tools
+```bash
+# CI/CD pipeline recording
+scriptty -k ./deploy.sh
+
+# Test result capture
+scriptty npm test 2>&1 | tee test-results.txt
+```
+
+### With System Administration
+```bash
+# System health monitoring
+scriptty -f watch -n 1 'ps aux | head -20'
+
+# Security auditing
+scriptty --private security-scan.sh
+```
 
 ## Contributing
 
-scriptty is part of the [tamakiii/.dotfiles](https://github.com/tamakiii/.dotfiles) repository. 
+scriptty is part of the [tamakiii/.dotfiles](https://github.com/tamakiii/.dotfiles) repository.
 
-### Development Setup
+### Development
 
-1. Clone the dotfiles repository
-2. Install GNU script (see Installation section)
-3. Test with various command scenarios
+1. Clone the repository
+2. Test with various BSD script scenarios
+3. Ensure compatibility with macOS script command
 4. Follow the project's contribution guidelines
 
 ### Testing
@@ -298,14 +336,14 @@ scriptty is part of the [tamakiii/.dotfiles](https://github.com/tamakiii/.dotfil
 # Test basic functionality
 scriptty echo "test"
 
-# Test option parsing
-scriptty -q -d /tmp echo "quiet test"
+# Test BSD-specific features  
+scriptty -k echo "keylog test"
+scriptty -f echo "live stream test"
+scriptty -r echo "raw mode test"
 
-# Test error handling
-scriptty -x  # Should show error
-
-# Test GNU script detection
+# Test session management
 scriptty --status
+scriptty --resume
 ```
 
 ## License
@@ -314,7 +352,7 @@ MIT License - see the main dotfiles repository for full license text.
 
 ## See Also
 
-- [GNU util-linux documentation](https://www.kernel.org/pub/linux/utils/util-linux/)
-- [scriptreplay(1)](https://man7.org/linux/man-pages/man1/scriptreplay.1.html) - For replaying GNU script sessions
-- [script(1)](https://man7.org/linux/man-pages/man1/script.1.html) - GNU script manual
-- [Alternative tools: asciinema, ttyrec](https://asciinema.org/) - Modern terminal recording
+- [script(1)](https://man.freebsd.org/cgi/man.cgi?query=script&sektion=1) - BSD script manual
+- [Terminal recording alternatives](https://asciinema.org/) - Modern web-based recording
+- [FreeBSD script documentation](https://docs.freebsd.org/en/books/handbook/) - Comprehensive BSD docs
+- [macOS Terminal utilities](https://support.apple.com/guide/terminal/) - Native macOS terminal features

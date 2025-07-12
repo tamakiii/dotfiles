@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# scriptty - Enhanced terminal session recorder using the 'script' command
+# scriptty - Enhanced BSD script wrapper for macOS with modern UX
 #
 # Usage: scriptty [OPTIONS] [-- COMMAND [ARGS...]]
 #
@@ -12,7 +12,9 @@
 #   -a, --append       Append to existing log file instead of creating new
 #   -q, --quiet        Suppress script start and stop messages
 #   -e, --exit-code    Return exit code of recorded command
-#   -f, --flush        Force flush output after each write
+#   -f, --flush        Force flush output after each write (live streaming)
+#   -k, --keylog       Record timing data for keystroke replay
+#   -r, --raw          Record in raw mode (no post-processing)
 #   --private          Warn about sensitive data recording and scan logs
 #   --resume           Resume the most recent session for this TTY
 #   -s, --status       Check if a script session is currently active
@@ -25,13 +27,13 @@
 # Examples:
 #   scriptty                    # Start recording interactive shell
 #   scriptty claude             # Record a claude session  
-#   scriptty -d ~/logs         # Save logs to custom directory
-#   scriptty -s                # Check if recording is active
-#   scriptty -l                # List recent session logs
-#   scriptty -- claude         # Record a claude session (explicit)
-#   scriptty npm test          # Record npm test output
-#   scriptty -q claude --help  # Quiet mode, record claude --help
-#   scriptty -d ~/logs make    # Record make with custom log dir
+#   scriptty -k make build      # Record with keystroke timing data
+#   scriptty -f npm test        # Live stream npm test output
+#   scriptty -r debug-session   # Raw recording, no post-processing
+#   scriptty -s                 # Check if recording is active
+#   scriptty -l                 # List recent session logs
+#   scriptty -q claude --help   # Quiet mode, record claude --help
+#   scriptty -d ~/logs make     # Record make with custom log dir
 
 set -euo pipefail
 
@@ -42,6 +44,8 @@ APPEND_MODE=false
 QUIET_MODE=false
 RETURN_EXIT_CODE=false
 FORCE_FLUSH=false
+KEYLOG_MODE=false
+RAW_MODE=false
 PRIVATE_MODE=false
 RESUME_MODE=false
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -55,36 +59,11 @@ case "$PLATFORM" in
     *)      IS_MACOS=false ;;
 esac
 
-# Script command detection - prefer GNU script
-SCRIPT_CMD="script"
-if command -v gscript >/dev/null 2>&1; then
-    SCRIPT_CMD="gscript"
-    IS_GNU_SCRIPT=true
-elif [[ -x "/opt/local/bin/script" ]]; then
-    # MacPorts installation
-    SCRIPT_CMD="/opt/local/bin/script"
-    if /opt/local/bin/script --version 2>&1 | grep -q "util-linux"; then
-        IS_GNU_SCRIPT=true
-    else
-        IS_GNU_SCRIPT=false
-        SHOW_GNU_WARNING=true
-    fi
-elif command -v script >/dev/null 2>&1; then
-    # Check if it's GNU script by testing for GNU-specific option
-    if script --version 2>&1 | grep -q "util-linux"; then
-        IS_GNU_SCRIPT=true
-    else
-        IS_GNU_SCRIPT=false
-        SHOW_GNU_WARNING=true
-    fi
-else
-    echo "[ERROR] No script command found in PATH"
-    echo "        Please install a script command for terminal recording"
-    echo "        macOS options:"
-    echo "          - Nix: nix-env -iA nixpkgs.util-linux"
-    echo "          - MacPorts: sudo port install util-linux"
-    echo "          - BSD script is built-in but limited"
-    echo "        Linux: sudo apt install util-linux"
+# Verify script command availability
+if ! command -v script >/dev/null 2>&1; then
+    echo "[ERROR] script command not found in PATH"
+    echo "        The script command should be available on macOS by default"
+    echo "        If missing, try: xcode-select --install"
     exit 1
 fi
 
@@ -303,6 +282,14 @@ while [[ $# -gt 0 ]]; do
             FORCE_FLUSH=true
             shift
             ;;
+        -k|--keylog)
+            KEYLOG_MODE=true
+            shift
+            ;;
+        -r|--raw)
+            RAW_MODE=true
+            shift
+            ;;
         --private)
             PRIVATE_MODE=true
             shift
@@ -433,24 +420,16 @@ if [[ "$QUIET_MODE" == true ]]; then
     SCRIPT_OPTS+=("-q")
 fi
 if [[ "$FORCE_FLUSH" == true ]]; then
-    if [[ "$IS_GNU_SCRIPT" == true ]]; then
-        SCRIPT_OPTS+=("-f")
-    elif [[ "$IS_MACOS" == true ]]; then
-        SCRIPT_OPTS+=("-F")
-    else
-        SCRIPT_OPTS+=("-f")
-    fi
+    SCRIPT_OPTS+=("-F")
+fi
+if [[ "$KEYLOG_MODE" == true ]]; then
+    SCRIPT_OPTS+=("-k")
+fi
+if [[ "$RAW_MODE" == true ]]; then
+    SCRIPT_OPTS+=("-r")
 fi
 if [[ "$APPEND_MODE" == true ]] && [[ -f "$LOG_FILE" ]]; then
     SCRIPT_OPTS+=("-a")
-fi
-
-# GNU script warning
-if [[ "${SHOW_GNU_WARNING:-false}" == true ]] && [[ "$IS_MACOS" == true ]] && [[ "$QUIET_MODE" != true ]]; then
-    echo "[WARNING] Using BSD script instead of GNU script"
-    echo "          For best results, install GNU script: brew install util-linux"
-    echo "          Some features may be limited with BSD script"
-    echo ""
 fi
 
 # Private mode warning
@@ -470,6 +449,13 @@ if [[ "$QUIET_MODE" != true ]]; then
     fi
     echo "     TTY: $TTY_ID"
     echo "     Log: $LOG_FILE"
+    if [[ "$KEYLOG_MODE" == true ]]; then
+        echo "     Mode: Keylog recording (timing data included)"
+    elif [[ "$RAW_MODE" == true ]]; then
+        echo "     Mode: Raw recording (no post-processing)"
+    elif [[ "$FORCE_FLUSH" == true ]]; then
+        echo "     Mode: Live streaming (real-time output)"
+    fi
     if [[ -n "$COMMAND_TO_RUN" ]]; then
         echo "     Command: $COMMAND_TO_RUN"
         if [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
@@ -481,15 +467,15 @@ if [[ "$QUIET_MODE" != true ]]; then
     echo ""
 fi
 
-# Run script command
+# Run script command (BSD syntax)
 EXIT_CODE=0
 if [[ -n "$COMMAND_TO_RUN" ]]; then
-    # Execute the specified command
-    "$SCRIPT_CMD" "${SCRIPT_OPTS[@]}" "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
+    # Execute the specified command (BSD syntax: script [options] file [command])
+    script "${SCRIPT_OPTS[@]}" "$LOG_FILE" "$COMMAND_TO_RUN" "${COMMAND_ARGS[@]}"
     EXIT_CODE=$?
 else
     # Interactive shell mode
-    "$SCRIPT_CMD" "${SCRIPT_OPTS[@]}" "$LOG_FILE"
+    script "${SCRIPT_OPTS[@]}" "$LOG_FILE"
     EXIT_CODE=$?
 fi
 
