@@ -199,6 +199,10 @@ All secrets are stored securely in macOS keychain and accessed via environment v
 | `DISCORD_USER_ID` | Discord user identification | `DISCORD_USER_ID` |
 
 ### Managing Secrets
+
+The `security` command is macOS's CLI tool for managing keychains, certificates, and system security.
+
+#### Basic Operations
 ```sh
 # Add a new secret to keychain
 security add-generic-password -s "SECRET_NAME" -a "$USER" -w "secret_value"
@@ -206,8 +210,35 @@ security add-generic-password -s "SECRET_NAME" -a "$USER" -w "secret_value"
 # Retrieve a secret
 security find-generic-password -s "SECRET_NAME" -w
 
-# Update configuration with new secrets
-make install
+# Update existing password (use -U flag)
+security add-generic-password -s "SECRET_NAME" -a "$USER" -w "new_secret_value" -U
+
+# Delete a password
+security delete-generic-password -s "SECRET_NAME" -a "$USER"
+```
+
+#### Working with Environment Variables
+```sh
+# Export secret to environment variable
+export GITHUB_TOKEN="$(security find-generic-password -s GITHUB_TOKEN -a $(whoami) -w)"
+
+# Copy password to clipboard
+security find-generic-password -s GITHUB_TOKEN -a "$(whoami)" -w | pbcopy
+```
+
+#### Interactive Password Management
+```sh
+# Register password from clipboard
+security add-generic-password -s "API_KEY" -a "$(whoami)" -w "$(pbpaste)"
+
+# Update password from clipboard
+security add-generic-password -s "API_KEY" -a "$(whoami)" -w "$(pbpaste)" -U
+```
+
+#### Visual Keychain Management
+```sh
+# Launch Keychain Access app
+open /System/Applications/Passwords.app
 ```
 
 Use the commands in `makefiles/include/secret.macos.mk` for advanced keychain management.
