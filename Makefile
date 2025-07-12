@@ -22,6 +22,7 @@ install: \
 	~/.config \
 	~/.config/tmux \
 	~/.config/helix \
+	~/.config/ghostty \
 	~/.claude/CLAUDE.md \
 	~/.claude/settings.json \
 	~/.claude/commands \
@@ -34,6 +35,7 @@ check:
 	test -L ~/.zshrc
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
+	test -L ~/.config/ghostty
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
 	test -L ~/.claude/commands
@@ -57,6 +59,7 @@ uninstall:
 	rm -vrf ~/.config/claude
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
+	rm -vrf ~/.config/ghostty
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh
 	rm -rf .zsh
@@ -80,6 +83,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/helix: .config/helix
+	ln -sfnv $(abspath $<) $@
+
+~/.config/ghostty: .config/ghostty
 	ln -sfnv $(abspath $<) $@
 
 ~/.claude:
