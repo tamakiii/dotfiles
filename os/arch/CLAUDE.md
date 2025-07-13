@@ -76,6 +76,105 @@ sudo systemctl daemon-reload
 sudo systemctl restart bluetooth
 ```
 
+### Bluetooth Troubleshooting (Pairing Issues)
+
+Common symptoms on Arch Linux systems:
+- GNOME Settings detects devices but shows "Not Set Up" status
+- Clicking devices in Settings doesn't complete pairing
+- bluetoothctl shows `org.bluez.Error.AuthenticationCanceled`
+- Devices connect briefly then disconnect immediately
+
+**Root Causes:**
+- Authentication timing issues between GUI and bluetoothd
+- Missing or inactive Bluetooth agent for handling pairing requests
+- Audio profile availability problems with PipeWire
+- Device-specific pairing protocols (especially Sony devices)
+
+### Diagnostic Commands
+
+Essential commands for Bluetooth troubleshooting:
+
+```bash
+# Check Bluetooth service status
+systemctl status bluetooth.service
+
+# Verify Bluetooth adapter status
+bluetoothctl show
+
+# List all discovered devices
+bluetoothctl devices
+
+# Check specific device information
+bluetoothctl info <MAC_ADDRESS>
+
+# Check audio system status
+systemctl --user status pipewire-pulse
+
+# Verify installed Bluetooth packages
+pacman -Q | grep -E "(blue|pulse)"
+```
+
+### Pairing Process Troubleshooting
+
+**Step 1: Agent Management**
+```bash
+# Start Bluetooth agent
+bluetoothctl agent on
+bluetoothctl default-agent
+```
+
+**Step 2: Device Cache Clearing**
+```bash
+# Remove problematic device from cache
+bluetoothctl remove <MAC_ADDRESS>
+
+# Restart scanning
+bluetoothctl scan off
+bluetoothctl scan on
+```
+
+**Step 3: Manual Pairing Workflow**
+```bash
+# Put device in pairing mode first, then:
+bluetoothctl pair <MAC_ADDRESS>
+bluetoothctl trust <MAC_ADDRESS>
+bluetoothctl connect <MAC_ADDRESS>
+```
+
+**Step 4: Alternative Approaches**
+```bash
+# Trust-first approach (for some devices)
+bluetoothctl trust <MAC_ADDRESS>
+bluetoothctl connect <MAC_ADDRESS>
+
+# Direct connection (audio devices sometimes work)
+bluetoothctl connect <MAC_ADDRESS>
+```
+
+### Audio Device Integration
+
+**PipeWire Bluetooth Issues:**
+- Profile availability errors: `br-connection-profile-unavailable`
+- Service discovery works but connection fails
+- Devices show correct UUIDs but won't maintain connection
+
+**Troubleshooting Audio Devices:**
+```bash
+# Verify PipeWire Bluetooth support
+systemctl --user status pipewire-pulse
+
+# Check for audio-related errors
+journalctl -u bluetooth.service --since "1 hour ago"
+
+# For persistent issues, restart audio subsystem
+systemctl --user restart pipewire-pulse
+```
+
+**Device-Specific Notes:**
+- **Sony devices (WF-C710N, etc.)**: Often require specific timing - put in pairing mode, remove from cache, then pair immediately
+- **Keyboards (HHKB, etc.)**: Usually have simpler pairing - hold Fn + Bluetooth key combination
+- **Audio timing**: Some devices exit pairing mode quickly - work fast through the sequence
+
 ## System Update Troubleshooting
 
 ### Common Package Conflicts
