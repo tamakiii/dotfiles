@@ -27,10 +27,15 @@ The following tools must be installed before running `make install`:
 - hx (helix editor)
 - go (for workbench tools)
 
-### Ubuntu-specific Installation
+### OS-Specific Installation
+
+#### Ubuntu
 ```bash
 make -C make -f ubuntu.mk install
 ```
+
+#### Arch Linux
+See `os/arch/CLAUDE.md` for detailed Arch Linux installation instructions and package management.
 
 ## Repository Structure
 
@@ -63,8 +68,13 @@ make install  # Generates ~/.zprofile from os/macos/.zprofile
 
 **Key Files:**
 - `os/macos/.zprofile` - macOS-specific profile template with documented environment setup
+- `os/arch/CLAUDE.md` - Arch Linux-specific configuration and installation guide
 - `~/.zprofile` - Generated file containing actual environment configuration
 - The template is processed during installation using `envsubst` for environment variable substitution
+
+**OS-Specific Documentation:**
+- For Arch Linux users, see `os/arch/CLAUDE.md` for distribution-specific setup instructions
+- For macOS users, the default configuration in `os/macos/` is used
 
 **Security Notes:**
 - Environment-specific values can be sourced from environment variables or keychain
