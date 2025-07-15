@@ -2,10 +2,6 @@
 
 SHELL := bash --noprofile --norc -eo pipefail
 
-# Shared functions and variables
-error-install := echo \"[error] install '$$_'\"; exit 1;
-check-dependency = which $(1) || { $(call error-install) }
-
 # macOS-specific installation targets
 install: \
 	.zsh \
@@ -31,10 +27,10 @@ check:
 
 # macOS-specific dependency checks
 check-dependency:
-	@$(call check-dependency,zsh)
-	@$(call check-dependency,tmux)
-	@$(call check-dependency,fzf)
-	@$(call check-dependency,hx)
+	which zsh > /dev/null || $(error Please install zsh)
+	which tmux > /dev/null || $(error Please install tmux)
+	which fzf > /dev/null || $(error Please install fzf)
+	which hx > /dev/null || $(error Please install hx)
 
 # macOS-specific uninstall
 uninstall:

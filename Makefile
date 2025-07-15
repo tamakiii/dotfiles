@@ -3,9 +3,6 @@
 SHELL := bash --noprofile --norc -eo pipefail
 
 include makefiles/include/secret.mk
-error-install := echo "[error] install '$$_'"; exit 1;
-check-dependency = which $(1) || { $(call error-install) }
-
 export GITHUB_PERSONAL_ACCESS_TOKEN ?= $(GITHUB_PERSONAL_ACCESS_TOKEN)
 export DISCORD_CHANNEL_ID ?= $(DISCORD_CHANNEL_ID_CLAUDE)
 export DISCORD_USER_ID ?= $(DISCORD_USER_ID)
@@ -31,7 +28,7 @@ check:
 	test -f ~/.config/claude/mcp.json
 
 check-dependency:
-	@$(call check-dependency,uv)
+	which uv > /dev/null || $(error Please install uv)
 
 uninstall:
 	rm -vrf ~/.config/claude/mcp.json
