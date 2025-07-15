@@ -19,7 +19,7 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 
 ## Local Configuration Management
 
-- Note that there's ~/.claude/CLAUDE.local.md which contains locally global knowledges (Since I'm managing some part of configuration for Claude Code in this repository, and this is a public repository, I'd like to store some information that I don't want to exposure)
+- Note that `~/.claude/CLAUDE.local.md` contains locally scoped global knowledge. Since I’m managing part of the configuration for Claude Code in this (public) repository, I’d like to store certain information there that I prefer not to expose publicly.
 
 ## Code Quality Standards
 
