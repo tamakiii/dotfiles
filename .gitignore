@@ -1,7 +1,9 @@
+*.egg-info/
 /node_modules/
 /dependency/
 /dist/
 /.zsh/
+/os/macos/.zsh/
 /tmux-client-*.log
 /.config/iterm2/AppSupport
 /.config/.isolated-storage/

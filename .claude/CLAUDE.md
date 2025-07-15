@@ -17,6 +17,10 @@ It is symlinked to `~/.claude/CLAUDE.md` and loaded automatically when Claude Co
 - Always use the most secure approach - never expose secrets, credentials, or sensitive information
 - Prefer defensive programming and error handling
 
+## Local Configuration Management
+
+- Note that `~/.claude/CLAUDE.local.md` contains locally scoped global knowledge. Since I’m managing part of the configuration for Claude Code in this (public) repository, I’d like to store certain information there that I prefer not to expose publicly.
+
 ## Code Quality Standards
 
 ### Testing
