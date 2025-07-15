@@ -213,3 +213,90 @@ Quick reference commands in `document/snippets.md`:
 ## Bluetooth Troubleshooting
 
 For comprehensive Bluetooth troubleshooting on Arch Linux, including device-specific solutions and PipeWire integration, see `os/arch/CLAUDE.md`.
+
+## Architecture and Design Patterns
+
+### Makefile Organization
+
+The repository follows a hierarchical Makefile structure with clear separation of concerns:
+
+#### Global vs Platform-Specific Separation
+- **Root Makefile**: Handles only global/cross-platform concerns (Claude configuration, Python dependencies)
+- **OS-Specific Makefiles**: Handle platform-specific installations (`os/macos/Makefile`, `os/arch/Makefile`)
+- **Explicit Control**: Users run `make install` for global setup and `make -C os/{os-name} install` for platform-specific setup
+
+#### Dependency Order Rules
+All Makefile rules follow consistent dependency ordering:
+
+1. **Install Order** (dependencies first):
+   ```
+   .venv → ~/.claude/CLAUDE.md → ~/.claude/settings.json → ~/.claude/commands → ~/.config/claude → ~/.config/claude/mcp.json
+   ```
+
+2. **Check Order** (same as install):
+   ```
+   test -d .venv → test -L ~/.claude/CLAUDE.md → ... → test -f ~/.config/claude/mcp.json
+   ```
+
+3. **Uninstall Order** (reverse of install):
+   ```
+   ~/.config/claude/mcp.json → ~/.config/claude → ~/.claude/commands → ~/.claude/settings.json → ~/.claude/CLAUDE.md → .venv
+   ```
+
+#### File Organization by Platform
+- **Platform-specific files moved to `os/{os-name}/`**:
+  - `os/macos/.zshrc` - macOS shell configuration
+  - `os/macos/.config/tmux/` - macOS terminal multiplexer config  
+  - `os/macos/.config/helix/` - macOS editor configuration
+  - `os/macos/.config/ghostty/` - macOS terminal emulator config
+  - `os/macos/Library/Application Support/Claude/` - macOS-specific Claude Desktop config
+
+### Secret Management Architecture
+
+#### Hierarchical Secret Loading
+- **`makefiles/include/secret.mk`**: Auto-detects OS and loads appropriate secret files
+- **`os/{os-name}/makefiles/secret.mk`**: Platform-specific secret implementations
+- **Dynamic Discovery**: Uses file existence checking for graceful fallback
+
+#### macOS Keychain Integration
+- **Secure Storage**: Uses macOS `security` command for credential management
+- **Environment Variable Substitution**: Secrets populated at build time via `envsubst`
+- **Service-Specific Keys**: Organized by service name (GITHUB_TOKEN, DISCORD_TOKEN, etc.)
+
+### MCP (Model Context Protocol) Integration
+
+#### Multi-Server Configuration
+The repository supports multiple MCP servers:
+- **GitHub MCP**: Repository operations and API access
+- **Human-in-the-Loop**: Interactive decision making with Discord integration
+- **MarkItDown MCP**: Document conversion using `uvx markitdown-mcp`
+
+#### Python Dependency Management
+- **uv-based**: Uses modern Python package manager for fast, reliable installs
+- **Virtual Environment**: `.venv` created and managed by `uv sync`
+- **Dependency Priority**: `.venv` built first since MCP configuration depends on it
+
+### Development Workflow Patterns
+
+#### TodoWrite Tool Usage
+- **Task Planning**: Create todos at start of complex multi-step tasks
+- **Progress Tracking**: Mark tasks as `in_progress` before starting, `completed` immediately after finishing
+- **Single Focus**: Only one task `in_progress` at a time
+- **Completion Criteria**: Only mark completed when fully accomplished (tests pass, no errors)
+
+#### File Refactoring Approach
+- **Move files to platform-specific locations** rather than changing path references
+- **Maintain working directory context** for Makefiles
+- **Update .gitignore** to reflect new file locations
+- **Test thoroughly** after structural changes
+
+### Best Practices Learned
+
+1. **Dependency Management**: Always place critical dependencies first in build order
+2. **Platform Separation**: Keep global concerns separate from OS-specific implementations  
+3. **Consistent Ordering**: Use same dependency order across install/check/uninstall rules
+4. **Secret Security**: Never store secrets in files, use platform-specific secure storage
+5. **Error Handling**: Include proper error messages and dependency checking
+6. **Testing**: Verify all operations work after refactoring (install, check, uninstall)
+
+This architecture provides a scalable foundation for managing development environments across multiple platforms while maintaining security and reliability.
