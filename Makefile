@@ -15,30 +15,30 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
+	.venv \
 	~/.claude/CLAUDE.md \
 	~/.claude/settings.json \
 	~/.claude/commands \
 	~/.config/claude \
-	~/.config/claude/mcp.json \
-	.venv
+	~/.config/claude/mcp.json
 
 check:
+	test -d .venv
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
 	test -L ~/.claude/commands
 	test -d ~/.config/claude
 	test -f ~/.config/claude/mcp.json
-	test -d .venv
 
 check-dependency:
 	@$(call check-dependency,uv)
 
 uninstall:
+	rm -vrf ~/.config/claude/mcp.json
+	rm -vrf ~/.config/claude
 	rm -vrf ~/.claude/commands
 	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/CLAUDE.md
-	rm -vrf ~/.config/claude/mcp.json
-	rm -vrf ~/.config/claude
 	rm -rf .venv
 
 ~/.claude:
