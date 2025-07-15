@@ -73,3 +73,58 @@ Extract repository name from a git URL in clipboard and navigate to that directo
 diff -u --color <(cat ~/.config/claude/mcp.json) <(pbpaste)
 ```
 Show colored diff between your MCP configuration and clipboard contents.
+
+## Claude Worktree Sessions
+
+### Start parallel Claude session
+```bash
+claude-worktree start
+```
+Create a new isolated worktree and launch Claude Code for parallel development.
+
+### Start session with recording
+```bash
+claude-worktree start --record
+```
+Start a Claude session in worktree with scriptty recording enabled.
+
+### Quick session workflow
+```bash
+# Start session
+claude-worktree start
+
+# After Claude work, commit changes
+claude-worktree commit "Add authentication feature"
+
+# Merge back to main
+claude-worktree merge
+
+# Cleanup session
+claude-worktree cleanup
+```
+Complete workflow for isolated Claude development sessions.
+
+### Resume previous session
+```bash
+claude-worktree resume $(claude-worktree list | grep -o '[0-9]*T[0-9]*Z' | head -1)
+```
+Resume the most recent Claude worktree session.
+
+### List and cleanup old sessions
+```bash
+# List all sessions
+claude-worktree list
+
+# Cleanup specific session
+claude-worktree cleanup 20250712T143022Z
+
+# Cleanup current session
+claude-worktree cleanup
+```
+Session management and cleanup commands.
+
+### Worktree status check
+```bash
+claude-worktree status
+```
+Check if you're in a worktree and show git status for current session.
