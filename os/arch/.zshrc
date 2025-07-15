@@ -31,7 +31,7 @@ colors
 autoload history-search-end
 
 # prompt
-PROMPT="$(echo -e '\\U1F9F8') %M:%c
+PROMPT="$(echo -e '\U1F9F8') %M:%c
 $ "
 
 # completion
