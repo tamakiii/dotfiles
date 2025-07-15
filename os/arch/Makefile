@@ -2,8 +2,6 @@
 
 SHELL := bash --noprofile --norc -eo pipefail
 
-check-dependency = which $(1) || $(error [error] install '$(1)')
-
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
@@ -20,13 +18,13 @@ check:
 	test -L ~/.config/autostart/overskride.desktop
 
 check-dependency:
-	@$(call check-dependency,zsh)
-	@$(call check-dependency,tmux)
-	@$(call check-dependency,hx)
-	@$(call check-dependency,ghostty)
-	@$(call check-dependency,fzf)
-	@$(call check-dependency,blueman-applet)
-	@$(call check-dependency,overskride)
+	which zsh > /dev/null || $(error Please install zsh)
+	which tmux > /dev/null || $(error Please install tmux)
+	which hx > /dev/null || $(error Please install hx)
+	which ghostty > /dev/null || $(error Please install ghostty)
+	which fzf > /dev/null || $(error Please install fzf)
+	which blueman-applet > /dev/null || $(error Please install blueman-applet)
+	which overskride > /dev/null || $(error Please install overskride)
 
 install: \
 	.zsh \
