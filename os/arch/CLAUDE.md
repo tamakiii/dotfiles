@@ -171,9 +171,52 @@ systemctl --user restart pipewire-pulse
 ```
 
 **Device-Specific Notes:**
-- **Sony devices (WF-C710N, etc.)**: Often require specific timing - put in pairing mode, remove from cache, then pair immediately
-- **Keyboards (HHKB, etc.)**: Usually have simpler pairing - hold Fn + Bluetooth key combination
+- **Sony devices (WF-C710N, WH-1000XM6)**: Often require specific timing - put in pairing mode, remove from cache, then pair immediately
+- **HHKB-Studio2 Keyboard**: Multiple pairing slots (1-4) with different MAC addresses per slot
+  - Slot switching: Fn + Control + [1-4] 
+  - Clear all pairings: Fn + Z + Backspace
+  - Known authentication failures with Linux - common issue
+  - Different slots show as different devices (HHKB-Studio1, HHKB-Studio2, etc.)
+  - **Not officially supported on Linux** - use Overskride for best results
 - **Audio timing**: Some devices exit pairing mode quickly - work fast through the sequence
+
+### Recommended Bluetooth Management Tools
+
+**Tool Recommendations by Device Type:**
+- **Blueman**: Best for Sony audio devices (WF-C710N, WH-1000XM6)
+  - Superior audio profile management
+  - Better Sony device compatibility
+  - Manual A2DP configuration
+- **Overskride**: Best for keyboards (HHKB-Studio2) and modern devices
+  - Modern Rust-based implementation
+  - Better handling of non-standard pairing protocols
+  - Available from AUR: `yay -S overskride`
+
+**Installation:**
+```bash
+# Install both tools for comprehensive device support
+sudo pacman -S blueman
+yay -S overskride
+
+# Autostart configuration (available in this repository)
+make -C os/arch install
+```
+
+### Critical PipeWire Fixes
+
+**Audio Endpoint Registration Error:**
+```bash
+# Symptoms: "No audio endpoints registered"
+# Root cause: WirePlumber Bluetooth codec ABI version mismatches
+
+# Solution:
+systemctl --user restart wireplumber pipewire pipewire-pulse
+```
+
+**Working Bluetooth Stack Versions:**
+- bluez 5.83-1 with blueman 2.4.6-1 and overskride 0.6.2-1
+- PipeWire 1.2.5+ with WirePlumber
+- Kernel 6.10.10-arch1-1 (past problematic 5.9.x versions)
 
 ## System Update Troubleshooting
 
