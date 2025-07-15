@@ -11,6 +11,7 @@ install: \
 	~/.zprofile \
 	~/.config \
 	~/.config/tmux \
+	~/.config/helix \
 	~/.config/ghostty \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
@@ -20,6 +21,7 @@ check:
 	test -f ~/.zprofile
 	test -d ~/.config
 	test -L ~/.config/tmux
+	test -L ~/.config/helix
 	test -L ~/.config/ghostty
 	test -d ~/.config/autostart
 	test -L ~/.config/autostart/blueman-applet.desktop
@@ -28,6 +30,7 @@ check:
 check-dependency:
 	@$(call check-dependency,zsh)
 	@$(call check-dependency,tmux)
+	@$(call check-dependency,hx)
 	@$(call check-dependency,ghostty)
 	@$(call check-dependency,blueman-applet)
 	@$(call check-dependency,overskride)
@@ -36,6 +39,7 @@ uninstall:
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
 	rm -vrf ~/.config/autostart/overskride.desktop
 	rm -vrf ~/.config/ghostty
+	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
 	rm -rf ~/.zprofile
 
@@ -43,6 +47,9 @@ uninstall:
 	mkdir -p $@
 
 ~/.config/tmux: .config/tmux ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/helix: .config/helix ~/.config
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/ghostty: .config/ghostty ~/.config
