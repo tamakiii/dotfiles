@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "Fixing package conflicts before system update..."
 echo
@@ -13,9 +14,9 @@ echo "   - Will replace sdl2 with sdl2-compat"
 echo "   - Will replace webrtc-audio-processing with webrtc-audio-processing-0.3"
 echo
 
-# Run update answering Yes to replacements
-echo -e "Y\nY\n" | sudo pacman -Syu
+# Run update with automatic conflict resolution
+sudo pacman -Syu --noconfirm
 
 echo
 echo "Update complete! Checking bluez version..."
-pacman -Q bluez bluez-libs bluez-utils
+pacman -Q bluez bluez-libs bluez-utils 2>/dev/null | column -t

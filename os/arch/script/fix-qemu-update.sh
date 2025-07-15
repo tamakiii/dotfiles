@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "Fixing QEMU conflicts and updating system..."
 echo
@@ -9,8 +10,8 @@ sudo pacman -R qemu-emulators-full qemu-full --noconfirm
 
 echo
 echo "2. Now running system update..."
-# Run update answering Yes to replacements
-echo -e "Y\nY\n" | sudo pacman -Syu
+# Run update with automatic conflict resolution
+sudo pacman -Syu --noconfirm
 
 echo
 echo "3. Reinstalling QEMU packages with new structure..."
