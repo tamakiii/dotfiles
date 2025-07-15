@@ -20,8 +20,7 @@ install: \
 	~/.claude/commands \
 	~/.config/claude \
 	~/.config/claude/mcp.json \
-	uv.lock
-	$(MAKE) -C os/macos install
+	.venv
 
 check:
 	test -L ~/.claude/CLAUDE.md
@@ -29,12 +28,10 @@ check:
 	test -L ~/.claude/commands
 	test -d ~/.config/claude
 	test -f ~/.config/claude/mcp.json
-	test -f uv.lock
-	$(MAKE) -C os/macos check
+	test -d .venv
 
 check-dependency:
 	@$(call check-dependency,uv)
-	$(MAKE) -C os/macos check-dependency
 
 uninstall:
 	rm -vrf ~/.claude/commands
@@ -42,8 +39,7 @@ uninstall:
 	rm -vrf ~/.claude/CLAUDE.md
 	rm -vrf ~/.config/claude/mcp.json
 	rm -vrf ~/.config/claude
-	rm -rf uv.lock
-	$(MAKE) -C os/macos uninstall
+	rm -rf .venv
 
 ~/.claude:
 	mkdir -p $@
@@ -68,5 +64,5 @@ uninstall:
 ~/.config/claude/mcp.json: .config/claude/mcp.json ~/.config/claude
 	envsubst < $< > $@
 
-uv.lock: pyproject.toml
-	uv lock
+.venv: pyproject.toml
+	uv sync
