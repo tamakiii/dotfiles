@@ -26,6 +26,8 @@ The following tools must be installed before running `make install`:
 - fzf
 - hx (helix editor)
 - go (for workbench tools)
+- node (for npm-based MCP servers)
+- docker (optional, for Terraform MCP server)
 
 ### OS-Specific Installation
 
@@ -133,10 +135,42 @@ claude --mcp-config ~/.config/claude/mcp.json
 claude --mcp-config ~/.config/claude/mcp.json /mcp
 ```
 
+### Server-Specific Usage
+
+#### Context7 Server
+Add "use context7" to prompts when needing library documentation:
+```
+"Create a Next.js middleware using context7"
+```
+
+#### Playwright Server
+Web automation tasks are automatically detected:
+```
+"Take a screenshot of anthropic.com"
+"Click the login button on the page"
+```
+
+#### Terraform Server
+Infrastructure-related requests use the Terraform server:
+```
+"Create a Terraform configuration for AWS S3 bucket"
+"Plan infrastructure changes for production"
+```
+
+#### MarkItDown Server
+Document conversion tasks are handled automatically:
+```
+"Convert this PDF to markdown"
+"Extract content from https://example.com"
+```
+
 ### Security Notes
 - GitHub tokens are retrieved from macOS keychain, not stored in files
 - MCP configuration uses environment variable substitution to keep secrets secure
 - The configuration template is version controlled while keeping credentials separate
+- Docker containers run with minimal privileges (Terraform MCP)
+- npm packages are executed in isolated environments
+- No additional secrets required for Context7, Playwright, or Terraform servers
 
 ## Custom Slash Commands
 
@@ -270,6 +304,9 @@ The repository supports multiple MCP servers:
 - **GitHub MCP**: Repository operations and API access
 - **Human-in-the-Loop**: Interactive decision making with Discord integration
 - **MarkItDown MCP**: Document conversion using `uvx markitdown-mcp`
+- **Context7 MCP**: Up-to-date library documentation using `npx @upstash/context7-mcp`
+- **Playwright MCP**: Web browser automation using `npx @playwright/mcp@latest`
+- **Terraform MCP**: Infrastructure as Code management using Docker
 
 #### Python Dependency Management
 - **uv-based**: Uses modern Python package manager for fast, reliable installs

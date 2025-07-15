@@ -43,6 +43,8 @@ The following tools must be installed before running `make install`:
 - `fzf` - Command-line fuzzy finder
 - `hx` - Helix editor
 - `go` - Go programming language (for workbench tools)
+- `node` - Node.js runtime (for npm-based MCP servers)
+- `docker` - Container runtime (optional, for Terraform MCP server)
 
 ## 🛠️ Installation
 
@@ -89,12 +91,33 @@ claude-cli -p "Please review: https://github.com/tamakiii/meta/blob/main/.github
 - **Authentication**: Uses Discord credentials from keychain
 - **Use cases**: Confirmation dialogs, user input requests
 
+#### MarkItDown Server
+- **Capabilities**: Document conversion to Markdown (web pages, PDFs)
+- **Command**: `uvx markitdown-mcp`
+- **Use cases**: Content extraction, document processing
+
+#### Context7 Server
+- **Capabilities**: Up-to-date library documentation and code examples
+- **Command**: `npx @upstash/context7-mcp`
+- **Usage**: Add "use context7" to prompts for library documentation
+
+#### Playwright Server
+- **Capabilities**: Web browser automation, screenshots, page interaction
+- **Command**: `npx @playwright/mcp@latest --browser chromium --headless`
+- **Use cases**: Web testing, automation, screenshot capture
+
+#### Terraform Server
+- **Capabilities**: Infrastructure as Code management
+- **Command**: `docker run -i --rm hashicorp/terraform-mcp-server`
+- **Requirements**: Docker must be running
+- **Use cases**: Infrastructure planning, resource provisioning
+
 ### AI Code Assistance
 - **GitHub Copilot**: Custom instruction prompts for code generation, review, testing
 - **Claude Code**: Contextual AI assistance with project-specific knowledge
 - **LLM Prompts**: Pre-configured templates in `.llm/prompt/`
 
-For detailed MCP configuration, see [MCP.md](MCP.md).
+For detailed MCP configuration, see [document/MCP.md](document/MCP.md).
 
 ## Development Tools
 
@@ -227,6 +250,14 @@ security find-generic-password -s "GITHUB_TOKEN"
 
 # Test Claude CLI
 claude-cli /mcp
+
+# For Terraform MCP server issues
+docker ps  # Ensure Docker is running
+docker pull hashicorp/terraform-mcp-server
+
+# For npm-based servers (Context7, Playwright)
+node --version  # Check Node.js installation
+npm --version   # Verify npm is available
 ```
 
 #### Shell Not Loading Properly
