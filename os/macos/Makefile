@@ -60,7 +60,7 @@ uninstall:
 ~/.zshrc: .zshrc
 	ln -sfnv $(abspath $<) $@
 
-~/.zprofile: os/macos/.zprofile
+~/.zprofile: .zprofile
 	envsubst < $< > $@
 
 ~/.config:
