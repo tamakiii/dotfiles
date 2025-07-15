@@ -15,86 +15,35 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
-	.zsh \
-	.zsh/antigen.zsh \
-	~/.zsh \
-	~/.zshrc \
-	~/.zprofile \
-	~/.config \
-	~/.config/tmux \
-	~/.config/helix \
-	~/.config/ghostty \
 	~/.claude/CLAUDE.md \
 	~/.claude/settings.json \
 	~/.claude/commands \
 	~/.config/claude \
 	~/.config/claude/mcp.json \
-	$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json \
 	uv.lock
+	$(MAKE) -C os/macos install
 
 check:
-	test -L ~/.zsh
-	test -L ~/.zshrc
-	test -f ~/.zprofile
-	test -L ~/.config/tmux
-	test -L ~/.config/helix
-	test -L ~/.config/ghostty
 	test -L ~/.claude/CLAUDE.md
 	test -L ~/.claude/settings.json
 	test -L ~/.claude/commands
 	test -d ~/.config/claude
 	test -f ~/.config/claude/mcp.json
-	test -f $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
 	test -f uv.lock
+	$(MAKE) -C os/macos check
 
 check-dependency:
-	@$(call check-dependency,zsh)
-	@$(call check-dependency,tmux)
 	@$(call check-dependency,uv)
-	@$(call check-dependency,fzf)
-	@$(call check-dependency,hx)
+	$(MAKE) -C os/macos check-dependency
 
 uninstall:
-	rm -vfr $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
 	rm -vrf ~/.claude/commands
 	rm -vrf ~/.claude/settings.json
 	rm -vrf ~/.claude/CLAUDE.md
 	rm -vrf ~/.config/claude/mcp.json
 	rm -vrf ~/.config/claude
-	rm -vrf ~/.config/helix
-	rm -vrf ~/.config/tmux
-	rm -vrf ~/.config/ghostty
-	rm -rf ~/.zprofile
-	rm -rf ~/.zshrc
-	rm -rf ~/.zsh
-	rm -rf .zsh
-
-.zsh:
-	mkdir $@
-
-.zsh/antigen.zsh:
-	curl -L git.io/antigen > $@
-
-~/.zsh: .zsh
-	ln -sfnv $(abspath $<) $@
-
-~/.zshrc: .zshrc
-	ln -sfnv $(abspath $<) $@
-
-~/.zprofile: os/macos/.zprofile
-	envsubst < $< > $@
-
-~/.config:
-	mkdir -p $@
-
-~/.config/tmux: .config/tmux
-	ln -sfnv $(abspath $<) $@
-
-~/.config/helix: .config/helix
-	ln -sfnv $(abspath $<) $@
-
-~/.config/ghostty: .config/ghostty
-	ln -sfnv $(abspath $<) $@
+	rm -rf uv.lock
+	$(MAKE) -C os/macos uninstall
 
 ~/.claude:
 	mkdir -p $@
@@ -110,14 +59,14 @@ uninstall:
 ~/.claude/commands: .claude/commands ~/.claude
 	ln -sfnv $(abspath $<) $@
 
+~/.config:
+	mkdir -p $@
+
 ~/.config/claude: ~/.config
 	mkdir -p $@
 
 ~/.config/claude/mcp.json: .config/claude/mcp.json ~/.config/claude
 	envsubst < $< > $@
-
-$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json: Library/Application\ Support/Claude/claude_desktop_config.json
-	envsubst < "$<" > "$@"
 
 uv.lock: pyproject.toml
 	uv lock
