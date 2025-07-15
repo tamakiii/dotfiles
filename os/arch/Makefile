@@ -1,4 +1,4 @@
-.PHONY: help install check check-dependency uninstall
+.PHONY: help check check-dependency install uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
 
@@ -6,20 +6,6 @@ check-dependency = which $(1) || $(error [error] install '$(1)')
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
-
-install: \
-	.zsh \
-	.zsh/antigen.zsh \
-	~/.zsh \
-	~/.zshrc \
-	~/.zprofile \
-	~/.config \
-	~/.config/tmux \
-	~/.config/helix \
-	~/.config/ghostty \
-	~/.config/autostart \
-	~/.config/autostart/blueman-applet.desktop \
-	~/.config/autostart/overskride.desktop
 
 check:
 	test -L ~/.zsh
@@ -41,6 +27,20 @@ check-dependency:
 	@$(call check-dependency,fzf)
 	@$(call check-dependency,blueman-applet)
 	@$(call check-dependency,overskride)
+
+install: \
+	.zsh \
+	.zsh/antigen.zsh \
+	~/.zsh \
+	~/.zshrc \
+	~/.zprofile \
+	~/.config \
+	~/.config/tmux \
+	~/.config/helix \
+	~/.config/ghostty \
+	~/.config/autostart \
+	~/.config/autostart/blueman-applet.desktop \
+	~/.config/autostart/overskride.desktop
 
 uninstall:
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
