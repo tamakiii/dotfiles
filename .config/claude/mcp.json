@@ -16,6 +16,10 @@
       "env": {
         "DISCORD_TOKEN": "${DISCORD_TOKEN}"
       }
+    },
+    "markitdown": {
+      "command": "uvx",
+      "args": ["markitdown-mcp"]
     }
   }
 }

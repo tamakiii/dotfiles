@@ -29,7 +29,8 @@ install: \
 	~/.claude/commands \
 	~/.config/claude \
 	~/.config/claude/mcp.json \
-	$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
+	$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json \
+	uv.lock
 
 check:
 	test -L ~/.zsh
@@ -44,6 +45,7 @@ check:
 	test -d ~/.config/claude
 	test -f ~/.config/claude/mcp.json
 	test -f $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
+	test -f uv.lock
 
 check-dependency:
 	@$(call check-dependency,zsh)
@@ -116,3 +118,6 @@ uninstall:
 
 $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json: Library/Application\ Support/Claude/claude_desktop_config.json
 	envsubst < "$<" > "$@"
+
+uv.lock: pyproject.toml
+	uv lock
