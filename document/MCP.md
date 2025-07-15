@@ -44,7 +44,7 @@ The wrapper script:
 Enables Claude to interact with GitHub repositories, issues, and pull requests.
 - **Type**: HTTP-based server
 - **Capabilities**: Repository browsing, issue management, PR operations
-- **Authentication**: Uses GITHUB_PERSONAL_ACCESS_TOKEN from keychain
+- **Authentication**: Uses GITHUB_PERSONAL_ACCESS_TOKEN from `gh auth token`
 
 ### Human-in-the-Loop Server
 Enables Claude to ask for user input via Discord integration.
@@ -77,8 +77,8 @@ The GitHub MCP server supports referencing resources using the `@` syntax:
 # Check MCP configuration
 cat ~/.config/claude/mcp.json
 
-# Verify secrets in keychain
-security find-generic-password -s "GITHUB_TOKEN"
+# Verify GitHub authentication
+gh auth status
 
 # Test Claude CLI with MCP
 claude-cli /mcp
@@ -87,10 +87,10 @@ claude-cli /mcp
 ### Authentication Issues
 ```sh
 # Verify GitHub token
-security find-generic-password -s "GITHUB_TOKEN" -w
+gh auth token
 
 # Test GitHub API access
-curl -H "Authorization: token $(security find-generic-password -s 'GITHUB_TOKEN' -w)" \
+curl -H "Authorization: token $(gh auth token)" \
      https://api.github.com/user
 ```
 
@@ -103,15 +103,16 @@ security find-generic-password -s "DISCORD_USER_ID" -w
 
 ## Security Considerations
 
-All MCP server configurations use environment variables populated from macOS keychain:
+All MCP server configurations use environment variables:
+- GitHub token obtained via `gh auth token` (cross-platform)
+- Discord credentials from macOS keychain
 - No secrets are stored in plain text
 - Environment variable substitution happens during installation
-- Secrets can be rotated by updating keychain entries and reinstalling
 
 ## Advanced Configuration
 
 ### Custom MCP Servers
-To add additional MCP servers, modify the `.config/claude/mcp.json` template and add the corresponding environment variables to your keychain.
+To add additional MCP servers, modify the `.config/claude/mcp.json` template and add the corresponding environment variables to your secret configuration.
 
 ### Development Mode
 For testing MCP configurations:
