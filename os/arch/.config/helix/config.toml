@@ -1,5 +1,7 @@
 # Helix editor configuration for Arch Linux
 
+theme = "onedark_transparent"
+
 [editor]
 line-number = "relative"
 mouse = true
