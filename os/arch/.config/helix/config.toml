@@ -1,6 +1,6 @@
 # Helix editor configuration for Arch Linux
 
-theme = "onedark_transparent"
+theme = "transparent"
 
 [editor]
 line-number = "relative"
