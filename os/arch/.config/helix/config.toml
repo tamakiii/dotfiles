@@ -1,0 +1,54 @@
+# Helix editor configuration for Arch Linux
+
+theme = "transparent"
+
+[editor]
+line-number = "relative"
+mouse = true
+middle-click-paste = true
+bufferline = "multiple"
+color-modes = true
+true-color = true
+rulers = [80, 120]
+shell = ["zsh", "-c"]
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = true
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name"]
+center = ["file-type"]
+right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending"]
+
+[editor.indent-guides]
+render = true
+character = "│"
+skip-levels = 1
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.search]
+smart-case = true
+wrap-around = true
+
+[keys.normal]
+C-e = "scroll_down"
+C-y = "scroll_up"
+C-d = "half_page_down"
+C-u = "half_page_up"
+
+[keys.insert]
+"C-[" = "normal_mode"
+
+[keys.select]
+C-e = "scroll_down"
+C-y = "scroll_up"
+C-d = "half_page_down"
+C-u = "half_page_up"
