@@ -1,5 +1,6 @@
 *.egg-info/
 .zsh/
+/.dotcommands/
 /node_modules/
 /dependency/
 /dist/
