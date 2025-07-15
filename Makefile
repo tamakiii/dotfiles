@@ -3,6 +3,7 @@
 SHELL := bash --noprofile --norc -eo pipefail
 
 include makefiles/include/secret.mk
+
 export GITHUB_PERSONAL_ACCESS_TOKEN ?= $(GITHUB_PERSONAL_ACCESS_TOKEN)
 export DISCORD_CHANNEL_ID ?= $(DISCORD_CHANNEL_ID_CLAUDE)
 export DISCORD_USER_ID ?= $(DISCORD_USER_ID)
