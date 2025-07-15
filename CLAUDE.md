@@ -209,3 +209,34 @@ Quick reference commands in `document/snippets.md`:
 - Git operations and worktree management
 - Development tool shortcuts
 - Clipboard operations
+
+## Bluetooth Troubleshooting on Arch Linux
+
+### Key Learnings
+
+**Working Solutions:**
+- **Blueman** is superior to GNOME Settings for Bluetooth pairing on Arch Linux
+- Sony WF-C710N earphones successfully paired after fixing PipeWire audio endpoint issues
+- Audio endpoint registration errors require PipeWire/WirePlumber restart
+
+**Specific Device Issues:**
+- **HHKB-Studio2 Keyboard**: Multiple pairing slots (1-4) with different MAC addresses per slot
+  - Slot switching: Fn + Control + [1-4]
+  - Clear all pairings: Fn + Z + Backspace
+  - Known authentication failures with Linux - common issue
+  - Different slots show as different devices (HHKB-Studio1, HHKB-Studio2, etc.)
+
+**Critical Fixes:**
+1. **Audio Endpoint Error**: "No audio endpoints registered"
+   - Solution: `systemctl --user restart wireplumber pipewire pipewire-pulse`
+   - Root cause: WirePlumber Bluetooth codec ABI version mismatches
+
+2. **Authentication Failures**: 
+   - Use Blueman instead of GNOME Settings or bluetoothctl
+   - Trust device before pairing: `bluetoothctl trust <MAC>`
+   - Use appropriate agent: KeyboardOnly for keyboards, default for audio
+
+**Working Bluetooth Stack:**
+- bluez 5.83-1 with blueman 2.4.6-1
+- PipeWire 1.2.5 with WirePlumber
+- Kernel 6.10.10-arch1-1 (past problematic 5.9.x versions)
