@@ -8,6 +8,10 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
+	.zsh \
+	.zsh/antigen.zsh \
+	~/.zsh \
+	~/.zshrc \
 	~/.zprofile \
 	~/.config \
 	~/.config/tmux \
@@ -18,6 +22,8 @@ install: \
 	~/.config/autostart/overskride.desktop
 
 check:
+	test -L ~/.zsh
+	test -L ~/.zshrc
 	test -f ~/.zprofile
 	test -d ~/.config
 	test -L ~/.config/tmux
@@ -32,6 +38,7 @@ check-dependency:
 	@$(call check-dependency,tmux)
 	@$(call check-dependency,hx)
 	@$(call check-dependency,ghostty)
+	@$(call check-dependency,fzf)
 	@$(call check-dependency,blueman-applet)
 	@$(call check-dependency,overskride)
 
@@ -42,6 +49,21 @@ uninstall:
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
 	rm -rf ~/.zprofile
+	rm -rf ~/.zshrc
+	rm -rf ~/.zsh
+	rm -rf .zsh
+
+.zsh:
+	mkdir $@
+
+.zsh/antigen.zsh:
+	curl -L git.io/antigen > $@
+
+~/.zsh: .zsh
+	ln -sfnv $(abspath $<) $@
+
+~/.zshrc: .zshrc
+	ln -sfnv $(abspath $<) $@
 
 ~/.config:
 	mkdir -p $@
