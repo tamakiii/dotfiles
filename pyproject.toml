@@ -2,9 +2,9 @@
 name = "dotfiles"
 version = "0.1.0"
 description = "Personal dotfiles with MCP server dependencies"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 dependencies = [
-    "markitdown-mcp>=0.1.0"
+    "markitdown-mcp==0.0.1a4"  # Latest available version of the MCP server
 ]
 
 [build-system]
