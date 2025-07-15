@@ -2,8 +2,7 @@
 
 SHELL := bash --noprofile --norc -eo pipefail
 
-error-install := echo "[error] install '$$_'"; exit 1;
-check-dependency = which $(1) || { $(call error-install) }
+check-dependency = which $(1) || $(error [error] install '$(1)')
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))

@@ -5,7 +5,7 @@ echo
 
 # Update system and bluetooth packages
 echo "1. Updating bluez packages..."
-sudo pacman -Syu bluez bluez-libs bluez-utils --needed
+sudo pacman -Syu bluez bluez-libs bluez-utils --needed --noconfirm
 
 # Install additional packages
 echo
