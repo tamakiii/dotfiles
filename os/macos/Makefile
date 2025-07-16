@@ -1,18 +1,9 @@
-.PHONY: install check uninstall
+.PHONY: help install check check-dependency uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
 
-install: \
-	.zsh \
-	.zsh/antigen.zsh \
-	~/.zsh \
-	~/.zshrc \
-	~/.zprofile \
-	~/.config \
-	~/.config/tmux \
-	~/.config/helix \
-	~/.config/ghostty \
-	$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
+help:
+	@cat $(firstword $(MAKEFILE_LIST))
 
 check:
 	test -L ~/.zsh
@@ -28,6 +19,18 @@ check-dependency:
 	which tmux > /dev/null || $(error Please install tmux)
 	which fzf > /dev/null || $(error Please install fzf)
 	which hx > /dev/null || $(error Please install hx)
+
+install: \
+	.zsh \
+	.zsh/antigen.zsh \
+	~/.zsh \
+	~/.zshrc \
+	~/.zprofile \
+	~/.config \
+	~/.config/tmux \
+	~/.config/helix \
+	~/.config/ghostty \
+	$(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
 
 uninstall:
 	rm -vfr $(HOME)/Library/Application\ Support/Claude/claude_desktop_config.json
@@ -52,7 +55,7 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.zprofile: .zprofile
-	envsubst < $< > $@
+	cp $< $@
 
 ~/.config:
 	mkdir -p $@

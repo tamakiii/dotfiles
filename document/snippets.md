@@ -46,6 +46,12 @@ git worktree add /tmp/"$(git remote get-url origin | git-url | jq -r '.path' | s
 ```
 Create a new worktree in /tmp with a timestamped branch name.
 
+### Delete all local branches except current
+```bash
+git branch | grep -v ^\* | xargs -I @ git branch -D @
+```
+Delete all local git branches except the currently checked out branch.
+
 ## Development Tools
 
 ### Terminal recording
