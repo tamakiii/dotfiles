@@ -83,7 +83,7 @@ claude-cli -p "Please review: https://github.com/tamakiii/meta/blob/main/.github
 
 #### GitHub Integration
 - **Capabilities**: Repository browsing, issue management, PR operations
-- **Authentication**: Uses `GITHUB_PERSONAL_ACCESS_TOKEN` from keychain
+- **Authentication**: Uses `GITHUB_PERSONAL_ACCESS_TOKEN` from `gh auth token`
 - **Resource syntax**: `@github:issue://114` for issue references
 
 #### Human-in-the-Loop Server
@@ -245,8 +245,8 @@ make install
 # Check MCP configuration
 cat ~/.config/claude/mcp.json
 
-# Verify secrets in keychain
-security find-generic-password -s "GITHUB_TOKEN"
+# Verify GitHub authentication
+gh auth status
 
 # Test Claude CLI
 claude-cli /mcp
@@ -298,13 +298,13 @@ git merge test-config
 
 ## Security
 
-All secrets are stored securely in macOS keychain and accessed via environment variables:
+Secrets are managed securely via environment variables:
 
-| Secret | Purpose | Keychain Service |
-|--------|---------|-----------------|
-| `GITHUB_TOKEN` | GitHub API access | `GITHUB_TOKEN` |
-| `DISCORD_CHANNEL_ID_CLAUDE` | Human-in-the-loop integration | `DISCORD_CHANNEL_ID_CLAUDE` |
-| `DISCORD_USER_ID` | Discord user identification | `DISCORD_USER_ID` |
+| Secret | Purpose | Source |
+|--------|---------|---------|
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | GitHub API access | `gh auth token` |
+| `DISCORD_CHANNEL_ID_CLAUDE` | Human-in-the-loop integration | macOS keychain |
+| `DISCORD_USER_ID` | Discord user identification | macOS keychain |
 
 ### Managing Secrets
 
@@ -327,11 +327,11 @@ security delete-generic-password -s "SECRET_NAME" -a "$USER"
 
 #### Working with Environment Variables
 ```sh
-# Export secret to environment variable
-export GITHUB_TOKEN="$(security find-generic-password -s GITHUB_TOKEN -a $(whoami) -w)"
+# Export GitHub token to environment variable
+export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token)"
 
-# Copy password to clipboard
-security find-generic-password -s GITHUB_TOKEN -a "$(whoami)" -w | pbcopy
+# Copy GitHub token to clipboard
+gh auth token | pbcopy
 ```
 
 #### Interactive Password Management
