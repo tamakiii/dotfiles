@@ -40,7 +40,7 @@ paths=(
     "$HOME/.dotfiles/node_modules/.bin"
 
     # Dotcommands-specific tools
-    "$HOME/.dotfiles/.dotcommands/command/bin"
+    "$HOME/.dotcommands/command/bin"
 
     # Python virtual environment
     "$HOME/.venv/bin"
