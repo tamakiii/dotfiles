@@ -55,7 +55,7 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.zprofile: .zprofile
-	envsubst < $< > $@
+	cp $< $@
 
 ~/.config:
 	mkdir -p $@

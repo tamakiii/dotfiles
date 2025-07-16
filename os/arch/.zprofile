@@ -13,8 +13,10 @@ paths=(
 
     # Dotfiles-specific tools
     "$HOME/.dotfiles/bin"
-    "$HOME/.dotfiles/workbench/bin"
     "$HOME/.dotfiles/node_modules/.bin"
+
+    # Dotcommands-specific tools
+    "$HOME/.dotfiles/.dotcommands/command/bin"
 
     # Python virtual environment
     "$HOME/.venv/bin"
