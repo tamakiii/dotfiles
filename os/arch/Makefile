@@ -16,6 +16,7 @@ check:
 	test -d ~/.config/autostart
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
+	test -L ~/.config/git
 
 check-dependency:
 	which zsh > /dev/null || $(error Please install zsh)
@@ -38,9 +39,11 @@ install: \
 	~/.config/ghostty \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
-	~/.config/autostart/overskride.desktop
+	~/.config/autostart/overskride.desktop \
+	~/.config/git
 
 uninstall:
+	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
 	rm -vrf ~/.config/autostart/overskride.desktop
 	rm -vrf ~/.config/ghostty
@@ -82,6 +85,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/autostart/overskride.desktop: .config/autostart/overskride.desktop ~/.config/autostart
+	ln -sfnv $(abspath $<) $@
+
+~/.config/git: .config/git ~/.config
 	ln -sfnv $(abspath $<) $@
 
 ~/.zprofile: .zprofile

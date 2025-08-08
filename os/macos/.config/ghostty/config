@@ -52,6 +52,7 @@
 font-family = "Monaco"
 # font-family = "Hiragino Sans"
 font-family = "PT Mono"
+font-family = "Noto Color Emoji"
 
 font-family-bold = 
 font-family-italic = 

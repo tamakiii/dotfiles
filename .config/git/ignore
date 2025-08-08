@@ -1,5 +1,6 @@
 .DS_Store
-**/CLAUDE.local.md
+nohup.out
+local.duckdb
+CLAUDE.local.md
+.claude.local/
 **/.claude/settings.local.json
-**/.claude.local/
-**/local.duckdb
