@@ -1,5 +1,4 @@
 {
-  "enableAllProjectMcpServers": false,
   "permissions": {
     "allow": [
       "Bash(ls:*)",
@@ -20,6 +19,7 @@
       "Bash(node:*)",
       "Bash(deno:*)",
       "Bash(bun:*)",
+      "Bash(curl:-s http://localhost:9222/json/version)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.github.com)",
@@ -28,5 +28,7 @@
       "WebFetch(domain:npmjs.com)",
       "mcp__human-in-the-loop__ask_human"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": false,
+  "model": "sonnet"
 }
