@@ -17,6 +17,10 @@ check:
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
 	test -L ~/.config/git
+	test -d ~/.config/systemd
+	test -d ~/.config/systemd/user
+	test -L ~/.config/systemd/user/shairport-sync.service
+	test -L ~/.config/shairport-sync.conf
 
 check-dependency:
 	which zsh > /dev/null || $(error Please install zsh)
@@ -26,6 +30,8 @@ check-dependency:
 	which fzf > /dev/null || $(error Please install fzf)
 	which blueman-applet > /dev/null || $(error Please install blueman-applet)
 	which overskride > /dev/null || $(error Please install overskride)
+	which shairport-sync > /dev/null || $(error Please install shairport-sync)
+	which avahi-daemon > /dev/null || $(error Please install avahi)
 
 install: \
 	.zsh \
@@ -40,9 +46,15 @@ install: \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
 	~/.config/autostart/overskride.desktop \
-	~/.config/git
+	~/.config/git \
+	~/.config/systemd \
+	~/.config/systemd/user \
+	~/.config/systemd/user/shairport-sync.service \
+	~/.config/shairport-sync.conf
 
 uninstall:
+	rm -vrf ~/.config/shairport-sync.conf
+	rm -vrf ~/.config/systemd/user/shairport-sync.service
 	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
 	rm -vrf ~/.config/autostart/overskride.desktop
@@ -88,6 +100,18 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/git: .config/git ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/systemd:
+	mkdir -p $@
+
+~/.config/systemd/user: ~/.config/systemd
+	mkdir -p $@
+
+~/.config/systemd/user/shairport-sync.service: .config/systemd/user/shairport-sync.service ~/.config/systemd/user
+	ln -sfnv $(abspath $<) $@
+
+~/.config/shairport-sync.conf: .config/shairport-sync.conf ~/.config
 	ln -sfnv $(abspath $<) $@
 
 ~/.zprofile: .zprofile
