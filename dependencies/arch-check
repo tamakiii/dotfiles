@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""
+Arch Linux Dependency Checker
+Validates that all required packages from the manifest are installed.
+This replaces the old manual dependency checking in the Makefile.
+"""
+
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+from typing import Dict, List, Set, Tuple
+
+
+def run_command(cmd: List[str], check: bool = True) -> Tuple[bool, str]:
+    """Run a shell command and return success status and output."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=check)
+        return True, result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.strip() if e.stderr else str(e)
+
+
+def is_package_installed(package: str) -> bool:
+    """Check if a package is installed."""
+    success, _ = run_command(['pacman', '-Q', package], check=False)
+    return success
+
+
+def is_command_available(command: str) -> bool:
+    """Check if a command is available in PATH."""
+    success, _ = run_command(['which', command], check=False)
+    return success
+
+
+def load_manifest(manifest_path: Path) -> Dict:
+    """Load the arch.toml manifest file."""
+    try:
+        with open(manifest_path, 'rb') as f:
+            return tomllib.load(f)
+    except Exception as e:
+        print(f"Error loading manifest: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def resolve_package_name(declared_name: str, package_info: Dict) -> str:
+    """Resolve the actual package name from the manifest entry."""
+    if isinstance(package_info, dict) and 'package' in package_info:
+        return package_info['package']
+    return declared_name
+
+
+def get_command_from_package(package_name: str) -> str:
+    """Map package names to their primary commands for validation."""
+    # Map of package names to their main commands
+    command_map = {
+        'zsh': 'zsh',
+        'tmux': 'tmux',
+        'helix': 'hx',
+        'fzf': 'fzf',
+        'git': 'git',
+        'go': 'go',
+        'nodejs': 'node',
+        'npm': 'npm',
+        'alsa-utils': 'aplay',
+        'pipewire': 'pipewire',
+        'bluez-utils': 'bluetoothctl',
+        'blueman': 'blueman-applet',
+        'ghostty': 'ghostty',
+        'avahi': 'avahi-daemon',
+        'shairport-sync': 'shairport-sync',
+        'overskride': 'overskride',
+        'base-devel': 'make',  # Meta-package, check for make
+        'uv': 'uv'
+    }
+    
+    return command_map.get(package_name, package_name)
+
+
+def check_core_dependencies(manifest: Dict) -> List[str]:
+    """Check core dependencies that are essential for the dotfiles to work."""
+    missing_deps = []
+    
+    # Always check core packages regardless of group selection
+    if 'packages' in manifest and 'core' in manifest['packages']:
+        core_packages = manifest['packages']['core']
+        
+        print("Checking core dependencies...")
+        for declared_name, package_info in core_packages.items():
+            actual_name = resolve_package_name(declared_name, package_info)
+            command = get_command_from_package(actual_name)
+            
+            if not is_package_installed(actual_name):
+                reason = package_info.get('reason', 'Required package') if isinstance(package_info, dict) else 'Required package'
+                missing_deps.append(f"{actual_name} - {reason}")
+                print(f"  ✗ {actual_name} (not installed)")
+            elif not is_command_available(command):
+                reason = package_info.get('reason', 'Required package') if isinstance(package_info, dict) else 'Required package'
+                missing_deps.append(f"{actual_name} - {reason} (command '{command}' not found)")
+                print(f"  ✗ {actual_name} (installed but command '{command}' not available)")
+            else:
+                print(f"  ✓ {actual_name}")
+    
+    return missing_deps
+
+
+def check_standard_dependencies(manifest: Dict) -> List[str]:
+    """Check standard group dependencies for normal operation."""
+    missing_deps = []
+    
+    # Get standard group categories
+    standard_groups = ['audio', 'bluetooth', 'development']
+    if 'groups' in manifest and 'standard' in manifest['groups']:
+        standard_groups = [cat for cat in manifest['groups']['standard'] if cat != 'core']
+    
+    if 'packages' not in manifest:
+        return missing_deps
+    
+    print("\nChecking standard dependencies...")
+    for category in standard_groups:
+        if category not in manifest['packages']:
+            continue
+        
+        print(f"  Category: {category}")
+        packages = manifest['packages'][category]
+        
+        for declared_name, package_info in packages.items():
+            actual_name = resolve_package_name(declared_name, package_info)
+            
+            if not is_package_installed(actual_name):
+                reason = package_info.get('reason', 'Standard package') if isinstance(package_info, dict) else 'Standard package'
+                missing_deps.append(f"{actual_name} - {reason}")
+                print(f"    ✗ {actual_name} (not installed)")
+            else:
+                print(f"    ✓ {actual_name}")
+    
+    return missing_deps
+
+
+def check_optional_dependencies(manifest: Dict) -> List[str]:
+    """Check optional dependencies (warn but don't fail)."""
+    missing_optional = []
+    
+    optional_groups = ['desktop', 'network', 'optional']
+    
+    if 'packages' not in manifest:
+        return missing_optional
+    
+    print("\nChecking optional dependencies...")
+    for category in optional_groups:
+        if category not in manifest['packages']:
+            continue
+        
+        if not manifest['packages'][category]:  # Skip empty categories
+            continue
+        
+        print(f"  Category: {category}")
+        packages = manifest['packages'][category]
+        
+        for declared_name, package_info in packages.items():
+            actual_name = resolve_package_name(declared_name, package_info)
+            
+            if not is_package_installed(actual_name):
+                reason = package_info.get('reason', 'Optional package') if isinstance(package_info, dict) else 'Optional package'
+                missing_optional.append(f"{actual_name} - {reason}")
+                print(f"    ? {actual_name} (optional, not installed)")
+            else:
+                print(f"    ✓ {actual_name}")
+    
+    return missing_optional
+
+
+def main():
+    """Main entry point."""
+    # Determine paths
+    script_dir = Path(__file__).parent
+    manifest_path = script_dir / 'arch.toml'
+    
+    if not manifest_path.exists():
+        print(f"Error: Manifest file not found at {manifest_path}", file=sys.stderr)
+        print("Run this from the os/arch directory or ensure the manifest exists.", file=sys.stderr)
+        sys.exit(1)
+    
+    # Load manifest
+    manifest = load_manifest(manifest_path)
+    
+    # Check dependencies
+    missing_core = check_core_dependencies(manifest)
+    missing_standard = check_standard_dependencies(manifest)
+    missing_optional = check_optional_dependencies(manifest)
+    
+    # Report results
+    total_missing = len(missing_core) + len(missing_standard)
+    
+    if missing_core:
+        print(f"\n❌ {len(missing_core)} core dependencies missing:")
+        for dep in missing_core:
+            print(f"  • {dep}")
+    
+    if missing_standard:
+        print(f"\n⚠️  {len(missing_standard)} standard dependencies missing:")
+        for dep in missing_standard:
+            print(f"  • {dep}")
+    
+    if missing_optional:
+        print(f"\n💡 {len(missing_optional)} optional dependencies not installed:")
+        for dep in missing_optional[:5]:  # Limit output
+            print(f"  • {dep}")
+        if len(missing_optional) > 5:
+            print(f"  ... and {len(missing_optional) - 5} more")
+    
+    # Provide instructions
+    if total_missing > 0:
+        print(f"\n🔧 To install missing dependencies:")
+        print("  make -C os/arch install-packages")
+        print("  # or")
+        print("  make -C os/arch sync-packages")
+        print(f"\nDependency check failed: {total_missing} required packages missing")
+        sys.exit(1)
+    else:
+        print(f"\n✅ All required dependencies are installed!")
+        if missing_optional:
+            print(f"({len(missing_optional)} optional packages not installed)")
+        sys.exit(0)
+
+
+if __name__ == '__main__':
+    main()

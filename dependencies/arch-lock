@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""
+Arch Linux Package Lock File Generator
+Similar to Cargo.lock, this script generates a lock file with exact package versions
+from the current system state and the arch.toml manifest.
+"""
+
+import subprocess
+import sys
+import json
+import tomllib
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
+
+
+def run_command(cmd: List[str]) -> Tuple[bool, str]:
+    """Run a shell command and return success status and output."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return True, result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.strip() if e.stderr else str(e)
+
+
+def get_package_version(package: str) -> Optional[str]:
+    """Get the installed version of a package using pacman."""
+    success, output = run_command(['pacman', '-Q', package])
+    if success and output:
+        # pacman -Q returns "package version"
+        parts = output.strip().split(' ', 1)
+        if len(parts) == 2:
+            return parts[1]
+    return None
+
+
+def get_aur_packages() -> Dict[str, str]:
+    """Get all AUR packages with their versions."""
+    success, output = run_command(['pacman', '-Qm'])
+    aur_packages = {}
+    if success:
+        for line in output.split('\n'):
+            if line.strip():
+                parts = line.strip().split(' ', 1)
+                if len(parts) == 2:
+                    aur_packages[parts[0]] = parts[1]
+    return aur_packages
+
+
+def get_official_packages() -> Dict[str, str]:
+    """Get all official repository packages with their versions."""
+    success, output = run_command(['pacman', '-Qn'])
+    official_packages = {}
+    if success:
+        for line in output.split('\n'):
+            if line.strip():
+                parts = line.strip().split(' ', 1)
+                if len(parts) == 2:
+                    official_packages[parts[0]] = parts[1]
+    return official_packages
+
+
+def load_manifest(manifest_path: Path) -> Dict:
+    """Load the arch.toml manifest file."""
+    try:
+        with open(manifest_path, 'rb') as f:
+            return tomllib.load(f)
+    except Exception as e:
+        print(f"Error loading manifest: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def resolve_package_name(declared_name: str, package_info: Dict) -> str:
+    """Resolve the actual package name from the manifest entry."""
+    if isinstance(package_info, dict) and 'package' in package_info:
+        return package_info['package']
+    return declared_name
+
+
+def generate_lock_file(manifest_path: Path, lock_path: Path):
+    """Generate a lock file from the current system state and manifest."""
+    print("Loading manifest...")
+    manifest = load_manifest(manifest_path)
+    
+    print("Querying installed packages...")
+    aur_packages = get_aur_packages()
+    official_packages = get_official_packages()
+    
+    # Create lock file structure
+    lock_data = {
+        "version": 1,
+        "generated": datetime.now().isoformat(),
+        "manifest": str(manifest_path),
+        "packages": {},
+        "metadata": {
+            "arch_version": "rolling",
+            "pacman_version": None,
+            "total_packages": 0,
+            "missing_packages": []
+        }
+    }
+    
+    # Get pacman version
+    success, pacman_version = run_command(['pacman', '--version'])
+    if success:
+        lock_data["metadata"]["pacman_version"] = pacman_version.split('\n')[0]
+    
+    # Process each package category
+    missing_packages = []
+    total_packages = 0
+    
+    if 'packages' in manifest:
+        for category, packages in manifest['packages'].items():
+            lock_data['packages'][category] = {}
+            
+            for declared_name, package_info in packages.items():
+                total_packages += 1
+                actual_name = resolve_package_name(declared_name, package_info)
+                
+                # Determine expected source
+                source = "official"
+                if isinstance(package_info, dict) and package_info.get('source') == 'aur':
+                    source = "aur"
+                
+                # Get version from appropriate source
+                if source == "aur":
+                    version = aur_packages.get(actual_name)
+                else:
+                    version = official_packages.get(actual_name)
+                
+                if version:
+                    lock_data['packages'][category][declared_name] = {
+                        "package": actual_name,
+                        "version": version,
+                        "source": source,
+                        "reason": package_info.get('reason', '') if isinstance(package_info, dict) else ''
+                    }
+                else:
+                    missing_packages.append(f"{declared_name} ({actual_name})")
+                    print(f"Warning: Package '{actual_name}' (declared as '{declared_name}') not found", file=sys.stderr)
+    
+    lock_data["metadata"]["total_packages"] = total_packages
+    lock_data["metadata"]["missing_packages"] = missing_packages
+    
+    # Write lock file
+    print(f"Writing lock file to {lock_path}...")
+    with open(lock_path, 'w') as f:
+        json.dump(lock_data, f, indent=2)
+    
+    print(f"Lock file generated successfully!")
+    print(f"Total packages: {total_packages}")
+    print(f"Missing packages: {len(missing_packages)}")
+    
+    if missing_packages:
+        print(f"Missing packages: {', '.join(missing_packages)}")
+        return False
+    return True
+
+
+def main():
+    """Main entry point."""
+    # Determine paths
+    script_dir = Path(__file__).parent
+    manifest_path = script_dir / 'arch.toml'
+    lock_path = script_dir / 'arch.lock'
+    
+    if not manifest_path.exists():
+        print(f"Error: Manifest file not found at {manifest_path}", file=sys.stderr)
+        sys.exit(1)
+    
+    success = generate_lock_file(manifest_path, lock_path)
+    sys.exit(0 if success else 1)
+
+
+if __name__ == '__main__':
+    main()

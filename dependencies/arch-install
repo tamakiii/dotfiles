@@ -1,0 +1,201 @@
+#!/usr/bin/env python3
+"""
+Arch Linux Package Installer
+Installs packages from the arch.toml manifest, handling both official and AUR packages.
+"""
+
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+from typing import Dict, List, Set, Tuple
+
+
+def run_command(cmd: List[str], check: bool = True) -> Tuple[bool, str]:
+    """Run a shell command and return success status and output."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=check)
+        return True, result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.strip() if e.stderr else str(e)
+
+
+def is_package_installed(package: str) -> bool:
+    """Check if a package is already installed."""
+    success, _ = run_command(['pacman', '-Q', package], check=False)
+    return success
+
+
+def has_yay() -> bool:
+    """Check if yay (AUR helper) is available."""
+    success, _ = run_command(['which', 'yay'], check=False)
+    return success
+
+
+def has_paru() -> bool:
+    """Check if paru (AUR helper) is available."""
+    success, _ = run_command(['which', 'paru'], check=False)
+    return success
+
+
+def get_aur_helper() -> str:
+    """Get the available AUR helper (yay or paru)."""
+    if has_yay():
+        return 'yay'
+    elif has_paru():
+        return 'paru'
+    else:
+        print("Error: No AUR helper found. Please install yay or paru.", file=sys.stderr)
+        print("  sudo pacman -S base-devel git", file=sys.stderr)
+        print("  git clone https://aur.archlinux.org/yay.git", file=sys.stderr)
+        print("  cd yay && makepkg -si", file=sys.stderr)
+        sys.exit(1)
+
+
+def load_manifest(manifest_path: Path) -> Dict:
+    """Load the arch.toml manifest file."""
+    try:
+        with open(manifest_path, 'rb') as f:
+            return tomllib.load(f)
+    except Exception as e:
+        print(f"Error loading manifest: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def resolve_package_name(declared_name: str, package_info: Dict) -> str:
+    """Resolve the actual package name from the manifest entry."""
+    if isinstance(package_info, dict) and 'package' in package_info:
+        return package_info['package']
+    return declared_name
+
+
+def collect_packages(manifest: Dict, groups: List[str] = None) -> Tuple[List[str], List[str]]:
+    """Collect packages from the manifest, separated by source."""
+    official_packages = []
+    aur_packages = []
+    
+    # Default to 'standard' group if no groups specified
+    if not groups:
+        if 'groups' in manifest and 'standard' in manifest['groups']:
+            groups = manifest['groups']['standard']
+        else:
+            groups = ['core', 'audio', 'bluetooth', 'development']
+    
+    if 'packages' not in manifest:
+        return official_packages, aur_packages
+    
+    for category in groups:
+        if category not in manifest['packages']:
+            print(f"Warning: Category '{category}' not found in manifest", file=sys.stderr)
+            continue
+            
+        packages = manifest['packages'][category]
+        for declared_name, package_info in packages.items():
+            actual_name = resolve_package_name(declared_name, package_info)
+            
+            # Skip if already installed
+            if is_package_installed(actual_name):
+                print(f"  ✓ {actual_name} (already installed)")
+                continue
+            
+            # Determine source
+            source = "official"
+            if isinstance(package_info, dict) and package_info.get('source') == 'aur':
+                source = "aur"
+            
+            if source == "aur":
+                aur_packages.append(actual_name)
+            else:
+                official_packages.append(actual_name)
+    
+    return official_packages, aur_packages
+
+
+def install_official_packages(packages: List[str]) -> bool:
+    """Install packages from official repositories using pacman."""
+    if not packages:
+        return True
+    
+    print(f"\nInstalling {len(packages)} official packages:")
+    for pkg in packages:
+        print(f"  • {pkg}")
+    
+    cmd = ['sudo', 'pacman', '-S', '--needed', '--noconfirm'] + packages
+    success, output = run_command(cmd, check=False)
+    
+    if not success:
+        print(f"Error installing official packages: {output}", file=sys.stderr)
+        return False
+    
+    print("✓ Official packages installed successfully")
+    return True
+
+
+def install_aur_packages(packages: List[str]) -> bool:
+    """Install packages from AUR using yay or paru."""
+    if not packages:
+        return True
+    
+    aur_helper = get_aur_helper()
+    print(f"\nInstalling {len(packages)} AUR packages using {aur_helper}:")
+    for pkg in packages:
+        print(f"  • {pkg}")
+    
+    cmd = [aur_helper, '-S', '--needed', '--noconfirm'] + packages
+    success, output = run_command(cmd, check=False)
+    
+    if not success:
+        print(f"Error installing AUR packages: {output}", file=sys.stderr)
+        return False
+    
+    print("✓ AUR packages installed successfully")
+    return True
+
+
+def main():
+    """Main entry point."""
+    # Parse command line arguments
+    groups = sys.argv[1:] if len(sys.argv) > 1 else None
+    
+    # Determine paths
+    script_dir = Path(__file__).parent
+    manifest_path = script_dir / 'arch.toml'
+    
+    if not manifest_path.exists():
+        print(f"Error: Manifest file not found at {manifest_path}", file=sys.stderr)
+        sys.exit(1)
+    
+    print("Loading manifest...")
+    manifest = load_manifest(manifest_path)
+    
+    print(f"Collecting packages to install (groups: {groups or 'standard'})...")
+    official_packages, aur_packages = collect_packages(manifest, groups)
+    
+    if not official_packages and not aur_packages:
+        print("✓ All packages are already installed!")
+        return
+    
+    total_packages = len(official_packages) + len(aur_packages)
+    print(f"\nFound {total_packages} packages to install:")
+    print(f"  Official: {len(official_packages)}")
+    print(f"  AUR: {len(aur_packages)}")
+    
+    # Install packages
+    success = True
+    
+    if official_packages:
+        success &= install_official_packages(official_packages)
+    
+    if aur_packages and success:
+        success &= install_aur_packages(aur_packages)
+    
+    if success:
+        print("\n✓ All packages installed successfully!")
+        print("Run 'make -C os/arch lock-packages' to update the lock file.")
+    else:
+        print("\n✗ Some packages failed to install", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+"""
+Arch Linux Package Sync Tool
+Synchronizes the system to match the manifest by installing missing packages
+and optionally removing packages not in the manifest.
+"""
+
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+from typing import Dict, List, Set, Tuple
+
+
+def run_command(cmd: List[str], check: bool = True) -> Tuple[bool, str]:
+    """Run a shell command and return success status and output."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=check)
+        return True, result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.strip() if e.stderr else str(e)
+
+
+def is_package_installed(package: str) -> bool:
+    """Check if a package is already installed."""
+    success, _ = run_command(['pacman', '-Q', package], check=False)
+    return success
+
+
+def has_aur_helper() -> str:
+    """Get the available AUR helper (yay or paru)."""
+    for helper in ['yay', 'paru']:
+        success, _ = run_command(['which', helper], check=False)
+        if success:
+            return helper
+    
+    print("Warning: No AUR helper found. AUR packages will be skipped.", file=sys.stderr)
+    print("Install yay or paru to manage AUR packages.", file=sys.stderr)
+    return None
+
+
+def load_manifest(manifest_path: Path) -> Dict:
+    """Load the arch.toml manifest file."""
+    try:
+        with open(manifest_path, 'rb') as f:
+            return tomllib.load(f)
+    except Exception as e:
+        print(f"Error loading manifest: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def resolve_package_name(declared_name: str, package_info: Dict) -> str:
+    """Resolve the actual package name from the manifest entry."""
+    if isinstance(package_info, dict) and 'package' in package_info:
+        return package_info['package']
+    return declared_name
+
+
+def collect_manifest_packages(manifest: Dict, groups: List[str] = None) -> Tuple[List[str], List[str], Set[str]]:
+    """Collect packages from the manifest, separated by source."""
+    official_packages = []
+    aur_packages = []
+    all_packages = set()
+    
+    # Default to 'standard' group if no groups specified
+    if not groups:
+        if 'groups' in manifest and 'standard' in manifest['groups']:
+            groups = manifest['groups']['standard']
+        else:
+            groups = ['core', 'audio', 'bluetooth', 'development']
+    
+    if 'packages' not in manifest:
+        return official_packages, aur_packages, all_packages
+    
+    for category in groups:
+        if category not in manifest['packages']:
+            print(f"Warning: Category '{category}' not found in manifest", file=sys.stderr)
+            continue
+        
+        packages = manifest['packages'][category]
+        for declared_name, package_info in packages.items():
+            actual_name = resolve_package_name(declared_name, package_info)
+            all_packages.add(actual_name)
+            
+            # Skip if already installed
+            if is_package_installed(actual_name):
+                continue
+            
+            # Determine source
+            source = "official"
+            if isinstance(package_info, dict) and package_info.get('source') == 'aur':
+                source = "aur"
+            
+            if source == "aur":
+                aur_packages.append(actual_name)
+            else:
+                official_packages.append(actual_name)
+    
+    return official_packages, aur_packages, all_packages
+
+
+def get_explicitly_installed_packages() -> Set[str]:
+    """Get packages that were explicitly installed by the user."""
+    success, output = run_command(['pacman', '-Qe'])
+    packages = set()
+    if success:
+        for line in output.split('\n'):
+            if line.strip():
+                package_name = line.strip().split(' ')[0]
+                packages.add(package_name)
+    return packages
+
+
+def install_official_packages(packages: List[str]) -> bool:
+    """Install packages from official repositories using pacman."""
+    if not packages:
+        return True
+    
+    print(f"\nInstalling {len(packages)} official packages:")
+    for pkg in packages:
+        print(f"  • {pkg}")
+    
+    cmd = ['sudo', 'pacman', '-S', '--needed', '--noconfirm'] + packages
+    success, output = run_command(cmd, check=False)
+    
+    if not success:
+        print(f"Error installing official packages: {output}", file=sys.stderr)
+        return False
+    
+    print("✓ Official packages installed successfully")
+    return True
+
+
+def install_aur_packages(packages: List[str], aur_helper: str) -> bool:
+    """Install packages from AUR using yay or paru."""
+    if not packages or not aur_helper:
+        return True
+    
+    print(f"\nInstalling {len(packages)} AUR packages using {aur_helper}:")
+    for pkg in packages:
+        print(f"  • {pkg}")
+    
+    cmd = [aur_helper, '-S', '--needed', '--noconfirm'] + packages
+    success, output = run_command(cmd, check=False)
+    
+    if not success:
+        print(f"Error installing AUR packages: {output}", file=sys.stderr)
+        return False
+    
+    print("✓ AUR packages installed successfully")
+    return True
+
+
+def find_orphaned_packages(manifest_packages: Set[str], remove_orphans: bool = False) -> bool:
+    """Find and optionally remove packages not in the manifest."""
+    explicitly_installed = get_explicitly_installed_packages()
+    
+    # Find explicitly installed packages not in manifest
+    orphaned_packages = explicitly_installed - manifest_packages
+    
+    if not orphaned_packages:
+        print("✓ No orphaned packages found")
+        return True
+    
+    print(f"\n📦 Found {len(orphaned_packages)} packages not in manifest:")
+    
+    # Show a sample of orphaned packages
+    orphaned_list = sorted(list(orphaned_packages))
+    for package in orphaned_list[:10]:
+        print(f"  • {package}")
+    
+    if len(orphaned_list) > 10:
+        print(f"  ... and {len(orphaned_list) - 10} more")
+    
+    if remove_orphans:
+        print("\n⚠️  Removing orphaned packages...")
+        response = input("This may break your system if important packages are removed. Continue? [y/N]: ")
+        
+        if response.lower() == 'y':
+            # Remove packages in batches to handle dependency issues
+            failed_packages = []
+            
+            for package in orphaned_list:
+                cmd = ['sudo', 'pacman', '-R', '--noconfirm', package]
+                success, output = run_command(cmd, check=False)
+                
+                if not success:
+                    failed_packages.append(package)
+            
+            if failed_packages:
+                print(f"⚠️  Could not remove {len(failed_packages)} packages:")
+                for pkg in failed_packages[:5]:
+                    print(f"  • {pkg}")
+                if len(failed_packages) > 5:
+                    print(f"  ... and {len(failed_packages) - 5} more")
+                print("These packages may be dependencies or in use by other software.")
+                return False
+            else:
+                print("✓ All orphaned packages removed successfully")
+                return True
+        else:
+            print("Orphaned package removal cancelled")
+            return False
+    else:
+        print("\nUse --remove-orphans to remove these packages.")
+        print("Or use 'make -C os/arch audit' for detailed analysis.")
+        return False
+
+
+def main():
+    """Main entry point."""
+    # Parse command line arguments
+    remove_orphans = '--remove-orphans' in sys.argv
+    groups = [arg for arg in sys.argv[1:] if not arg.startswith('--')]
+    
+    if not groups:
+        groups = None  # Use default groups
+    
+    # Determine paths
+    script_dir = Path(__file__).parent
+    manifest_path = script_dir / 'arch.toml'
+    
+    if not manifest_path.exists():
+        print(f"Error: Manifest file not found at {manifest_path}", file=sys.stderr)
+        sys.exit(1)
+    
+    print("🔄 Synchronizing system with manifest...")
+    print(f"Manifest: {manifest_path}")
+    print(f"Groups: {groups or 'standard'}")
+    
+    # Load manifest and collect packages
+    manifest = load_manifest(manifest_path)
+    official_packages, aur_packages, all_manifest_packages = collect_manifest_packages(manifest, groups)
+    aur_helper = has_aur_helper()
+    
+    # Install missing packages
+    total_to_install = len(official_packages) + len(aur_packages)
+    
+    if total_to_install == 0:
+        print("✓ All manifest packages are already installed")
+    else:
+        print(f"\n📦 Installing {total_to_install} missing packages:")
+        print(f"  Official: {len(official_packages)}")
+        print(f"  AUR: {len(aur_packages)}")
+        
+        success = True
+        
+        if official_packages:
+            success &= install_official_packages(official_packages)
+        
+        if aur_packages and success:
+            success &= install_aur_packages(aur_packages, aur_helper)
+        
+        if not success:
+            print("\n❌ Some packages failed to install", file=sys.stderr)
+            sys.exit(1)
+        
+        print("\n✓ All missing packages installed successfully")
+    
+    # Handle orphaned packages
+    print("\n🔍 Checking for orphaned packages...")
+    orphan_success = find_orphaned_packages(all_manifest_packages, remove_orphans)
+    
+    # Summary
+    if total_to_install == 0 and orphan_success:
+        print("\n✅ System is fully synchronized with manifest!")
+    elif total_to_install > 0 and orphan_success:
+        print("\n✅ System synchronized! New packages installed and no orphans found.")
+        print("Run 'make -C os/arch lock-packages' to update the lock file.")
+    else:
+        print("\n⚠️  System partially synchronized - see above for details")
+        if total_to_install > 0:
+            print("Run 'make -C os/arch lock-packages' to update the lock file.")
+
+
+if __name__ == '__main__':
+    main()
