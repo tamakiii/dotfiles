@@ -1,4 +1,4 @@
-.PHONY: help check check-dependency install uninstall
+.PHONY: help check check-dependency install uninstall backup-packages restore-packages
 
 SHELL := bash --noprofile --norc -eo pipefail
 
@@ -116,3 +116,12 @@ uninstall:
 
 ~/.zprofile: .zprofile
 	cp $< $@
+
+# Package Management
+backup-packages:
+	pacman -Qe > pkglist.txt
+	@echo "Package list backed up to pkglist.txt"
+
+restore-packages:
+	@test -f pkglist.txt || $(error pkglist.txt not found. Run 'make backup-packages' first)
+	sudo pacman -S --needed - < pkglist.txt
