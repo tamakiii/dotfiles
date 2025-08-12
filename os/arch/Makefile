@@ -33,6 +33,12 @@ check-dependency:
 	which shairport-sync > /dev/null || $(error Please install shairport-sync)
 	which avahi-daemon > /dev/null || $(error Please install avahi)
 
+backup-packages: \
+	pkglist.txt
+
+restore-packages: | pkglist.txt
+	sudo pacman -S --needed - < $|
+
 install: \
 	.zsh \
 	.zsh/antigen.zsh \
@@ -117,11 +123,5 @@ uninstall:
 ~/.zprofile: .zprofile
 	cp $< $@
 
-# Package Management
-backup-packages:
+pkglist.txt:
 	pacman -Qe > pkglist.txt
-	@echo "Package list backed up to pkglist.txt"
-
-restore-packages:
-	@test -f pkglist.txt || $(error pkglist.txt not found. Run 'make backup-packages' first)
-	sudo pacman -S --needed - < pkglist.txt
