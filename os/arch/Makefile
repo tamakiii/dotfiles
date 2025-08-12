@@ -1,4 +1,4 @@
-.PHONY: help check check-dependency install uninstall install-packages sync-packages lock-packages audit add-package remove-package update-packages
+.PHONY: help check check-dependency install uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
 
@@ -23,8 +23,15 @@ check:
 	test -L ~/.config/shairport-sync.conf
 
 check-dependency:
-	@echo "Checking dependencies against manifest..."
-	@../../dependencies/arch-check
+	which zsh > /dev/null || $(error Please install zsh)
+	which tmux > /dev/null || $(error Please install tmux)
+	which hx > /dev/null || $(error Please install hx)
+	which ghostty > /dev/null || $(error Please install ghostty)
+	which fzf > /dev/null || $(error Please install fzf)
+	which blueman-applet > /dev/null || $(error Please install blueman-applet)
+	which overskride > /dev/null || $(error Please install overskride)
+	which shairport-sync > /dev/null || $(error Please install shairport-sync)
+	which avahi-daemon > /dev/null || $(error Please install avahi)
 
 install: \
 	.zsh \
@@ -109,37 +116,3 @@ uninstall:
 
 ~/.zprofile: .zprofile
 	cp $< $@
-
-# Package Management Targets
-# These targets provide Cargo-like dependency management for Arch Linux packages
-
-install-packages:
-	@echo "Installing packages from manifest..."
-	@../../dependencies/arch-install
-
-sync-packages:
-	@echo "Synchronizing system packages to match manifest..."
-	@../../dependencies/arch-sync
-
-lock-packages:
-	@echo "Generating lock file from current system state..."
-	@../../dependencies/arch-lock
-
-audit:
-	@echo "Auditing packages for security updates and unused packages..."
-	@../../dependencies/arch-audit
-
-add-package:
-	@test -n "$(PACKAGE)" || (echo "Usage: make add-package PACKAGE=package-name [SOURCE=aur]" && exit 1)
-	@echo "Adding package $(PACKAGE) to manifest and installing..."
-	@../../dependencies/arch-add "$(PACKAGE)" "$(SOURCE)"
-
-remove-package:
-	@test -n "$(PACKAGE)" || (echo "Usage: make remove-package PACKAGE=package-name" && exit 1)
-	@echo "Removing package $(PACKAGE) from manifest and system..."
-	@../../dependencies/arch-remove "$(PACKAGE)"
-
-update-packages:
-	@echo "Updating packages and regenerating lock file..."
-	@sudo pacman -Syu --noconfirm
-	@../../dependencies/arch-lock
