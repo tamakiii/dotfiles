@@ -1,0 +1,92 @@
+# Great — running multiple parallel Claude sessions in isolated git worktrees is a solid and scalable strategy. Since you're editing **within each worktree** and want to later **merge changes back to the mainline**, here’s an updated, minimal yet powerful shell-based workflow tailored for that use case:
+
+# ---
+
+# ## 🧭 Updated Workflow Plan
+
+# ### 🧱 Setup (from inside the main repo)
+
+# ```bash
+# # 1. Create a UTC-based identifier
+# IDENTIFIER="$(date -u +%Y%m%dT%H%M%SZ)"
+
+# # 2. Build worktree path using your preferred remote parser
+# WORKTREE_PATH="/tmp/git-worktree/$IDENTIFIER/$(git remote get-url origin | git-url | jq -r '.path' | sed 's/\.git$//')"
+
+# # 3. Create a new branch and worktree
+# git worktree add "$WORKTREE_PATH" -b "$IDENTIFIER"
+
+# # 4. Enter the worktree
+# pushd "$WORKTREE_PATH"
+# ```
+
+# ---
+
+# ### 🤖 Work with Claude (per worktree)
+
+# ```bash
+# claude
+# # ... code generation happens here ...
+# ```
+
+# ---
+
+# ### 💾 Save work inside worktree
+
+# ```bash
+# # 5. Commit changes from the session
+# git add .
+# git commit -m "Claude edits from session $IDENTIFIER"
+# ```
+
+# ---
+
+# ### 🔁 Merge back to main branch from main repo
+
+# Return to your main repo directory and run:
+
+# ```bash
+# # Make sure you're on main or init (choose your target)
+# git checkout main
+
+# # Merge the session branch
+# git merge --no-ff "$IDENTIFIER" -m "Merge from Claude session $IDENTIFIER"
+
+# # (Optional) Clean up the session worktree and branch
+# git worktree remove "/tmp/git-worktree/$IDENTIFIER/..."  # Use tab completion here
+# git branch -d "$IDENTIFIER"
+# ```
+
+# ---
+
+# ### 🧭 Return to your original directory
+
+# ```bash
+# # 6. Go back to where you started
+# popd
+# ```
+
+# ---
+
+# ## 🧰 Optional Convenience Shell Function
+
+# You could wrap this into a shell function like:
+
+# ```bash
+# claude-session () {
+#   local IDENTIFIER REPO_NAME WORKTREE_PATH
+#   IDENTIFIER="$(date -u +%Y%m%dT%H%M%SZ)"
+#   WORKTREE_PATH="/tmp/git-worktree/$IDENTIFIER/$(git remote get-url origin | git-url | jq -r '.path' | sed 's/\.git$//')"
+#   git worktree add "$WORKTREE_PATH" -b "$IDENTIFIER" && pushd "$WORKTREE_PATH" && claude
+# }
+# ```
+
+# Then call it from any repo:
+
+# ```bash
+# $ claude-session
+# ```
+
+# ---
+
+# Would you like a `Makefile` version or a `.sh` script that includes cleanup/merge steps too?
