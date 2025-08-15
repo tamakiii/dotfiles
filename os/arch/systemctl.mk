@@ -1,0 +1,66 @@
+# systemctl.mk - systemd service management rules
+# This file contains rules for managing systemd services and configurations
+
+.PHONY: help check install uninstall check-dependency
+
+SHELL := bash --noprofile --norc -eo pipefail
+
+help:
+	@cat $(firstword $(MAKEFILE_LIST))
+
+# Main targets
+check:
+	test -d ~/.config/systemd
+	test -d ~/.config/systemd/user
+	test -L ~/.config/systemd/user/shairport-sync.service
+	test -L ~/.config/shairport-sync.conf
+	test -f /etc/systemd/system/wol@.service
+	test -f /etc/systemd/network/20-ethernet.network
+	systemctl is-enabled wol@eno1.service
+
+check-dependency:
+	which shairport-sync > /dev/null || $(error Please install shairport-sync)
+	which avahi-daemon > /dev/null || $(error Please install avahi)
+	which ethtool > /dev/null || $(error Please install ethtool)
+
+install: \
+	~/.config/systemd \
+	~/.config/systemd/user \
+	~/.config/systemd/user/shairport-sync.service \
+	~/.config/shairport-sync.conf \
+	/etc/systemd/system/wol@.service \
+	/etc/systemd/network/20-ethernet.network \
+	wol@eno1.service-enabled
+
+uninstall:
+	sudo systemctl disable wol@eno1.service
+	sudo rm -vf /etc/systemd/network/20-ethernet.network
+	sudo rm -vf /etc/systemd/system/wol@.service
+	rm -vrf ~/.config/shairport-sync.conf
+	rm -vrf ~/.config/systemd/user/shairport-sync.service
+
+# Rule definitions
+~/.config/systemd:
+	mkdir -p $@
+
+~/.config/systemd/user: ~/.config/systemd
+	mkdir -p $@
+
+~/.config/systemd/user/shairport-sync.service: .config/systemd/user/shairport-sync.service ~/.config/systemd/user
+	ln -sfnv $(abspath $<) $@
+
+~/.config/shairport-sync.conf: .config/shairport-sync.conf ~/.config
+	ln -sfnv $(abspath $<) $@
+
+/etc/systemd/system/wol@.service: etc/systemd/system/wol@.service
+	sudo cp $< $@
+
+/etc/systemd/network/20-ethernet.network: etc/systemd/network/20-ethernet.network
+	sudo cp $< $@
+	sudo systemctl restart systemd-networkd
+
+wol@eno1.service-enabled: /etc/systemd/system/wol@.service
+	sudo systemctl daemon-reload
+	sudo systemctl enable wol@eno1.service
+	sudo systemctl start wol@eno1.service
+	touch $@
