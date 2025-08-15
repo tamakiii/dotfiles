@@ -32,6 +32,7 @@ check-dependency:
 	which overskride > /dev/null || $(error Please install overskride)
 	which shairport-sync > /dev/null || $(error Please install shairport-sync)
 	which avahi-daemon > /dev/null || $(error Please install avahi)
+	which mpv > /dev/null || $(error Please install mpv)
 
 backup-packages: \
 	pkglist.txt

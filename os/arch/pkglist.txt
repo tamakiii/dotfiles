@@ -84,6 +84,7 @@ loupe 48.1-1
 malcontent 0.13.0-1
 man-db 2.13.1-1
 mission-center 1.0.2-1
+mpv 0.39.0-1
 nano 8.5-1
 nautilus 48.3-1
 noto-fonts 1:2025.08.01-1
