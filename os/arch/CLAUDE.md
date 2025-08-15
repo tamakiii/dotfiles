@@ -298,38 +298,49 @@ sudo pacman-key --refresh-keys
 The Arch Linux dotfiles configuration uses two independent Makefiles:
 
 ### Core Dotfiles (`Makefile`)
-Manages shell, editor, and application configurations:
+Manages shell, editor, application configurations, and user systemd services:
 
 ```bash
-# Install core dotfiles (zsh, tmux, helix, etc.)
+# Install dotfiles + user configs (zsh, tmux, helix, shairport-sync user service)
 make -C os/arch install
 
-# Check core dotfiles installation
+# Check dotfiles + user configs installation
 make -C os/arch check
 
-# Check core dependencies
+# Check all dependencies (including shairport-sync, avahi)
 make -C os/arch check-dependency
 
-# Remove core dotfiles
+# Remove dotfiles + user configs
 make -C os/arch uninstall
 ```
 
+**What it manages:**
+- Shell configurations (zsh, tmux, helix, ghostty)
+- Application autostart (blueman, overskride)
+- User systemd services (`~/.config/systemd/user/shairport-sync.service`)
+- User service configurations (`~/.config/shairport-sync.conf`)
+
 ### System Services (`systemctl.mk`)
-Manages systemd services and network configurations independently:
+Manages system-level Wake-on-LAN services only:
 
 ```bash
-# Install systemd services (Wake-on-LAN, shairport-sync)
+# Install Wake-on-LAN system services only
 make -f os/arch/systemctl.mk install
 
-# Check systemd services
+# Check Wake-on-LAN system services
 make -f os/arch/systemctl.mk check
 
-# Check systemd dependencies (ethtool, shairport-sync, avahi)
+# Check Wake-on-LAN dependencies (ethtool only)
 make -f os/arch/systemctl.mk check-dependency
 
-# Remove systemd services
+# Remove Wake-on-LAN system services
 make -f os/arch/systemctl.mk uninstall
 ```
+
+**What it manages:**
+- System service files (`/etc/systemd/system/wol@.service`)
+- System network configuration (`/etc/systemd/network/20-ethernet.network`)
+- Service enablement and management (wol@eno1.service)
 
 ### Combined Installation
 For complete setup, run both makefiles:
@@ -345,10 +356,11 @@ make -f os/arch/systemctl.mk check
 ```
 
 ### Makefile Separation Benefits
-- **Modular deployment**: Install Wake-on-LAN without full dotfiles
-- **Independent testing**: Test each component separately
-- **Selective installation**: Choose components for different machines
-- **Clear separation**: Dotfiles vs system services
+- **Modular deployment**: Install Wake-on-LAN system services independently of user dotfiles
+- **Independent testing**: Test user configs vs system services separately
+- **Selective installation**: Choose components for different machines (e.g., Wake-on-LAN on servers only)
+- **Clear separation**: User configurations (~/.config) vs system files (/etc)
+- **Privilege separation**: User dotfiles need no sudo, system services require sudo
 
 ## Common Issues and Solutions
 
