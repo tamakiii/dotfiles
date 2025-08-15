@@ -293,17 +293,62 @@ sudo pacman-key --refresh-keys
 - Check service status after updates
 - Review `/etc` configuration files after major updates
 
-## Arch-Specific Makefile Targets
+## Arch-Specific Makefile Structure
 
-When using the dotfiles Makefile on Arch:
+The Arch Linux dotfiles configuration uses two independent Makefiles:
+
+### Core Dotfiles (`Makefile`)
+Manages shell, editor, and application configurations:
 
 ```bash
-# Install Arch-specific configurations
-make -C make -f arch.mk install  # If implemented
+# Install core dotfiles (zsh, tmux, helix, etc.)
+make -C os/arch install
 
-# Check Arch dependencies
-make check-dependency  # Will verify pacman packages
+# Check core dotfiles installation
+make -C os/arch check
+
+# Check core dependencies
+make -C os/arch check-dependency
+
+# Remove core dotfiles
+make -C os/arch uninstall
 ```
+
+### System Services (`systemctl.mk`)
+Manages systemd services and network configurations independently:
+
+```bash
+# Install systemd services (Wake-on-LAN, shairport-sync)
+make -f os/arch/systemctl.mk install
+
+# Check systemd services
+make -f os/arch/systemctl.mk check
+
+# Check systemd dependencies (ethtool, shairport-sync, avahi)
+make -f os/arch/systemctl.mk check-dependency
+
+# Remove systemd services
+make -f os/arch/systemctl.mk uninstall
+```
+
+### Combined Installation
+For complete setup, run both makefiles:
+
+```bash
+# Install everything
+make -C os/arch install
+make -f os/arch/systemctl.mk install
+
+# Verify everything
+make -C os/arch check
+make -f os/arch/systemctl.mk check
+```
+
+### Makefile Separation Benefits
+- **Modular deployment**: Install Wake-on-LAN without full dotfiles
+- **Independent testing**: Test each component separately
+- **Selective installation**: Choose components for different machines
+- **Clear separation**: Dotfiles vs system services
 
 ## Common Issues and Solutions
 
