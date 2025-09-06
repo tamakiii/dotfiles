@@ -3,6 +3,7 @@
 /node_modules/
 /dependency/
 /dist/
+/tmp/
 /tmux-client-*.log
 /.config/iterm2/AppSupport
 /.config/.isolated-storage/

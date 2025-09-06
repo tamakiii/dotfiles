@@ -45,3 +45,6 @@ PATH="$NEW:$PATH"
 # Uncomment and modify as needed for specific environments
 # export CUSTOM_ENV_VAR="${CUSTOM_ENV_VAR:-default_value}"
 # export DEVELOPMENT_MODE="${DEVELOPMENT_MODE:-false}"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
