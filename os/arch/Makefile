@@ -13,6 +13,7 @@ check:
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
 	test -L ~/.config/ghostty
+	test -L ~/.config/rofi
 	test -d ~/.config/autostart
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
@@ -23,16 +24,17 @@ check:
 	test -L ~/.config/shairport-sync.conf
 
 check-dependency:
-	which zsh > /dev/null || $(error Please install zsh)
-	which tmux > /dev/null || $(error Please install tmux)
-	which hx > /dev/null || $(error Please install hx)
-	which ghostty > /dev/null || $(error Please install ghostty)
-	which fzf > /dev/null || $(error Please install fzf)
-	which blueman-applet > /dev/null || $(error Please install blueman-applet)
-	which overskride > /dev/null || $(error Please install overskride)
-	which mpv > /dev/null || $(error Please install mpv)
-	which shairport-sync > /dev/null || $(error Please install shairport-sync)
-	which avahi-daemon > /dev/null || $(error Please install avahi)
+	@which zsh > /dev/null || (echo "Please install zsh" && exit 1)
+	@which tmux > /dev/null || (echo "Please install tmux" && exit 1)
+	@which hx > /dev/null || (echo "Please install hx" && exit 1)
+	@which ghostty > /dev/null || (echo "Please install ghostty" && exit 1)
+	@which fzf > /dev/null || (echo "Please install fzf" && exit 1)
+	@which rofi > /dev/null || (echo "Please install rofi" && exit 1)
+	@which blueman-applet > /dev/null || (echo "Please install blueman-applet" && exit 1)
+	@which overskride > /dev/null || (echo "Please install overskride" && exit 1)
+	@which mpv > /dev/null || (echo "Please install mpv" && exit 1)
+	@which shairport-sync > /dev/null || (echo "Please install shairport-sync" && exit 1)
+	@which avahi-daemon > /dev/null || (echo "Please install avahi" && exit 1)
 
 backup-packages: \
 	pkglist.txt
@@ -50,6 +52,7 @@ install: \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
+	~/.config/rofi \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
 	~/.config/autostart/overskride.desktop \
@@ -65,6 +68,7 @@ uninstall:
 	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
 	rm -vrf ~/.config/autostart/overskride.desktop
+	rm -vrf ~/.config/rofi
 	rm -vrf ~/.config/ghostty
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
@@ -95,6 +99,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/ghostty: .config/ghostty ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/rofi: .config/rofi ~/.config
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/autostart:
