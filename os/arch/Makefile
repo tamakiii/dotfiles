@@ -21,6 +21,7 @@ check:
 	test -d ~/.config/hypr
 	test -L ~/.config/hypr/hyprland.conf
 	test -L ~/.config/hypr/hyprpaper.conf
+	test -L ~/.config/hypr/hyprlock.conf
 	test -d ~/.config/waybar
 	test -L ~/.config/waybar/config
 	test -L ~/.config/waybar/style.css
@@ -62,6 +63,7 @@ install: \
 	~/.config/hypr \
 	~/.config/hypr/hyprland.conf \
 	~/.config/hypr/hyprpaper.conf \
+	~/.config/hypr/hyprlock.conf \
 	~/.config/waybar \
 	~/.config/waybar/config \
 	~/.config/waybar/style.css \
@@ -69,6 +71,7 @@ install: \
 uninstall:
 	rm -vrf ~/.config/waybar/style.css
 	rm -vrf ~/.config/waybar/config
+	rm -vrf ~/.config/hypr/hyprlock.conf
 	rm -vrf ~/.config/hypr/hyprpaper.conf
 	rm -vrf ~/.config/hypr/hyprland.conf
 	rm -vrf ~/.config/shairport-sync.conf
@@ -130,6 +133,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/hypr/hyprpaper.conf: .config/hypr/hyprpaper.conf ~/.config/hypr
+	ln -sfnv $(abspath $<) $@
+
+~/.config/hypr/hyprlock.conf: .config/hypr/hyprlock.conf ~/.config/hypr
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/waybar: ~/.config
