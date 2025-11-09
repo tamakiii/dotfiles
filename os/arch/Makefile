@@ -25,6 +25,7 @@ check:
 	test -d ~/.config/waybar
 	test -L ~/.config/waybar/config
 	test -L ~/.config/waybar/style.css
+	test -d ~/.config/waybar/scripts
 
 check-dependency:
 	@which zsh > /dev/null || (echo "Please install zsh" && exit 1)
@@ -67,8 +68,10 @@ install: \
 	~/.config/waybar \
 	~/.config/waybar/config \
 	~/.config/waybar/style.css \
+	~/.config/waybar/scripts \
 
 uninstall:
+	rm -vrf ~/.config/waybar/scripts
 	rm -vrf ~/.config/waybar/style.css
 	rm -vrf ~/.config/waybar/config
 	rm -vrf ~/.config/hypr/hyprlock.conf
@@ -145,6 +148,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/waybar/style.css: .config/waybar/style.css ~/.config/waybar
+	ln -sfnv $(abspath $<) $@
+
+~/.config/waybar/scripts: .config/waybar/scripts ~/.config/waybar
 	ln -sfnv $(abspath $<) $@
 
 ~/.zprofile: .zprofile

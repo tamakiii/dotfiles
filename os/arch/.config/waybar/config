@@ -3,10 +3,13 @@
     "position": "top",
     "height": 30,
     "spacing": 4,
+    "mode": "dock",
+    "reload_style_on_change": true,
+    "gtk-layer-shell": true,
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "network", "cpu", "memory", "temperature", "backlight", "battery", "tray"],
+    "modules-right": ["custom/media", "idle_inhibitor", "pulseaudio", "network", "cpu", "memory", "temperature", "backlight", "battery", "tray"],
 
     "hyprland/workspaces": {
         "disable-scroll": false,
@@ -30,18 +33,86 @@
     "hyprland/window": {
         "format": "{}",
         "max-length": 50,
-        "separate-outputs": true
+        "separate-outputs": true,
+        "rewrite": {
+            "": "<span foreground='#89b4fa'> </span> Hyprland",
+
+            "~": "  Terminal",
+            "zsh": "  Terminal",
+            "bash": "  Terminal",
+            "(.*)@(.*):(~)": "  Terminal",
+            "(.*)@(.*):(.*)": "  Terminal",
+
+            "(.*) — Mozilla Firefox": "<span foreground='#f38ba8'>󰈹 </span> $1",
+            "(.*)Mozilla Firefox": "<span foreground='#f38ba8'>󰈹 </span> Firefox",
+            "(.*) - Google Chrome": "<span foreground='#fab387'>󰊯 </span> $1",
+            "(.*)Google Chrome": "<span foreground='#fab387'>󰊯 </span> Chrome",
+
+            "(.*) - Visual Studio Code": "<span foreground='#89b4fa'>󰨞 </span> $1",
+            "(.*)Visual Studio Code": "<span foreground='#89b4fa'>󰨞 </span> Visual Studio Code",
+            "(.*) - Helix": "<span foreground='#a6e3a1'> </span> $1",
+            "(.*)Helix": "<span foreground='#a6e3a1'> </span> Helix",
+
+            "(.*)Spotify": "<span foreground='#a6e3a1'> </span> Spotify",
+            "(.*)Spotify Premium": "<span foreground='#a6e3a1'> </span> Spotify Premium",
+
+            "VLC media player": "<span foreground='#fab387'>󰕼 </span> VLC Media Player",
+            "(.*) - VLC media player": "<span foreground='#fab387'>󰕼 </span> $1",
+
+            "• Discord(.*)": "Discord$1",
+            "(.*)Discord(.*)": "<span foreground='#89b4fa'> </span> $1Discord$2",
+
+            "(.*).pdf": "<span foreground='#f38ba8'> </span> $1.pdf",
+            "(.*).docx": "<span foreground='#89b4fa'> </span> $1.docx",
+            "(.*).xlsx": "<span foreground='#a6e3a1'> </span> $1.xlsx",
+
+            "/": "  File Manager"
+        }
     },
 
     "tray": {
         "spacing": 10
     },
 
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": " ",
+            "deactivated": " "
+        },
+        "tooltip": true,
+        "tooltip-format-activated": "Presentation Mode (Screen won't sleep)",
+        "tooltip-format-deactivated": "Idle Mode (Screen will sleep)"
+    },
+
+    "custom/media": {
+        "exec": "~/.config/waybar/scripts/media-player.py",
+        "return-type": "json",
+        "format": "{}",
+        "tooltip": true,
+        "on-click": "playerctl play-pause",
+        "interval": 2
+    },
+
     "clock": {
         "timezone": "America/New_York",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format": "{:%Y-%m-%d %H:%M}",
-        "format-alt": "{:%A, %B %d, %Y}"
+        "format-alt": "{:%A, %B %d, %Y}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "on-click-right": "mode",
+            "format": {
+                "months": "<span color='#b4befe'><b>{}</b></span>",
+                "weekdays": "<span color='#a6adc8'>{}</span>",
+                "today": "<span color='#f38ba8'><b>{}</b></span>"
+            }
+        },
+        "actions": {
+            "on-click": "mode",
+            "on-click-right": "mode"
+        }
     },
 
     "cpu": {
@@ -50,7 +121,14 @@
     },
 
     "memory": {
-        "format": " {}%"
+        "states": {
+            "warning": 75,
+            "critical": 90
+        },
+        "format": " {percentage}%",
+        "format-critical": "󰀦 {percentage}%",
+        "tooltip": true,
+        "tooltip-format": "Memory Used: {used:0.1f} GB / {total:0.1f} GB"
     },
 
     "temperature": {
@@ -66,23 +144,32 @@
 
     "battery": {
         "states": {
+            "full": 100,
+            "good": 99,
             "warning": 30,
             "critical": 15
         },
         "format": "{icon} {capacity}%",
-        "format-charging": " {capacity}%",
+        "format-icons": ["󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂"],
+        "format-full": "󱃌 {capacity}%",
+        "format-warning": "󰁻 {capacity}%",
+        "format-critical": "󱃍 {capacity}%",
+        "format-charging": "󱘖 {capacity}%",
         "format-plugged": " {capacity}%",
-        "format-alt": "{icon} {time}",
-        "format-icons": ["", "", "", "", ""]
+        "tooltip-format": "Discharging: {time}",
+        "tooltip-format-charging": "Charging: {time}"
     },
 
     "network": {
         "format-wifi": " {essid} ({signalStrength}%)",
         "format-ethernet": " {ipaddr}/{cidr}",
-        "tooltip-format": " {ifname} via {gwaddr}",
         "format-linked": " {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
-        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+        "format-alt": "{ifname}: {ipaddr}/{cidr}",
+        "tooltip-format": "{ifname} via {gwaddr}",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
+        "tooltip-format-ethernet": "{ifname}\n{ipaddr}/{cidr}",
+        "tooltip-format-disconnected": "Disconnected"
     },
 
     "pulseaudio": {
@@ -91,14 +178,16 @@
         "format-bluetooth-muted": "  {icon}",
         "format-muted": " {volume}%",
         "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
+            "headphone": "󰋋",
+            "hands-free": "󰋋",
+            "headset": "󰋋",
             "phone": "",
             "portable": "",
             "car": "",
-            "default": ["", "", ""]
+            "default": ["󰕿", "󰖀", "󰕾"]
         },
+        "tooltip": true,
+        "tooltip-format": "Device: {desc}",
         "on-click": "pavucontrol"
     }
 }
