@@ -62,7 +62,6 @@ install: \
 	~/.config/rofi \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
-	~/.config/autostart/overskride.desktop \
 	~/.config/git \
 	~/.config/hypr \
 	~/.config/hypr/hyprland.conf \
@@ -84,7 +83,6 @@ uninstall:
 	rm -vrf ~/.config/systemd/user/shairport-sync.service
 	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
-	rm -vrf ~/.config/autostart/overskride.desktop
 	rm -vrf ~/.config/rofi
 	rm -vrf ~/.config/ghostty
 	rm -vrf ~/.config/helix
@@ -125,9 +123,6 @@ uninstall:
 	mkdir -p $@
 
 ~/.config/autostart/blueman-applet.desktop: .config/autostart/blueman-applet.desktop ~/.config/autostart
-	ln -sfnv $(abspath $<) $@
-
-~/.config/autostart/overskride.desktop: .config/autostart/overskride.desktop ~/.config/autostart
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/git: .config/git ~/.config
