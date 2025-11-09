@@ -1,4 +1,4 @@
-.PHONY: help check check-dependency install uninstall backup-packages restore-packages
+.PHONY: help check check-dependency install uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
 
@@ -24,20 +24,15 @@ check:
 	test -d ~/.config/waybar
 	test -L ~/.config/waybar/config
 	test -L ~/.config/waybar/style.css
-	test -d ~/.config/systemd
-	test -d ~/.config/systemd/user
-	test -L ~/.config/systemd/user/shairport-sync.service
-	test -L ~/.config/shairport-sync.conf
 
 check-dependency:
 	@which zsh > /dev/null || (echo "Please install zsh" && exit 1)
 	@which tmux > /dev/null || (echo "Please install tmux" && exit 1)
-	@which hx > /dev/null || (echo "Please install hx" && exit 1)
+	@which helix > /dev/null || (echo "Please install hx" && exit 1)
 	@which ghostty > /dev/null || (echo "Please install ghostty" && exit 1)
 	@which fzf > /dev/null || (echo "Please install fzf" && exit 1)
 	@which rofi > /dev/null || (echo "Please install rofi" && exit 1)
 	@which blueman-applet > /dev/null || (echo "Please install blueman-applet" && exit 1)
-	@which overskride > /dev/null || (echo "Please install overskride" && exit 1)
 	@which mpv > /dev/null || (echo "Please install mpv" && exit 1)
 	@which shairport-sync > /dev/null || (echo "Please install shairport-sync" && exit 1)
 	@which avahi-daemon > /dev/null || (echo "Please install avahi" && exit 1)
@@ -48,12 +43,6 @@ check-dependency:
 	@which slurp > /dev/null || (echo "Please install slurp" && exit 1)
 	@which wl-copy > /dev/null || (echo "Please install wl-clipboard" && exit 1)
 	@which brightnessctl > /dev/null || (echo "Please install brightnessctl" && exit 1)
-
-backup-packages: \
-	pkglist.txt
-
-restore-packages: | pkglist.txt
-	sudo pacman -S --needed - < $|
 
 install: \
 	.zsh \
@@ -76,10 +65,6 @@ install: \
 	~/.config/waybar \
 	~/.config/waybar/config \
 	~/.config/waybar/style.css \
-	~/.config/systemd \
-	~/.config/systemd/user \
-	~/.config/systemd/user/shairport-sync.service \
-	~/.config/shairport-sync.conf
 
 uninstall:
 	rm -vrf ~/.config/waybar/style.css
@@ -87,7 +72,6 @@ uninstall:
 	rm -vrf ~/.config/hypr/hyprpaper.conf
 	rm -vrf ~/.config/hypr/hyprland.conf
 	rm -vrf ~/.config/shairport-sync.conf
-	rm -vrf ~/.config/systemd/user/shairport-sync.service
 	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
 	rm -vrf ~/.config/autostart/overskride.desktop
@@ -157,20 +141,5 @@ uninstall:
 ~/.config/waybar/style.css: .config/waybar/style.css ~/.config/waybar
 	ln -sfnv $(abspath $<) $@
 
-~/.config/systemd:
-	mkdir -p $@
-
-~/.config/systemd/user: ~/.config/systemd
-	mkdir -p $@
-
-~/.config/systemd/user/shairport-sync.service: .config/systemd/user/shairport-sync.service ~/.config/systemd/user
-	ln -sfnv $(abspath $<) $@
-
-~/.config/shairport-sync.conf: .config/shairport-sync.conf ~/.config
-	ln -sfnv $(abspath $<) $@
-
 ~/.zprofile: .zprofile
 	cp $< $@
-
-pkglist.txt:
-	pacman -Qe > pkglist.txt
