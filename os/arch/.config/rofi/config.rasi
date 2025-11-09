@@ -3,13 +3,14 @@ configuration {
 	modi: "drun,run,window";
 	show-icons: true;
 	icon-theme: "Papirus";
-	drun-display-format: "{icon} {name}";
+	drun-display-format: "{icon}  {name}";
+	font: "Inter 11";
 
 	/* Behavior */
-	display-drun: "Applications";
-	display-run: "Run";
-	display-window: "Windows";
-	sidebar-mode: true;
+	display-drun: "";
+	display-run: "";
+	display-window: "";
+	sidebar-mode: false;
 
 	/* Performance */
 	lazy-grab: true;
@@ -28,4 +29,4 @@ configuration {
 	fixed-num-lines: false;
 }
 
-@theme "Arc-Dark"
+@theme "themes/macos-style-dark"

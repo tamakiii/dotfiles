@@ -1,0 +1,129 @@
+/*******************************************************************************
+ * macOS/GNOME-inspired Rofi Theme (Dark Mode)
+ * Clean, minimal design with rounded corners and icons
+ *******************************************************************************/
+
+* {
+    /* Color Palette - macOS Dark Mode Inspired with transparency */
+    bg-color:             #1e1e2ed9;   /* Dark background with opacity (85%) */
+    bg-alt:               #2a2a3ae6;   /* Input bar background (90% opacity) */
+    fg-color:             #e0e0e6;     /* Light text */
+    fg-alt:               #8a8a93;     /* Gray secondary text */
+    accent:               #0a84ff;     /* macOS dark mode blue accent */
+    accent-hover:         #409cff;     /* Lighter blue on hover */
+    border-col:           #3a3a4a80;   /* Subtle border with transparency */
+    transparent:          #00000000;
+
+    /* Base settings */
+    spacing:              0;
+    background-color:     @transparent;
+    text-color:           @fg-color;
+    font:                 "Inter 11";
+}
+
+window {
+    location:             center;
+    width:                640px;
+    background-color:     @bg-color;
+    border-radius:        12px;
+    border:               1px;
+    border-color:         @border-col;
+    padding:              0px;
+}
+
+mainbox {
+    background-color:     @transparent;
+    padding:              16px;
+    spacing:              12px;
+}
+
+/* Input bar styling */
+inputbar {
+    background-color:     @bg-alt;
+    border-radius:        8px;
+    padding:              12px 16px;
+    spacing:              8px;
+    children:             [ prompt, entry ];
+    border:               1px;
+    border-color:         @border-col;
+}
+
+prompt {
+    background-color:     @transparent;
+    text-color:           @accent;
+}
+
+entry {
+    background-color:     @transparent;
+    placeholder:          "Type to search...";
+    placeholder-color:    @fg-alt;
+    cursor:               text;
+}
+
+/* List view */
+listview {
+    background-color:     @transparent;
+    columns:              1;
+    lines:                8;
+    spacing:              4px;
+    cycle:                false;
+    dynamic:              true;
+    layout:               vertical;
+    fixed-height:         true;
+    scrollbar:            false;
+}
+
+/* Elements (app items) */
+element {
+    background-color:     @transparent;
+    padding:              10px 12px;
+    border-radius:        8px;
+    spacing:              12px;
+    orientation:          horizontal;
+}
+
+element normal.normal {
+    background-color:     @transparent;
+    text-color:           @fg-color;
+}
+
+element alternate.normal {
+    background-color:     @transparent;
+    text-color:           @fg-color;
+}
+
+element selected.normal {
+    background-color:     @accent;
+    text-color:           @bg-color;
+}
+
+element-icon {
+    background-color:     @transparent;
+    size:                 32px;
+    cursor:               inherit;
+}
+
+element-text {
+    background-color:     @transparent;
+    text-color:           inherit;
+    cursor:               inherit;
+    vertical-align:       0.5;
+}
+
+/* Message (optional, for errors/info) */
+message {
+    background-color:     @transparent;
+    padding:              8px;
+}
+
+textbox {
+    background-color:     @bg-alt;
+    text-color:           @fg-color;
+    padding:              8px 12px;
+    border-radius:        8px;
+}
+
+/* Mode switcher (hidden for cleaner look) */
+mode-switcher {
+    enabled:              false;
+}
