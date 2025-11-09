@@ -1,0 +1,81 @@
+/*******************************************************************************
+ * macOS/GNOME-inspired Hyprswitch Theme (Dark Mode)
+ * Clean, minimal design matching the rofi theme
+ *******************************************************************************/
+
+:root {
+  /* Colors matching rofi macos-style-dark theme */
+  --bg-color: rgba(30, 30, 46, 0.85);              /* Dark background with transparency */
+  --bg-color-hover: rgba(10, 132, 255, 1);         /* macOS blue accent on hover */
+  --border-color: rgba(58, 58, 74, 0.5);           /* Subtle border with transparency */
+  --border-color-active: rgba(10, 132, 255, 0.9);  /* Blue border for active window */
+  --index-border-color: rgba(10, 132, 255, 0.7);   /* Blue for index indicators */
+
+  /* Typography and spacing */
+  --border-radius: 12px;                            /* Rounded corners like rofi */
+  --border-size: 2px;                               /* Thinner border for cleaner look */
+
+  /* Text colors */
+  --text-color: rgba(224, 224, 230, 1);            /* Light text */
+  --text-color-dim: rgba(138, 138, 147, 1);        /* Dimmed text */
+}
+
+/* Main container styling */
+window {
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+}
+
+/* Window preview containers */
+.client-image {
+  margin: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.client-image:hover {
+  transform: scale(1.05);
+}
+
+/* Window labels (titles) */
+.client {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-top: 8px;
+}
+
+/* Workspace labels */
+.workspace {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 12px;
+}
+
+/* Numeric selection indicators */
+.index {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-color);
+  background-color: var(--index-border-color);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: 8px;
+}
+
+/* Active/selected window */
+.client-image.active {
+  border: var(--border-size) solid var(--border-color-active);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+/* Hover state */
+.client-image:hover {
+  background-color: var(--bg-color-hover);
+}

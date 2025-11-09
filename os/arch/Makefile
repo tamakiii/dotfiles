@@ -14,6 +14,7 @@ check:
 	test -L ~/.config/helix
 	test -L ~/.config/ghostty
 	test -L ~/.config/rofi
+	test -L ~/.config/hyprswitch
 	test -d ~/.config/autostart
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
@@ -57,6 +58,7 @@ install: \
 	~/.config/helix \
 	~/.config/ghostty \
 	~/.config/rofi \
+	~/.config/hyprswitch \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
 	~/.config/autostart/overskride.desktop \
@@ -77,6 +79,7 @@ uninstall:
 	rm -vrf ~/.config/hypr/hyprlock.conf
 	rm -vrf ~/.config/hypr/hyprpaper.conf
 	rm -vrf ~/.config/hypr/hyprland.conf
+	rm -vrf ~/.config/hyprswitch
 	rm -vrf ~/.config/shairport-sync.conf
 	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
@@ -115,6 +118,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/rofi: .config/rofi ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/hyprswitch: .config/hyprswitch ~/.config
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/autostart:
