@@ -23,6 +23,11 @@ export LANGUAGE="en_US"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="${HOME}/.dotfiles/node_modules/.bin:$PATH"
 
+# hyprland instance signature (auto-detect for hyprctl)
+if [ -n "$(pgrep -x Hyprland)" ]; then
+    export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t /run/user/1000/hypr/*/.socket.sock 2>/dev/null | head -1 | xargs dirname | xargs basename)
+fi
+
 # colors
 autoload colors
 colors
