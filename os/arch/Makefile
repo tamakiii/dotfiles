@@ -18,6 +18,12 @@ check:
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
 	test -L ~/.config/git
+	test -d ~/.config/hypr
+	test -L ~/.config/hypr/hyprland.conf
+	test -L ~/.config/hypr/hyprpaper.conf
+	test -d ~/.config/waybar
+	test -L ~/.config/waybar/config
+	test -L ~/.config/waybar/style.css
 	test -d ~/.config/systemd
 	test -d ~/.config/systemd/user
 	test -L ~/.config/systemd/user/shairport-sync.service
@@ -35,6 +41,13 @@ check-dependency:
 	@which mpv > /dev/null || (echo "Please install mpv" && exit 1)
 	@which shairport-sync > /dev/null || (echo "Please install shairport-sync" && exit 1)
 	@which avahi-daemon > /dev/null || (echo "Please install avahi" && exit 1)
+	@which Hyprland > /dev/null || (echo "Please install hyprland" && exit 1)
+	@which waybar > /dev/null || (echo "Please install waybar" && exit 1)
+	@which hyprpaper > /dev/null || (echo "Please install hyprpaper" && exit 1)
+	@which grim > /dev/null || (echo "Please install grim" && exit 1)
+	@which slurp > /dev/null || (echo "Please install slurp" && exit 1)
+	@which wl-copy > /dev/null || (echo "Please install wl-clipboard" && exit 1)
+	@which brightnessctl > /dev/null || (echo "Please install brightnessctl" && exit 1)
 
 backup-packages: \
 	pkglist.txt
@@ -57,12 +70,22 @@ install: \
 	~/.config/autostart/blueman-applet.desktop \
 	~/.config/autostart/overskride.desktop \
 	~/.config/git \
+	~/.config/hypr \
+	~/.config/hypr/hyprland.conf \
+	~/.config/hypr/hyprpaper.conf \
+	~/.config/waybar \
+	~/.config/waybar/config \
+	~/.config/waybar/style.css \
 	~/.config/systemd \
 	~/.config/systemd/user \
 	~/.config/systemd/user/shairport-sync.service \
 	~/.config/shairport-sync.conf
 
 uninstall:
+	rm -vrf ~/.config/waybar/style.css
+	rm -vrf ~/.config/waybar/config
+	rm -vrf ~/.config/hypr/hyprpaper.conf
+	rm -vrf ~/.config/hypr/hyprland.conf
 	rm -vrf ~/.config/shairport-sync.conf
 	rm -vrf ~/.config/systemd/user/shairport-sync.service
 	rm -vrf ~/.config/git
@@ -114,6 +137,24 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/git: .config/git ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/hypr: ~/.config
+	mkdir -p $@
+
+~/.config/hypr/hyprland.conf: .config/hypr/hyprland.conf ~/.config/hypr
+	ln -sfnv $(abspath $<) $@
+
+~/.config/hypr/hyprpaper.conf: .config/hypr/hyprpaper.conf ~/.config/hypr
+	ln -sfnv $(abspath $<) $@
+
+~/.config/waybar: ~/.config
+	mkdir -p $@
+
+~/.config/waybar/config: .config/waybar/config ~/.config/waybar
+	ln -sfnv $(abspath $<) $@
+
+~/.config/waybar/style.css: .config/waybar/style.css ~/.config/waybar
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/systemd:
