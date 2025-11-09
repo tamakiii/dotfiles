@@ -58,3 +58,7 @@ function fzf-history() {
 }
 zle -N fzf-history
 bindkey '^r' fzf-history
+
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
