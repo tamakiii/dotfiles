@@ -106,7 +106,8 @@
     },
 
     "cpu": {
-        "format": "😺 {usage}%",
+        "format": "{icon} {usage}%",
+        "format-icons": ["🐌", "🐢", "🐇", "🐕", "🐎", "🐆", "🐅", "🦁", "🦅", "🐉"],
         "tooltip": false
     },
 
