@@ -1,395 +1,147 @@
-# Arch Linux Configuration Guide
+# CLAUDE.md - Arch Linux Configuration
 
-This document provides Arch Linux-specific guidance for Claude Code when working with this dotfiles repository on Arch Linux systems.
+This file provides guidance to Claude Code when working with Arch Linux-specific configurations in this dotfiles repository.
 
-## Package Management
+## Hyprland Configuration
 
-### Core Package Manager - pacman
+### Config File Location
+- Main config: `os/arch/.config/hypr/hyprland.conf`
+- Wallpaper config: `os/arch/.config/hypr/hyprpaper.conf`
 
-```bash
-# Update system
-sudo pacman -Syu
+### Config Error Display
 
-# Install packages
-sudo pacman -S package-name
+**Important**: Hyprland configuration errors are displayed as **on-screen notifications**, not in terminal output or journalctl.
 
-# Search for packages
-pacman -Ss search-term
-
-# Query installed packages
-pacman -Q
-pacman -Qs search-term
-
-# Check package info
-pacman -Si package-name  # From repository
-pacman -Qi package-name  # Installed package
-
-# Remove packages
-sudo pacman -R package-name
-sudo pacman -Rdd package-name  # Force remove without dependency checks
+When you reload the config with `hyprctl reload` or start Hyprland, syntax errors appear as pop-up notifications on your screen showing:
+```
+Config error in file /path/to/hyprland.conf at line X: <error message>
 ```
 
-### AUR Helper - yay
+### Hyprland Logs Location
 
+Logs are stored in dynamic runtime directories:
 ```bash
-# Install from AUR
-yay -S package-name
+# Current session log location
+$XDG_RUNTIME_DIR/hypr/<instance-signature>/hyprland.log
 
-# Update all packages including AUR
-yay -Syu
+# Typical path
+/run/user/1000/hypr/<hash>/hyprland.log
+
+# Find current log
+ls -t $XDG_RUNTIME_DIR/hypr/*/hyprland.log | head -1
+
+# View current log
+cat $(ls -t $XDG_RUNTIME_DIR/hypr/*/hyprland.log | head -1)
+
+# Follow live
+tail -f $(ls -t $XDG_RUNTIME_DIR/hypr/*/hyprland.log | head -1)
 ```
 
-## Bluetooth Stack Configuration
+The instance signature (hash) changes with each Hyprland session, so the path is not static.
 
-### Required Packages
+### Enable Debug Logging
 
-```bash
-# Core bluetooth stack
-sudo pacman -S bluez bluez-libs bluez-utils
+By default, Hyprland disables detailed logs. Enable them in `hyprland.conf`:
 
-# Additional functionality
-sudo pacman -S bluez-obex  # File transfer support
-
-# GUI frontends (choose one)
-sudo pacman -S gnome-bluetooth-3.0  # GNOME (not legacy gnome-bluetooth)
-sudo pacman -S bluedevil           # KDE
-sudo pacman -S blueman             # GTK-based
+```conf
+debug {
+    disable_logs = false
+}
 ```
 
-### Audio Support
+After enabling, logs will show detailed config parsing and runtime information.
 
-- **PipeWire**: Bluetooth support is built-in (no separate package needed)
-- **PulseAudio**: Install `pulseaudio-bluetooth`
+### Common Config Syntax Updates (Hyprland 0.51+)
 
-### Service Management
+#### Window Rules
+```diff
+# Old syntax (deprecated)
+- windowrule = float, ^(pavucontrol)$
 
-```bash
-# Enable and start bluetooth
-sudo systemctl enable bluetooth
-sudo systemctl start bluetooth
-
-# Check status
-systemctl status bluetooth
-
-# Restart after updates
-sudo systemctl daemon-reload
-sudo systemctl restart bluetooth
+# New syntax (windowrulev2)
++ windowrulev2 = float, class:^(pavucontrol)$
 ```
 
-### Bluetooth Troubleshooting (Pairing Issues)
+#### Shadow Configuration
+```diff
+# Old syntax (deprecated)
+- drop_shadow = yes
+- shadow_range = 4
+- shadow_render_power = 3
+- col.shadow = rgba(1a1a1aee)
 
-Common symptoms on Arch Linux systems:
-- GNOME Settings detects devices but shows "Not Set Up" status
-- Clicking devices in Settings doesn't complete pairing
-- bluetoothctl shows `org.bluez.Error.AuthenticationCanceled`
-- Devices connect briefly then disconnect immediately
-
-**Root Causes:**
-- Authentication timing issues between GUI and bluetoothd
-- Missing or inactive Bluetooth agent for handling pairing requests
-- Audio profile availability problems with PipeWire
-- Device-specific pairing protocols (especially Sony devices)
-
-### Diagnostic Commands
-
-Essential commands for Bluetooth troubleshooting:
-
-```bash
-# Check Bluetooth service status
-systemctl status bluetooth.service
-
-# Verify Bluetooth adapter status
-bluetoothctl show
-
-# List all discovered devices
-bluetoothctl devices
-
-# Check specific device information
-bluetoothctl info <MAC_ADDRESS>
-
-# Check audio system status
-systemctl --user status pipewire-pulse
-
-# Verify installed Bluetooth packages
-pacman -Q | grep -E "(blue|pulse)"
+# New syntax (nested block)
++ shadow {
++     enabled = yes
++     range = 4
++     render_power = 3
++     color = rgba(1a1a1aee)
++ }
 ```
 
-### Pairing Process Troubleshooting
+#### Gestures (Workspace Swipe)
+```diff
+# Old syntax (removed in 0.51)
+- workspace_swipe = on
 
-**Step 1: Agent Management**
-```bash
-# Start Bluetooth agent
-bluetoothctl agent on
-bluetoothctl default-agent
+# New syntax (gesture-based)
++ gesture = 3, horizontal, workspace
++ workspace_swipe_distance = 700
++ workspace_swipe_invert = false
 ```
 
-**Step 2: Device Cache Clearing**
-```bash
-# Remove problematic device from cache
-bluetoothctl remove <MAC_ADDRESS>
+### Troubleshooting
 
-# Restart scanning
-bluetoothctl scan off
-bluetoothctl scan on
+1. **Config errors not in journalctl**: Use on-screen notifications or enable debug logging
+2. **Can't find logs**: Check `$XDG_RUNTIME_DIR/hypr/*/hyprland.log` (not `/var/log` or `/tmp`)
+3. **Deprecated options**: Check Hyprland wiki for version-specific syntax changes
+4. **hyprctl connection failed**: Ensure `$HYPRLAND_INSTANCE_SIGNATURE` matches current session
+
+### Useful Commands
+
+```bash
+# Reload config
+export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t /run/user/1000/hypr/*/.socket.sock | head -1 | xargs dirname | xargs basename)
+hyprctl reload
+
+# Check version
+hyprctl version
+
+# List active window rules
+hyprctl windowrules
+
+# Monitor current workspace
+hyprctl monitors
 ```
 
-**Step 3: Manual Pairing Workflow**
-```bash
-# Put device in pairing mode first, then:
-bluetoothctl pair <MAC_ADDRESS>
-bluetoothctl trust <MAC_ADDRESS>
-bluetoothctl connect <MAC_ADDRESS>
-```
+## Waybar Configuration
 
-**Step 4: Alternative Approaches**
-```bash
-# Trust-first approach (for some devices)
-bluetoothctl trust <MAC_ADDRESS>
-bluetoothctl connect <MAC_ADDRESS>
+- Config: `os/arch/.config/waybar/config`
+- Styles: `os/arch/.config/waybar/style.css`
+- Theme: Catppuccin-inspired colors
 
-# Direct connection (audio devices sometimes work)
-bluetoothctl connect <MAC_ADDRESS>
-```
-
-### Audio Device Integration
-
-**PipeWire Bluetooth Issues:**
-- Profile availability errors: `br-connection-profile-unavailable`
-- Service discovery works but connection fails
-- Devices show correct UUIDs but won't maintain connection
-
-**Troubleshooting Audio Devices:**
-```bash
-# Verify PipeWire Bluetooth support
-systemctl --user status pipewire-pulse
-
-# Check for audio-related errors
-journalctl -u bluetooth.service --since "1 hour ago"
-
-# For persistent issues, restart audio subsystem
-systemctl --user restart pipewire-pulse
-```
-
-**Device-Specific Notes:**
-- **Sony devices (WF-C710N, WH-1000XM6)**: Often require specific timing - put in pairing mode, remove from cache, then pair immediately
-- **HHKB-Studio2 Keyboard**: Multiple pairing slots (1-4) with different MAC addresses per slot
-  - Slot switching: Fn + Control + [1-4] 
-  - Clear all pairings: Fn + Z + Backspace
-  - Known authentication failures with Linux - common issue
-  - Different slots show as different devices (HHKB-Studio1, HHKB-Studio2, etc.)
-  - **Not officially supported on Linux** - use Overskride for best results
-- **Audio timing**: Some devices exit pairing mode quickly - work fast through the sequence
-
-### Recommended Bluetooth Management Tools
-
-**Tool Recommendations by Device Type:**
-- **Blueman**: Best for Sony audio devices (WF-C710N, WH-1000XM6)
-  - Superior audio profile management
-  - Better Sony device compatibility
-  - Manual A2DP configuration
-- **Overskride**: Best for keyboards (HHKB-Studio2) and modern devices
-  - Modern Rust-based implementation
-  - Better handling of non-standard pairing protocols
-  - Available from AUR: `yay -S overskride`
-
-**Installation:**
-```bash
-# Install both tools for comprehensive device support
-sudo pacman -S blueman
-yay -S overskride
-
-# Autostart configuration (available in this repository)
-make -C os/arch install
-```
-
-### Critical PipeWire Fixes
-
-**Audio Endpoint Registration Error:**
-```bash
-# Symptoms: "No audio endpoints registered"
-# Root cause: WirePlumber Bluetooth codec ABI version mismatches
-
-# Solution:
-systemctl --user restart wireplumber pipewire pipewire-pulse
-```
-
-**Working Bluetooth Stack Versions:**
-- bluez 5.83-1 with blueman 2.4.6-1 and overskride 0.6.2-1
-- PipeWire 1.2.5+ with WirePlumber
-- Kernel 6.10.10-arch1-1 (past problematic 5.9.x versions)
-
-## System Update Troubleshooting
-
-### Common Package Conflicts
-
-When encountering package conflicts during system updates:
-
-1. **Package Replacements**
-   ```bash
-   # Common replacements (answer Y when prompted)
-   sdl2 → sdl2-compat
-   webrtc-audio-processing → webrtc-audio-processing-0.3
-   ```
-
-2. **QEMU Architecture Removal**
-   ```bash
-   # If qemu-system-cris conflicts with qemu-common
-   sudo pacman -Rdd qemu-system-cris
-   sudo pacman -R qemu-emulators-full qemu-full
-   sudo pacman -Syu
-   sudo pacman -S qemu-full
-   ```
-
-3. **Held Back Packages**
-   ```bash
-   # If packages don't update during system upgrade
-   sudo pacman -S specific-package-name
-   ```
-
-## Development Environment Setup
-
-### Essential Development Tools
+## Installation
 
 ```bash
-# Base development
-sudo pacman -S base-devel git
-
-# Editors
-sudo pacman -S helix neovim
-
-# Shell and terminal
-sudo pacman -S zsh tmux alacritty
-
-# Language-specific
-sudo pacman -S go rust python nodejs npm
-
-# Tools from this repository's requirements
-sudo pacman -S fzf ripgrep fd bat eza
-yay -S uv  # Python package manager (from AUR)
-```
-
-### System Paths and Environment
-
-Arch Linux specific paths:
-- System binaries: `/usr/bin`
-- User binaries: `~/.local/bin`
-- System config: `/etc`
-- User config: `~/.config`
-- Systemd services: `/usr/lib/systemd/system/`
-
-## Security Considerations
-
-### Keyring Management
-
-```bash
-# Update keyring if signature errors occur
-sudo pacman -Sy archlinux-keyring
-sudo pacman-key --refresh-keys
-```
-
-### Service Hardening
-
-- Always use systemctl for service management
-- Check service status after updates
-- Review `/etc` configuration files after major updates
-
-## Arch-Specific Makefile Structure
-
-The Arch Linux dotfiles configuration uses two independent Makefiles:
-
-### Core Dotfiles (`Makefile`)
-Manages shell, editor, application configurations, and user systemd services:
-
-```bash
-# Install dotfiles + user configs (zsh, tmux, helix, shairport-sync user service)
+# Install OS-specific configs
 make -C os/arch install
 
-# Check dotfiles + user configs installation
-make -C os/arch check
-
-# Check all dependencies (including shairport-sync, avahi)
+# Check dependencies
 make -C os/arch check-dependency
 
-# Remove dotfiles + user configs
-make -C os/arch uninstall
-```
-
-**What it manages:**
-- Shell configurations (zsh, tmux, helix, ghostty)
-- Application autostart (blueman, overskride)
-- User systemd services (`~/.config/systemd/user/shairport-sync.service`)
-- User service configurations (`~/.config/shairport-sync.conf`)
-
-### System Services (`systemctl.mk`)
-Manages system-level Wake-on-LAN services only:
-
-```bash
-# Install Wake-on-LAN system services only
-make -f os/arch/systemctl.mk install
-
-# Check Wake-on-LAN system services
-make -f os/arch/systemctl.mk check
-
-# Check Wake-on-LAN dependencies (ethtool only)
-make -f os/arch/systemctl.mk check-dependency
-
-# Remove Wake-on-LAN system services
-make -f os/arch/systemctl.mk uninstall
-```
-
-**What it manages:**
-- System service files (`/etc/systemd/system/wol@.service`)
-- System network configuration (`/etc/systemd/network/20-ethernet.network`)
-- Service enablement and management (wol@eno1.service)
-
-### Combined Installation
-For complete setup, run both makefiles:
-
-```bash
-# Install everything
-make -C os/arch install
-make -f os/arch/systemctl.mk install
-
-# Verify everything
+# Verify installation
 make -C os/arch check
-make -f os/arch/systemctl.mk check
 ```
 
-### Makefile Separation Benefits
-- **Modular deployment**: Install Wake-on-LAN system services independently of user dotfiles
-- **Independent testing**: Test user configs vs system services separately
-- **Selective installation**: Choose components for different machines (e.g., Wake-on-LAN on servers only)
-- **Clear separation**: User configurations (~/.config) vs system files (/etc)
-- **Privilege separation**: User dotfiles need no sudo, system services require sudo
+## Dependencies
 
-## Common Issues and Solutions
+Required packages for Hyprland setup:
+- `hyprland` - Wayland compositor
+- `waybar` - Status bar
+- `hyprpaper` - Wallpaper daemon
+- `grim` - Screenshot utility
+- `slurp` - Screen area selection
+- `wl-clipboard` - Clipboard utilities
+- `brightnessctl` - Brightness control
 
-### 1. Bluetooth Not Working After Update
-```bash
-# Reload modules
-sudo modprobe -r btusb
-sudo modprobe btusb
-
-# Check kernel modules
-lsmod | grep bluetooth
-```
-
-### 2. Package Signature Errors
-```bash
-# Refresh keys
-sudo pacman-key --refresh-keys
-sudo pacman -Sy archlinux-keyring
-```
-
-### 3. Partial Update Issues
-```bash
-# Never do partial updates
-# Always use -Syu, not just -S
-sudo pacman -Syu
-```
-
-## References
-
-- [Arch Wiki - Bluetooth](https://wiki.archlinux.org/title/Bluetooth)
-- [Arch Wiki - Pacman](https://wiki.archlinux.org/title/Pacman)
-- [Arch Wiki - General Recommendations](https://wiki.archlinux.org/title/General_recommendations)
+See `os/arch/Makefile` check-dependency target for full list.

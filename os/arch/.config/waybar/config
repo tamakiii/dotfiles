@@ -1,0 +1,196 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 4,
+    "mode": "dock",
+    "reload_style_on_change": true,
+    "gtk-layer-shell": true,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["custom/media", "idle_inhibitor", "pulseaudio", "network", "cpu", "memory", "temperature", "backlight", "battery", "tray"],
+
+    "hyprland/workspaces": {
+        "disable-scroll": false,
+        "all-outputs": true,
+        "warp-on-scroll": false,
+        "format": "{icon}",
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            "10": "10"
+        }
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 50,
+        "separate-outputs": true,
+        "rewrite": {
+            "": "<span foreground='#89b4fa'> </span> Hyprland",
+
+            "~": "  Terminal",
+            "zsh": "  Terminal",
+            "bash": "  Terminal",
+            "(.*)@(.*):(~)": "  Terminal",
+            "(.*)@(.*):(.*)": "  Terminal",
+
+            "(.*) — Mozilla Firefox": "<span foreground='#f38ba8'>󰈹 </span> $1",
+            "(.*)Mozilla Firefox": "<span foreground='#f38ba8'>󰈹 </span> Firefox",
+            "(.*) - Google Chrome": "<span foreground='#fab387'>󰊯 </span> $1",
+            "(.*)Google Chrome": "<span foreground='#fab387'>󰊯 </span> Chrome",
+
+            "(.*) - Visual Studio Code": "<span foreground='#89b4fa'>󰨞 </span> $1",
+            "(.*)Visual Studio Code": "<span foreground='#89b4fa'>󰨞 </span> Visual Studio Code",
+            "(.*) - Helix": "<span foreground='#a6e3a1'> </span> $1",
+            "(.*)Helix": "<span foreground='#a6e3a1'> </span> Helix",
+
+            "(.*)Spotify": "<span foreground='#a6e3a1'> </span> Spotify",
+            "(.*)Spotify Premium": "<span foreground='#a6e3a1'> </span> Spotify Premium",
+
+            "VLC media player": "<span foreground='#fab387'>󰕼 </span> VLC Media Player",
+            "(.*) - VLC media player": "<span foreground='#fab387'>󰕼 </span> $1",
+
+            "• Discord(.*)": "Discord$1",
+            "(.*)Discord(.*)": "<span foreground='#89b4fa'> </span> $1Discord$2",
+
+            "(.*).pdf": "<span foreground='#f38ba8'> </span> $1.pdf",
+            "(.*).docx": "<span foreground='#89b4fa'> </span> $1.docx",
+            "(.*).xlsx": "<span foreground='#a6e3a1'> </span> $1.xlsx",
+
+            "/": "  File Manager"
+        }
+    },
+
+    "tray": {
+        "spacing": 10
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": " ",
+            "deactivated": " "
+        },
+        "tooltip": true,
+        "tooltip-format-activated": "Presentation Mode (Screen won't sleep)",
+        "tooltip-format-deactivated": "Idle Mode (Screen will sleep)"
+    },
+
+    "custom/media": {
+        "exec": "~/.config/waybar/scripts/media-player.py",
+        "return-type": "json",
+        "format": "{}",
+        "tooltip": true,
+        "on-click": "playerctl play-pause",
+        "interval": 2
+    },
+
+    "clock": {
+        "timezone": "Asia/Tokyo",
+        "format": "{:%Y-%m-%d %H:%M}",
+        "format-alt": "{:%A, %B %d, %Y}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "actions": {
+            "on-click": "mode",
+            "on-click-right": "mode"
+        }
+    },
+
+    "cpu": {
+        "format": "{icon} {usage}%",
+        "format-icons": ["🪴", "🐢", "🐘", "🐄", "🐖", "🐇", "🦌", "🐕", "🦊", "🐎", "🐺", "🐆", "🐅", "🦁", "🦘", "🦈", "🦅", "🦇", "🐉", "🦎", "🐍", "🦂", "🕷️", "🦗", "🐝", "🐜", "🦟", "🦋", "🐛", "🦀", "🦞", "🦐", "🐙", "🦑", "🐠", "🐟", "🐡", "🦈", "🐊"],
+        "tooltip": false
+    },
+
+    "memory": {
+        "states": {
+            "warning": 75,
+            "critical": 90
+        },
+        "format": "🧠 {percentage}%",
+        "format-critical": "🤯 {percentage}%",
+        "tooltip": true,
+        "tooltip-format": "Memory Used: {used:0.1f} GB / {total:0.1f} GB"
+    },
+
+    "temperature": {
+        "critical-threshold": 80,
+        "format": "{icon} {temperatureC}°C",
+        "format-icons": ["🧊", "🌡️", "🔥", "🌋"]
+    },
+
+    "battery": {
+        "states": {
+            "full": 100,
+            "good": 99,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-icons": ["󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂"],
+        "format-full": "󱃌 {capacity}%",
+        "format-warning": "󰁻 {capacity}%",
+        "format-critical": "󱃍 {capacity}%",
+        "format-charging": "󱘖 {capacity}%",
+        "format-plugged": " {capacity}%",
+        "tooltip-format": "Discharging: {time}",
+        "tooltip-format-charging": "Charging: {time}"
+    },
+
+    "network": {
+        "format-wifi": " {essid} ({signalStrength}%)",
+        "format-ethernet": " {ipaddr}/{cidr}",
+        "format-linked": " {ifname} (No IP)",
+        "format-disconnected": "⚠ Disconnected",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}",
+        "tooltip-format": "{ifname} via {gwaddr}",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
+        "tooltip-format-ethernet": "{ifname}\n{ipaddr}/{cidr}",
+        "tooltip-format-disconnected": "Disconnected"
+    },
+
+
+    "bluetooth": {
+        "format": "󰂰",
+        "format-disabled": "󰂲",
+        "format-connected": "󰂱",
+        "format-connected-battery": "󰂱",
+        "tooltip-format": "{num_connections} connected",
+        "tooltip-format-disabled": "Bluetooth Disabled",
+        "tooltip-format-connected": "{num_connections} connected\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}: {device_battery_percentage}%",
+        "interval": 1,
+        "min-length": 1,
+        "max-length": 1
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 {volume}%",
+        "format-bluetooth": " {icon} {volume}%",
+        "format-bluetooth-muted": "  {icon}",
+        "format-muted": " {volume}%",
+        "format-icons": {
+            "headphone": "󰋋",
+            "hands-free": "󰋋",
+            "headset": "󰋋",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "tooltip": true,
+        "tooltip-format": "Device: {desc}",
+        "on-click": "pavucontrol"
+    }
+}

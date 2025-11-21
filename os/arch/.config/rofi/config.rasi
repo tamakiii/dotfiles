@@ -1,0 +1,32 @@
+configuration {
+	/* Display settings */
+	modi: "drun,run,window";
+	show-icons: true;
+	icon-theme: "Papirus";
+	drun-display-format: "{icon}  {name}";
+	font: "Inter 11";
+
+	/* Behavior */
+	display-drun: "";
+	display-run: "";
+	display-window: "";
+	sidebar-mode: false;
+
+	/* Performance */
+	lazy-grab: true;
+	scroll-method: 0;
+
+	/* Terminal for running terminal apps */
+	terminal: "ghostty";
+
+	/* Sorting and matching */
+	sort: true;
+	sorting-method: "fzf";
+	matching: "fuzzy";
+
+	/* Window positioning */
+	location: 0;
+	fixed-num-lines: false;
+}
+
+@theme "themes/macos-style"

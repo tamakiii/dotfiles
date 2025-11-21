@@ -1,4 +1,4 @@
-.PHONY: help check check-dependency install uninstall backup-packages restore-packages
+.PHONY: help check check-dependency install uninstall
 
 SHELL := bash --noprofile --norc -eo pipefail
 
@@ -13,32 +13,39 @@ check:
 	test -L ~/.config/tmux
 	test -L ~/.config/helix
 	test -L ~/.config/ghostty
+	test -L ~/.config/rofi
+	test -L ~/.config/hyprswitch
 	test -d ~/.config/autostart
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
 	test -L ~/.config/git
-	test -d ~/.config/systemd
-	test -d ~/.config/systemd/user
-	test -L ~/.config/systemd/user/shairport-sync.service
-	test -L ~/.config/shairport-sync.conf
+	test -d ~/.config/hypr
+	test -L ~/.config/hypr/hyprland.conf
+	test -L ~/.config/hypr/hyprpaper.conf
+	test -L ~/.config/hypr/hyprlock.conf
+	test -d ~/.config/waybar
+	test -L ~/.config/waybar/config
+	test -L ~/.config/waybar/style.css
+	test -d ~/.config/waybar/scripts
 
 check-dependency:
-	which zsh > /dev/null || $(error Please install zsh)
-	which tmux > /dev/null || $(error Please install tmux)
-	which hx > /dev/null || $(error Please install hx)
-	which ghostty > /dev/null || $(error Please install ghostty)
-	which fzf > /dev/null || $(error Please install fzf)
-	which blueman-applet > /dev/null || $(error Please install blueman-applet)
-	which overskride > /dev/null || $(error Please install overskride)
-	which mpv > /dev/null || $(error Please install mpv)
-	which shairport-sync > /dev/null || $(error Please install shairport-sync)
-	which avahi-daemon > /dev/null || $(error Please install avahi)
-
-backup-packages: \
-	pkglist.txt
-
-restore-packages: | pkglist.txt
-	sudo pacman -S --needed - < $|
+	@which zsh > /dev/null || (echo "Please install zsh" && exit 1)
+	@which tmux > /dev/null || (echo "Please install tmux" && exit 1)
+	@which helix > /dev/null || (echo "Please install hx" && exit 1)
+	@which ghostty > /dev/null || (echo "Please install ghostty" && exit 1)
+	@which fzf > /dev/null || (echo "Please install fzf" && exit 1)
+	@which rofi > /dev/null || (echo "Please install rofi" && exit 1)
+	@which blueman-applet > /dev/null || (echo "Please install blueman-applet" && exit 1)
+	@which mpv > /dev/null || (echo "Please install mpv" && exit 1)
+	@which shairport-sync > /dev/null || (echo "Please install shairport-sync" && exit 1)
+	@which avahi-daemon > /dev/null || (echo "Please install avahi" && exit 1)
+	@which Hyprland > /dev/null || (echo "Please install hyprland" && exit 1)
+	@which waybar > /dev/null || (echo "Please install waybar" && exit 1)
+	@which hyprpaper > /dev/null || (echo "Please install hyprpaper" && exit 1)
+	@which grim > /dev/null || (echo "Please install grim" && exit 1)
+	@which slurp > /dev/null || (echo "Please install slurp" && exit 1)
+	@which wl-copy > /dev/null || (echo "Please install wl-clipboard" && exit 1)
+	@which brightnessctl > /dev/null || (echo "Please install brightnessctl" && exit 1)
 
 install: \
 	.zsh \
@@ -50,21 +57,34 @@ install: \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
+	~/.config/rofi \
+	~/.config/hyprswitch \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
 	~/.config/autostart/overskride.desktop \
 	~/.config/git \
-	~/.config/systemd \
-	~/.config/systemd/user \
-	~/.config/systemd/user/shairport-sync.service \
-	~/.config/shairport-sync.conf
+	~/.config/hypr \
+	~/.config/hypr/hyprland.conf \
+	~/.config/hypr/hyprpaper.conf \
+	~/.config/hypr/hyprlock.conf \
+	~/.config/waybar \
+	~/.config/waybar/config \
+	~/.config/waybar/style.css \
+	~/.config/waybar/scripts \
 
 uninstall:
+	rm -vrf ~/.config/waybar/scripts
+	rm -vrf ~/.config/waybar/style.css
+	rm -vrf ~/.config/waybar/config
+	rm -vrf ~/.config/hypr/hyprlock.conf
+	rm -vrf ~/.config/hypr/hyprpaper.conf
+	rm -vrf ~/.config/hypr/hyprland.conf
+	rm -vrf ~/.config/hyprswitch
 	rm -vrf ~/.config/shairport-sync.conf
-	rm -vrf ~/.config/systemd/user/shairport-sync.service
 	rm -vrf ~/.config/git
 	rm -vrf ~/.config/autostart/blueman-applet.desktop
 	rm -vrf ~/.config/autostart/overskride.desktop
+	rm -vrf ~/.config/rofi
 	rm -vrf ~/.config/ghostty
 	rm -vrf ~/.config/helix
 	rm -vrf ~/.config/tmux
@@ -97,6 +117,12 @@ uninstall:
 ~/.config/ghostty: .config/ghostty ~/.config
 	ln -sfnv $(abspath $<) $@
 
+~/.config/rofi: .config/rofi ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/hyprswitch: .config/hyprswitch ~/.config
+	ln -sfnv $(abspath $<) $@
+
 ~/.config/autostart:
 	mkdir -p $@
 
@@ -109,20 +135,29 @@ uninstall:
 ~/.config/git: .config/git ~/.config
 	ln -sfnv $(abspath $<) $@
 
-~/.config/systemd:
+~/.config/hypr: ~/.config
 	mkdir -p $@
 
-~/.config/systemd/user: ~/.config/systemd
-	mkdir -p $@
-
-~/.config/systemd/user/shairport-sync.service: .config/systemd/user/shairport-sync.service ~/.config/systemd/user
+~/.config/hypr/hyprland.conf: .config/hypr/hyprland.conf ~/.config/hypr
 	ln -sfnv $(abspath $<) $@
 
-~/.config/shairport-sync.conf: .config/shairport-sync.conf ~/.config
+~/.config/hypr/hyprpaper.conf: .config/hypr/hyprpaper.conf ~/.config/hypr
+	ln -sfnv $(abspath $<) $@
+
+~/.config/hypr/hyprlock.conf: .config/hypr/hyprlock.conf ~/.config/hypr
+	ln -sfnv $(abspath $<) $@
+
+~/.config/waybar: ~/.config
+	mkdir -p $@
+
+~/.config/waybar/config: .config/waybar/config ~/.config/waybar
+	ln -sfnv $(abspath $<) $@
+
+~/.config/waybar/style.css: .config/waybar/style.css ~/.config/waybar
+	ln -sfnv $(abspath $<) $@
+
+~/.config/waybar/scripts: .config/waybar/scripts ~/.config/waybar
 	ln -sfnv $(abspath $<) $@
 
 ~/.zprofile: .zprofile
 	cp $< $@
-
-pkglist.txt:
-	pacman -Qe > pkglist.txt
