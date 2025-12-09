@@ -23,6 +23,7 @@ paths=(
     "$HOME/.venv/bin"
 
     # User-specific binaries
+    "$HOME/.opencode/bin"
     "$HOME/.local/bin"
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
