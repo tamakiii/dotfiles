@@ -1,59 +1,64 @@
-/* Hyprswitch theme - matching Hyprland gray theme */
+/* Hyprswitch theme - macOS Mission Control style */
+/* Clean, minimal with blur and subtle shadows */
 
 :root {
-    --border-color: rgba(89, 89, 89, 0.4);
-    --border-color-active: rgba(89, 89, 89, 0.9);
-    --bg-color: rgba(26, 26, 26, 0.85);
-    --bg-color-hover: rgba(50, 50, 50, 0.9);
-    --text-color: rgba(255, 255, 255, 0.9);
-    --text-color-dim: rgba(255, 255, 255, 0.6);
+    --bg-overlay: rgba(0, 0, 0, 0.4);
+    --bg-card: rgba(255, 255, 255, 0.12);
+    --bg-card-hover: rgba(255, 255, 255, 0.18);
+    --bg-card-active: rgba(255, 255, 255, 0.22);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-color-active: rgba(0, 122, 255, 0.9);
+    --accent: #007aff;
+    --text-color: rgba(255, 255, 255, 0.95);
+    --text-color-dim: rgba(255, 255, 255, 0.7);
     --border-radius: 10px;
-    --border-size: 2px;
 }
 
 * {
-    font-family: "Inter", "Cantarell", sans-serif;
+    font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Inter", sans-serif;
     font-size: 13px;
+    font-weight: 400;
     color: var(--text-color);
 }
 
 /* Monitor container - main popup background */
 .monitor {
-    background: rgba(20, 20, 20, 0.75);
-    border: 1px solid rgba(89, 89, 89, 0.3);
-    border-radius: 12px;
+    background: var(--bg-overlay);
+    border: none;
+    border-radius: 14px;
     padding: 16px;
 }
 
 .monitor_active {
-    border-color: rgba(89, 89, 89, 0.5);
+    background: var(--bg-overlay);
 }
 
 /* Workspace containers */
 .workspace {
-    background: rgba(40, 40, 40, 0.6);
-    border: 1px solid rgba(89, 89, 89, 0.2);
-    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     margin: 8px;
-    padding: 12px;
+    padding: 14px;
 }
 
 .workspace:hover {
-    background: rgba(50, 50, 50, 0.7);
+    background: var(--bg-card-hover);
 }
 
 .workspace_active {
-    border-color: rgba(89, 89, 89, 0.6);
+    background: var(--bg-card-active);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .workspace_special {
-    border-color: rgba(89, 89, 89, 0.4);
-    border-style: dashed;
+    border-color: var(--accent);
+    border-style: solid;
 }
 
 /* Individual window tiles */
 .client {
-    background: rgba(30, 30, 30, 0.8);
+    background: rgba(255, 255, 255, 0.08);
     border: 2px solid transparent;
     border-radius: 8px;
     margin: 4px;
@@ -62,13 +67,14 @@
 }
 
 .client:hover {
-    background: rgba(50, 50, 50, 0.9);
-    border-color: rgba(89, 89, 89, 0.5);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .client label {
     color: var(--text-color-dim);
     font-size: 11px;
+    font-weight: 400;
 }
 
 .client:hover label {
@@ -77,8 +83,8 @@
 
 /* Active/selected window */
 .client_active {
-    border-color: rgba(89, 89, 89, 0.9);
-    background: rgba(45, 45, 45, 0.9);
+    border-color: var(--accent);
+    background: rgba(0, 122, 255, 0.2);
 }
 
 .client_active label {
@@ -92,11 +98,11 @@
 
 /* Index number badges */
 .index {
-    background: rgba(89, 89, 89, 0.7);
-    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
     border: none;
     border-radius: 4px;
     padding: 2px 6px;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 500;
 }
