@@ -30,5 +30,5 @@
     ]
   },
   "enableAllProjectMcpServers": false,
-  "model": "sonnet"
+  "alwaysThinkingEnabled": false
 }
