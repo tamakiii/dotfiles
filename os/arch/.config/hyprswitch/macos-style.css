@@ -1,90 +1,52 @@
-/*******************************************************************************
- * macOS Cmd+Tab Style for Hyprswitch
- * Ultra-minimal icon-only switcher matching macOS appearance
- * Note: GTK CSS has limited property support compared to standard CSS
- *******************************************************************************/
-
 :root {
-  /* Colors matching macOS dark mode */
-  --bg-color: rgba(30, 30, 46, 0.9);
-  --bg-color-hover: rgba(50, 50, 66, 1);
-  --border-color: rgba(58, 58, 74, 0.3);
-  --border-color-active: rgba(10, 132, 255, 1);
-  --border-radius: 16px;
-  --text-color: rgba(10, 132, 255, 1);
+    --border-color: rgba(90, 90, 120, 0.4);
+    --border-color-active: rgba(0, 122, 255, 0.9);
+    --bg-color: rgba(30, 30, 30, 0.95);
+    --bg-color-hover: rgba(60, 60, 70, 1);
+    --index-border-color: rgba(0, 122, 255, 0.7);
+    --border-radius: 12px;
+    --border-size: 3px;
 }
 
-/* Main container - compact horizontal dock */
-window {
-  background-color: var(--bg-color);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  padding: 12px 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+* {
+    font-family: "SF Pro Display", "Helvetica Neue", sans-serif;
 }
 
-/* HIDE: Window previews (collapse to zero size) */
-.client-image {
-  opacity: 0;
-  min-height: 0;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-}
-
-/* HIDE: Numbered indicators (collapse to zero) */
-.index {
-  opacity: 0;
-  min-height: 0;
-  min-width: 0;
-  font-size: 0;
-  margin: 0;
-  padding: 0;
-}
-
-/* HIDE: Workspace labels (collapse to zero) */
-.workspace {
-  opacity: 0;
-  font-size: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-}
-
-/* HIDE: Monitor labels (collapse to zero) */
 .monitor {
-  opacity: 0;
-  font-size: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
 }
 
-/* Window container - compact spacing */
+.workspace {
+    font-size: 20px;
+    background-color: rgba(50, 50, 55, 0.8);
+    border-radius: 8px;
+}
+
+.workspace:hover {
+    background-color: rgba(70, 70, 80, 0.9);
+}
+
 .client {
-  margin: 0 8px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  min-width: 80px;
+    font-size: 12px;
+    background: rgba(45, 45, 50, 0.9);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    margin: 4px;
 }
 
-/* Application icons - larger and prominent */
-.client icon {
-  min-width: 72px;
-  min-height: 72px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: all 0.15s ease;
+.client:hover {
+    background: rgba(60, 60, 70, 1);
 }
 
-/* Hover effect on icons */
-.client:hover icon {
-  background-color: var(--bg-color-hover);
+.client-active {
+    border-color: rgba(0, 122, 255, 0.9);
 }
 
-/* Active window - blue background highlight */
-.client.active icon {
-  background-color: var(--bg-color-hover);
-  box-shadow: 0 0 0 2px var(--border-color-active);
+.index {
+    background: rgba(0, 122, 255, 0.8);
+    color: white;
+    border-radius: 4px;
+    padding: 2px 6px;
 }
