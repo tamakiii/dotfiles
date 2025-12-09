@@ -3,7 +3,7 @@
 
 # Appearance
 font=Inter 11
-background-color=#ffffffcc
+background-color=#ffffffee
 text-color=#1a1a1aee
 border-size=2
 border-color=#595959aa
@@ -29,13 +29,13 @@ layer=overlay
 # Urgency styles
 [urgency=low]
 border-color=#595959aa
-background-color=#f5f5f5cc
+background-color=#f5f5f5ee
 
 [urgency=normal]
 border-color=#595959cc
-background-color=#ffffffcc
+background-color=#ffffffee
 
 [urgency=critical]
 border-color=#595959ff
-background-color=#ffffffcc
+background-color=#ffffffee
 default-timeout=0
