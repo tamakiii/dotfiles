@@ -15,6 +15,7 @@ check:
 	test -L ~/.config/ghostty
 	test -L ~/.config/rofi
 	test -L ~/.config/hyprswitch
+	test -L ~/.config/mako
 	test -d ~/.config/autostart
 	test -L ~/.config/autostart/blueman-applet.desktop
 	test -L ~/.config/autostart/overskride.desktop
@@ -59,6 +60,7 @@ install: \
 	~/.config/ghostty \
 	~/.config/rofi \
 	~/.config/hyprswitch \
+	~/.config/mako \
 	~/.config/autostart \
 	~/.config/autostart/blueman-applet.desktop \
 	~/.config/autostart/overskride.desktop \
@@ -79,6 +81,7 @@ uninstall:
 	rm -vrf ~/.config/hypr/hyprlock.conf
 	rm -vrf ~/.config/hypr/hyprpaper.conf
 	rm -vrf ~/.config/hypr/hyprland.conf
+	rm -vrf ~/.config/mako
 	rm -vrf ~/.config/hyprswitch
 	rm -vrf ~/.config/shairport-sync.conf
 	rm -vrf ~/.config/git
@@ -121,6 +124,9 @@ uninstall:
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/hyprswitch: .config/hyprswitch ~/.config
+	ln -sfnv $(abspath $<) $@
+
+~/.config/mako: .config/mako ~/.config
 	ln -sfnv $(abspath $<) $@
 
 ~/.config/autostart:

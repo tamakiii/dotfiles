@@ -1,0 +1,41 @@
+# Mako notification daemon configuration
+# Matching Hyprland theme (gray #595959, 10px radius)
+
+# Appearance
+font=Inter 11
+background-color=#1a1a1acc
+text-color=#ffffffee
+border-size=2
+border-color=#595959aa
+border-radius=10
+padding=12
+margin=10
+width=350
+height=150
+
+# Position
+anchor=top-right
+
+# Icons
+icons=1
+max-icon-size=48
+icon-border-radius=6
+
+# Behavior
+default-timeout=5000
+ignore-timeout=0
+layer=overlay
+
+# Urgency styles
+[urgency=low]
+border-color=#595959aa
+background-color=#1a1a1acc
+
+[urgency=normal]
+border-color=#595959cc
+background-color=#1a1a1acc
+
+[urgency=critical]
+border-color=#ffffffcc
+background-color=#2a2a2acc
+default-timeout=0
