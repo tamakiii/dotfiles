@@ -443,15 +443,15 @@ freetype-load-flags = hinting,no-force-autohint,no-monochrome,autohint
 # be fixed in a future update:
 # 
 #   - macOS: titlebar tabs style is not updated when switching themes.
-theme = 
+theme = "TokyoNight Day"
 
 # Background color for the window.
 # Specified as either hex (`#RRGGBB` or `RRGGBB`) or a named X11 color.
-background = #282c34
+# background = #282c34
 
 # Foreground color for the window.
 # Specified as either hex (`#RRGGBB` or `RRGGBB`) or a named X11 color.
-foreground = #ffffff
+# foreground = #ffffff
 
 # Background image for the terminal.
 # 

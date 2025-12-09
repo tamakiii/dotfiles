@@ -2,7 +2,7 @@
 # Based on the built-in onedark theme but with transparent background
 # This allows the terminal background to show through
 
-inherits = "adwaita-dark"
+inherits = "tokyonight_day"
 
 # Make background transparent to match terminal
 "ui.background" = {}
