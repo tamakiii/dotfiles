@@ -1,0 +1,108 @@
+/* Hyprswitch theme - macOS Mission Control style */
+/* Clean, minimal with blur and subtle shadows */
+
+:root {
+    --bg-overlay: rgba(0, 0, 0, 0.4);
+    --bg-card: rgba(255, 255, 255, 0.12);
+    --bg-card-hover: rgba(255, 255, 255, 0.18);
+    --bg-card-active: rgba(255, 255, 255, 0.22);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-color-active: rgba(0, 122, 255, 0.9);
+    --accent: #007aff;
+    --text-color: rgba(255, 255, 255, 0.95);
+    --text-color-dim: rgba(255, 255, 255, 0.7);
+    --border-radius: 10px;
+}
+
+* {
+    font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-color);
+}
+
+/* Monitor container - main popup background */
+.monitor {
+    background: var(--bg-overlay);
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.monitor_active {
+    background: var(--bg-overlay);
+}
+
+/* Workspace containers */
+.workspace {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin: 8px;
+    padding: 14px;
+}
+
+.workspace:hover {
+    background: var(--bg-card-hover);
+}
+
+.workspace_active {
+    background: var(--bg-card-active);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.workspace_special {
+    border-color: var(--accent);
+    border-style: solid;
+}
+
+/* Individual window tiles */
+.client {
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    margin: 4px;
+    padding: 8px;
+    transition: all 0.15s ease;
+}
+
+.client:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.client label {
+    color: var(--text-color-dim);
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.client:hover label {
+    color: var(--text-color);
+}
+
+/* Active/selected window */
+.client_active {
+    border-color: var(--accent);
+    background: rgba(0, 122, 255, 0.2);
+}
+
+.client_active label {
+    color: var(--text-color);
+}
+
+/* Window icon */
+.client-image {
+    border-radius: 6px;
+}
+
+/* Index number badges */
+.index {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 500;
+}
