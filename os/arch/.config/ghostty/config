@@ -46,9 +46,10 @@
 # this within config files if you want to clear previously set values in
 # configuration files or on the CLI if you want to clear values set on the
 # CLI.
-font-family = 
+font-family = JetBrainsMono Nerd Font Mono
+font-family = Noto Sans Mono CJK JP
 
-font-family-bold = 
+font-family-bold =
 font-family-italic = 
 font-family-bold-italic = 
 # The named font style to use for each of the requested terminal font styles.
