@@ -43,6 +43,9 @@ paths=(
     "$HOME/.dotcommands/bin"
     "$HOME/.dotcommands/command/bin"
 
+    # .local/bin
+    "$HOME/.local/bin"
+
     # Python virtual environment
     "$HOME/.venv/bin"
 
