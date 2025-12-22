@@ -2364,11 +2364,6 @@ linux-cgroup-hard-fail = false
 # debug builds, `false` for all others.
 gtk-opengl-debug = false
 
-# Obsolete configuration that should not be set. This was deprecated in
-# Ghostty 1.1.3 and no longer has any effect. The configuration key will
-# be fully removed in 1.2.0. You can manually override the GSK renderer
-# using standard environment variables such as `GSK_RENDERER` (from GTK).
-gtk-gsk-renderer = default
 
 # If `true`, the Ghostty GTK application will run in single-instance mode:
 # each new `ghostty` process launched will result in a new window if there is
@@ -2434,19 +2429,6 @@ adw-toolbar-style = raised
 # which is the old style.
 gtk-wide-tabs = true
 
-# If `true` (default), Ghostty will enable Adwaita theme support. This
-# will make `window-theme` work properly and will also allow Ghostty to
-# properly respond to system theme changes, light/dark mode changing, etc.
-# This requires a GTK4 desktop with a GTK4 theme.
-# 
-# If you are running GTK3 or have a GTK3 theme, you may have to set this
-# to false to get your theme picked up properly. Having this set to true
-# with GTK3 should not cause any problems, but it may not work exactly as
-# expected.
-# 
-# This configuration only has an effect if Ghostty was built with
-# Adwaita support.
-gtk-adwaita = true
 
 # Custom CSS files to be loaded.
 # 
