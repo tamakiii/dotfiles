@@ -10,9 +10,11 @@ install: \
 	~/.zprofile \
 	~/.config/tmux \
 	~/.config/helix \
-	~/.config/ghostty
+	~/.config/ghostty \
+	~/.config/gitmux
 
 uninstall:
+	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
@@ -40,4 +42,7 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/ghostty: | .config/ghostty
+	ln -sfnv $(abspath $|) $@
+
+~/.config/gitmux: | .config/gitmux
 	ln -sfnv $(abspath $|) $@
