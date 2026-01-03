@@ -18,5 +18,4 @@ macos-titlebar-proxy-icon = hidden
 title = " "
 macos-titlebar-style = "tabs"
 linux-cgroup = single-instance
-gtk-titlebar = false
 auto-update-channel = stable
