@@ -7,9 +7,11 @@ install: \
 	~/.zsh \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
-	~/.zprofile
+	~/.zprofile \
+	~/.config/tmux
 
 uninstall:
+	rm -rf ~/.config/tmux
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -27,3 +29,5 @@ uninstall:
 ~/.zprofile: | .zprofile
 	ln -sfnv $(abspath $|) $@
 
+~/.config/tmux: | .config/tmux
+	ln -sfnv $(abspath $|) $@
