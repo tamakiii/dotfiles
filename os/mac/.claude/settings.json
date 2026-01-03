@@ -1,11 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(git:*)",
-      "Bash(make:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)"
-    ],
+    "allow": [],
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
