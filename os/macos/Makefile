@@ -8,9 +8,11 @@ install: \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.zprofile \
-	~/.config/tmux
+	~/.config/tmux \
+	~/.config/helix
 
 uninstall:
+	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
@@ -30,4 +32,7 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/tmux: | .config/tmux
+	ln -sfnv $(abspath $|) $@
+
+~/.config/helix: | .config/helix
 	ln -sfnv $(abspath $|) $@
