@@ -70,4 +70,4 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
-	ln -sfnv $(abspath $|) $@
+	cp "$|" "$@"
