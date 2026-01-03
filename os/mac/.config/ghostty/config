@@ -9,6 +9,9 @@ font-thicken = true
 font-thicken-strength = 0
 alpha-blending = native
 
+cursor-style = block
+cursor-style-blink = true
+
 click-repeat-interval = 500
 shell-integration = none
 macos-titlebar-proxy-icon = hidden
