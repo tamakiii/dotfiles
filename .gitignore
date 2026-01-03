@@ -1,0 +1,10 @@
+**/.claude/debug/
+**/.claude/file-history/
+**/.claude/projects/
+**/.claude/plans/
+**/.claude/shell-snapshots/
+**/.claude/statsig/
+**/.claude/todos/
+**/.claude/ide/
+**/.claude/history.jsonl
+**/.claude/stats-cache.json
