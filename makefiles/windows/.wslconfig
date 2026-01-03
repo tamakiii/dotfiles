@@ -1,6 +1,0 @@
-[wsl2]
-memory=75% # Set this to a percentage or a fixed amount like "8GB"
-processors=6 # Set the number of CPU cores WSL can use
-gpu=true # Enables GPU support for WSL (only if GPU compute support is available)
-swap=8GB # Enables swap space, useful for heavy memory loads
-localhostForwarding=true # Allows WSL to use Windows’ network stack for better networking performance
