@@ -15,9 +15,11 @@ install: \
 	~/.config/ghostty \
 	~/.config/gitmux \
 	~/.config/git \
-	~/.config/claude
+	~/.config/claude \
+	~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 uninstall:
+	rm -rf ~/Library/Application\ Support/Claude/claude_desktop_config.json
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
@@ -65,4 +67,7 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude.json: | .claude.json
+	ln -sfnv $(abspath $|) $@
+
+~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
 	ln -sfnv $(abspath $|) $@
