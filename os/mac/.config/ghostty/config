@@ -4,6 +4,11 @@ font-family = "Monaco"
 font-family = "PT Mono"
 font-family = "Noto Color Emoji"
 
+font-feature = -calt, -liga, -dlig
+font-thicken = true
+font-thicken-strength = 0
+alpha-blending = native
+
 click-repeat-interval = 500
 shell-integration = none
 macos-titlebar-proxy-icon = hidden
