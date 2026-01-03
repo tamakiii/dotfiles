@@ -1,3 +1,4 @@
+**/.claude.json
 **/.claude/debug/
 **/.claude/file-history/
 **/.claude/projects/
@@ -10,3 +11,5 @@
 **/.claude/telemetry/
 **/.claude/history.jsonl
 **/.claude/stats-cache.json
+**/.claude/plugins/known_marketplaces.json
+**/.claude/plugins/marketplaces/
