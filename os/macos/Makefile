@@ -11,9 +11,11 @@ install: \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
-	~/.config/gitmux
+	~/.config/gitmux \
+	~/.config/git
 
 uninstall:
+	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
@@ -45,4 +47,7 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/gitmux: | .config/gitmux
+	ln -sfnv $(abspath $|) $@
+
+~/.config/git: | .config/git
 	ln -sfnv $(abspath $|) $@
