@@ -8,18 +8,24 @@ install: \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.zprofile \
+	~/.claude \
+	~/.claude.json \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
 	~/.config/gitmux \
-	~/.config/git
+	~/.config/git \
+	~/.config/claude
 
 uninstall:
+	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
+	rm -rf ~/.claude.json
+	rm -rf ~/.claude
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -50,4 +56,13 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/git: | .config/git
+	ln -sfnv $(abspath $|) $@
+
+~/.config/claude: | .config/claude
+	ln -sfnv $(abspath $|) $@
+
+~/.claude: | .claude
+	ln -sfnv $(abspath $|) $@
+
+~/.claude.json: | .claude.json
 	ln -sfnv $(abspath $|) $@
