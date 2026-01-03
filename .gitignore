@@ -6,5 +6,7 @@
 **/.claude/statsig/
 **/.claude/todos/
 **/.claude/ide/
+**/.claude/session-env/
+**/.claude/telemetry/
 **/.claude/history.jsonl
 **/.claude/stats-cache.json

@@ -1,5 +1,4 @@
 .DS_Store
 nohup.out
-local.duckdb
-CLAUDE.local.md
-.claude.local/
+*.local.json
+*.local/
