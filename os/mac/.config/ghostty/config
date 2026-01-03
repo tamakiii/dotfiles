@@ -10,7 +10,7 @@ font-thicken-strength = 0
 alpha-blending = native
 
 cursor-style = block
-cursor-style-blink = true
+cursor-style-blink = false
 
 click-repeat-interval = 500
 shell-integration = none
