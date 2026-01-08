@@ -53,10 +53,6 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 
 ### Light
 
-```
-─ │ ┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼
-```
-
 | Char | Description |
 |------|-------------|
 | ─ | horizontal |
@@ -72,10 +68,6 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 | ┼ | cross |
 
 ### Heavy
-
-```
-━ ┃ ┏ ┓ ┗ ┛ ┣ ┫ ┳ ┻ ╋
-```
 
 | Char | Description |
 |------|-------------|
@@ -93,10 +85,6 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 
 ### Double
 
-```
-═ ║ ╔ ╗ ╚ ╝ ╠ ╣ ╦ ╩ ╬
-```
-
 | Char | Description |
 |------|-------------|
 | ═ | horizontal |
@@ -113,10 +101,6 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 
 ### Rounded
 
-```
-╭ ╮ ╰ ╯
-```
-
 | Char | Description |
 |------|-------------|
 | ╭ | top-left corner |
@@ -125,10 +109,6 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 | ╯ | bottom-right corner |
 
 ### Dashed
-
-```
-┄ ┆ ┈ ┊ ╌ ╎
-```
 
 | Char | Description |
 |------|-------------|
