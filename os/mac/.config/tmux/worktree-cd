@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+err() {
+  printf 'tmux-worktree-cd: %s\n' "$*" >&2
+}
+
+if [[ -z "${TMUX:-}" ]]; then
+  err "must be run inside tmux"
+  exit 1
+fi
+
+current_path=$(tmux display -p -F "#{pane_current_path}")
+current_path=${current_path:-$PWD}
+
+if ! repo_root=$(git -C "$current_path" rev-parse --show-toplevel 2>/dev/null); then
+  err "not inside a git repository"
+  exit 1
+fi
+
+worktree_choices=$(git -C "$repo_root" worktree list --porcelain | awk '
+  BEGIN { RS=""; FS="\n" }
+  {
+    path=""; branch=""; head=""; detached=0
+    for (i=1; i<=NF; i++) {
+      line=$i
+      space=index(line, " ")
+      if (space > 0) {
+        key=substr(line, 1, space-1)
+        val=substr(line, space+1)
+      } else {
+        key=line
+        val=""
+      }
+      if (key=="worktree") {
+        path=val
+      } else if (key=="branch") {
+        branch=val
+      } else if (key=="HEAD") {
+        head=val
+      } else if (key=="detached") {
+        detached=1
+      }
+    }
+    gsub("^refs/heads/", "", branch)
+    label=branch
+    if (label=="" && detached) {
+      label="detached"
+    } else if (label=="") {
+      label=head
+    }
+    print path "\t" label
+  }
+')
+
+if [[ -z "$worktree_choices" ]]; then
+  err "no worktrees found"
+  exit 1
+fi
+
+if command -v fzf >/dev/null 2>&1; then
+  selection=$(printf "%s\n" "$worktree_choices" | fzf --delimiter=$'\t' --with-nth=2,1 --select-1 --exit-0 --prompt='worktree> ')
+else
+  selection=$(printf "%s\n" "$worktree_choices" | head -n 1)
+fi
+
+if [[ -z "$selection" ]]; then
+  exit 0
+fi
+
+target_path=${selection%%$'\t'*}
+
+if [[ ! -d "$target_path" ]]; then
+  err "selected path does not exist: $target_path"
+  exit 1
+fi
+
+window_id=$(tmux display -p "#{window_id}")
+tmux set-window-option -t "$window_id" default-path "$target_path"
+
+escaped_path=$(printf "%q" "$target_path")
+
+tmux list-panes -t "$window_id" -F "#{pane_id} #{pane_current_command}" | while read -r pane_id pane_cmd; do
+  case "$pane_cmd" in
+    ""|zsh|bash|sh|fish|dash)
+      tmux send-keys -t "$pane_id" "cd -- $escaped_path" C-m
+      ;;
+  esac
+done
+
+tmux display-message "Switched window to $target_path"
