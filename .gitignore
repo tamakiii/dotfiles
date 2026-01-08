@@ -16,3 +16,4 @@
 **/.claude/chrome/
 **/.claude/plugins/installed_plugins.json
 **/.claude/plugins/installed_plugins_v2.json
+**/.claude/cache/
