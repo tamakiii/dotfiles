@@ -7,9 +7,9 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 ### Light
 
 ```
-┌────────┐
-│        │
-├───┬────┤
+┌───┬────┐
+│   │    │
+├───┼────┤
 │   │    │
 ├───┼────┤
 │   │    │
@@ -19,9 +19,9 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 ### Heavy
 
 ```
-┏━━━━━━━━┓
-┃        ┃
-┣━━━┳━━━━┫
+┏━━━┳━━━━┓
+┃   ┃    ┃
+┣━━━╋━━━━┫
 ┃   ┃    ┃
 ┣━━━╋━━━━┫
 ┃   ┃    ┃
@@ -31,9 +31,9 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 ### Double
 
 ```
-╔════════╗
-║        ║
-╠═══╦════╣
+╔═══╦════╗
+║   ║    ║
+╠═══╬════╣
 ║   ║    ║
 ╠═══╬════╣
 ║   ║    ║
