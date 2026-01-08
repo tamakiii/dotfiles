@@ -18,6 +18,7 @@ paths=(
   "/opt/homebrew/bin"
   "/Applications/Xcode.app/Contents/Developer/usr/bin"
   "/usr/local/sbin"
+  "$HOME/.local/bin"
 )
 
 NEW="${paths[1]}" && paths=("${paths[@]:1}")
