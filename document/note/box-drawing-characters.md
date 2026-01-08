@@ -49,6 +49,15 @@ Unicode box-drawing characters for diagrams, tables, and TUI layouts.
 ╰────────╯
 ```
 
+### Dashed
+
+```
+┌┄┄┄┄┄┄┄┄┐
+┆        ┆
+┆        ┆
+└┄┄┄┄┄┄┄┄┘
+```
+
 ## Characters
 
 ### Light
