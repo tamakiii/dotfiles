@@ -1,80 +1,80 @@
 # Box-drawing characters
 
-## Example
+## Templates
+
+### Light
 
 ```
-┌─┬──┐
-│ │  │
-├─┴──┤
-│    │
-├─┬──┤
-└─┴──┘
+┌────────┐
+│        │
+├───┬────┤
+│   │    │
+├───┼────┤
+│   │    │
+└───┴────┘
 ```
 
-## Light lines
+### Heavy
 
 ```
-─  horizontal
-│  vertical
-┌  top-left corner
-┐  top-right corner
-└  bottom-left corner
-┘  bottom-right corner
-├  left tee
-┤  right tee
-┬  top tee
-┴  bottom tee
-┼  cross
+┏━━━━━━━━┓
+┃        ┃
+┣━━━┳━━━━┫
+┃   ┃    ┃
+┣━━━╋━━━━┫
+┃   ┃    ┃
+┗━━━┻━━━━┛
 ```
 
-## Heavy lines
+### Double
 
 ```
-━  horizontal
-┃  vertical
-┏  top-left corner
-┓  top-right corner
-┗  bottom-left corner
-┛  bottom-right corner
-┣  left tee
-┫  right tee
-┳  top tee
-┻  bottom tee
-╋  cross
+╔════════╗
+║        ║
+╠═══╦════╣
+║   ║    ║
+╠═══╬════╣
+║   ║    ║
+╚═══╩════╝
 ```
 
-## Double lines
+### Rounded
 
 ```
-═  horizontal
-║  vertical
-╔  top-left corner
-╗  top-right corner
-╚  bottom-left corner
-╝  bottom-right corner
-╠  left tee
-╣  right tee
-╦  top tee
-╩  bottom tee
-╬  cross
+╭────────╮
+│        │
+│        │
+╰────────╯
 ```
 
-## Rounded corners
+## Characters
+
+### Light
 
 ```
-╭  top-left
-╮  top-right
-╰  bottom-left
-╯  bottom-right
+─ │ ┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼
 ```
 
-## Dashed lines
+### Heavy
 
 ```
-┄  light triple dash horizontal
-┆  light triple dash vertical
-┈  light quadruple dash horizontal
-┊  light quadruple dash vertical
-╌  light double dash horizontal
-╎  light double dash vertical
+━ ┃ ┏ ┓ ┗ ┛ ┣ ┫ ┳ ┻ ╋
+```
+
+### Double
+
+```
+═ ║ ╔ ╗ ╚ ╝ ╠ ╣ ╦ ╩ ╬
+```
+
+### Rounded
+
+```
+╭ ╮ ╰ ╯
+```
+
+### Dashed
+
+```
+┄ ┆ ┈ ┊ ╌ ╎
 ```
