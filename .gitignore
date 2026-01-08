@@ -13,3 +13,6 @@
 **/.claude/stats-cache.json
 **/.claude/plugins/known_marketplaces.json
 **/.claude/plugins/marketplaces/
+**/.claude/chrome/
+**/.claude/plugins/installed_plugins.json
+**/.claude/plugins/installed_plugins_v2.json
