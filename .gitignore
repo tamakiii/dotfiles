@@ -1,11 +1,14 @@
 **/.claude.json
 **/.claude/cache/
+**/.claude/chrome/
 **/.claude/debug/
 **/.claude/file-history/
 **/.claude/projects/
 **/.claude/plans/
 **/.claude/plugins/known_marketplaces.json
 **/.claude/plugins/marketplaces/
+**/.claude/plugins/installed_plugins.json
+**/.claude/plugins/installed_plugins_v2.json
 **/.claude/shell-snapshots/
 **/.claude/statsig/
 **/.claude/todos/
