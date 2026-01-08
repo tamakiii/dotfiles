@@ -1,0 +1,102 @@
+#!/bin/bash
+set -eu
+
+# tmux-worktree-cd: Switch all panes in current tmux window to a git worktree
+#
+# Usage: tmux-worktree-cd <worktree-name-or-path>
+
+# Program-specific commands (customize as needed)
+# Format: [program]="command_template"
+# Use {path} as placeholder for the worktree path
+declare -A PROGRAM_COMMANDS=(
+    [zsh]='cd {path}'
+    [bash]='cd {path}'
+    [fish]='cd {path}'
+    [sh]='cd {path}'
+    [hx]=$'\e:cd {path}\n'
+    [claude]='/cd {path}'
+)
+
+usage() {
+    echo "Usage: tmux-worktree-cd <worktree-name-or-path>"
+    echo ""
+    echo "Switches all panes in the current tmux window to the specified git worktree."
+    echo ""
+    echo "Arguments:"
+    echo "  worktree-name-or-path  Name or path of the worktree to switch to"
+    echo ""
+    echo "Examples:"
+    echo "  tmux-worktree-cd feature-branch"
+    echo "  tmux-worktree-cd /path/to/worktree"
+    exit 1
+}
+
+error() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+# Check if running inside tmux
+if [[ -z "${TMUX:-}" ]]; then
+    error "Not running inside tmux"
+fi
+
+# Check arguments
+if [[ $# -lt 1 ]]; then
+    usage
+fi
+
+worktree_arg="$1"
+worktree_path=""
+
+# Resolve worktree path
+if [[ -d "$worktree_arg" ]]; then
+    # Argument is an existing directory path
+    worktree_path="$(cd "$worktree_arg" && pwd)"
+else
+    # Search in git worktree list
+    while IFS= read -r line; do
+        wt_path="${line%% *}"
+        wt_name="$(basename "$wt_path")"
+
+        # Match by name or path suffix
+        if [[ "$wt_name" == "$worktree_arg" ]] || [[ "$wt_path" == *"$worktree_arg" ]]; then
+            worktree_path="$wt_path"
+            break
+        fi
+    done < <(git worktree list 2>/dev/null || true)
+fi
+
+if [[ -z "$worktree_path" ]]; then
+    error "Worktree not found: $worktree_arg"
+fi
+
+if [[ ! -d "$worktree_path" ]]; then
+    error "Worktree path does not exist: $worktree_path"
+fi
+
+echo "Switching to worktree: $worktree_path"
+
+# Get current window's panes
+current_window=$(tmux display-message -p '#{window_id}')
+panes=$(tmux list-panes -t "$current_window" -F '#{pane_id}')
+
+# Send cd command to each pane
+for pane in $panes; do
+    # Get the current command running in this pane
+    pane_cmd=$(tmux display-message -p -t "$pane" '#{pane_current_command}')
+
+    # Look up the command template for this program
+    if [[ -v "PROGRAM_COMMANDS[$pane_cmd]" ]]; then
+        cmd_template="${PROGRAM_COMMANDS[$pane_cmd]}"
+        cmd="${cmd_template//\{path\}/$worktree_path}"
+
+        # Send the command
+        tmux send-keys -t "$pane" "$cmd" Enter
+        echo "  Pane $pane ($pane_cmd): sent command"
+    else
+        echo "  Pane $pane ($pane_cmd): skipped (no mapping)"
+    fi
+done
+
+echo "Done."
