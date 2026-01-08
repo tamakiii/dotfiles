@@ -1,0 +1,35 @@
+#!/bin/bash
+set -eu
+
+file="${1:-}"
+
+if [[ -z "$file" ]]; then
+  echo "Usage: $(basename "$0") <theme-file>" >&2
+  exit 1
+fi
+
+hex_to_rgb() {
+  local hex="${1#\#}"
+  printf "%d %d %d" "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"
+}
+
+print_color() {
+  local label="$1" hex="$2"
+  read -r r g b <<< "$(hex_to_rgb "$hex")"
+  printf "\033[48;2;%d;%d;%dm    \033[0m %s %s\n" "$r" "$g" "$b" "$hex" "$label"
+}
+
+while IFS= read -r line; do
+  [[ -z "$line" ]] && continue
+
+  if [[ "$line" =~ ^([a-z-]+)\ *=\ *(.+)$ ]]; then
+    key="${BASH_REMATCH[1]}"
+    value="${BASH_REMATCH[2]}"
+
+    if [[ "$key" == "palette" && "$value" =~ ^([0-9]+)=(.+)$ ]]; then
+      print_color "palette ${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
+    else
+      print_color "$key" "$value"
+    fi
+  fi
+done < "$file"
