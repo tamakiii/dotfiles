@@ -16,10 +16,10 @@ install: \
 	~/.config/gitmux \
 	~/.config/git \
 	~/.config/claude \
-	~/Library/Application\ Support/Claude/claude_desktop_config.json
+	~/.config/hypr
 
 uninstall:
-	rm -rf ~/Library/Application\ Support/Claude/claude_desktop_config.json
+	rm -rf ~/.config/hypr
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
@@ -69,5 +69,5 @@ uninstall:
 ~/.claude.json: | .claude.json
 	ln -sfnv $(abspath $|) $@
 
-~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
-	cp "$|" "$@"
+~/.config/hypr: | .config/hypr
+	ln -sfnv $(abspath $|) $@

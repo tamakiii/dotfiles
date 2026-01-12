@@ -1,27 +1,54 @@
-export LANG="en_US.UTF-8"
-export LANGUAGE="en_US"
+# Environment-specific profile configuration template
+# This file contains machine/environment-specific settings that are generated
+# during dotfiles installation. The actual values come from environment variables
+# or keychain entries to keep sensitive information out of version control.
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
+# PATH configuration
+# Prioritized paths for development tools and utilities
+# Order matters: earlier entries take precedence
 paths=(
-  "/opt/homebrew/opt/make/libexec/gnubin"
-  "/opt/homebrew/opt/coreutils/libexec/gnubin"
-  "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
-  "/opt/homebrew/opt/grep/libexec/gnubin"
-  "/opt/homebrew/opt/findutils/libexec/gnubin"
-  "/opt/homebrew/opt/util-linux/bin"
-  "/opt/homebrew/opt/util-linux/sbin"
-  "/opt/homebrew/opt/llvm/bin"
-  "/opt/homebrew/opt/binutils/bin"
-  "/opt/homebrew/opt/node/bin"
-  "/opt/homebrew/opt/go/bin"
-  "/opt/homebrew/bin"
-  "/Applications/Xcode.app/Contents/Developer/usr/bin"
-  "/usr/local/sbin"
+    # Local project binaries
+    "bin"
+    ".venv/bin"
+
+    # Dotfiles-specific tools
+    "$HOME/.dotfiles/bin"
+    "$HOME/.dotfiles/node_modules/.bin"
+
+    # Dotcommands-specific tools
+    "$HOME/.dotcommands/bin"
+    "$HOME/.dotcommands/command/bin"
+
+    # Python virtual environment
+    "$HOME/.venv/bin"
+
+    # User-specific binaries
+    "$HOME/.opencode/bin"
+    "$HOME/.local/bin"
+    "$HOME/go/bin"
+    "$HOME/.cargo/bin"
+
+    # System-wide binaries
+    "/usr/local/bin"
+    "/usr/bin"
+    "/bin"
 )
 
+# Build PATH from array
+# Loop through each path and prepend to create final PATH
 NEW="${paths[1]}" && paths=("${paths[@]:1}")
 for p in "${paths[@]}"; do
-  NEW="$NEW:$p"
+    NEW="$NEW:$p"
 done
 PATH="$NEW:$PATH"
+
+# Optional: Environment-specific customizations
+# Uncomment and modify as needed for specific environments
+# export CUSTOM_ENV_VAR="${CUSTOM_ENV_VAR:-default_value}"
+# export DEVELOPMENT_MODE="${DEVELOPMENT_MODE:-false}"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Aliases
+alias hx=helix
