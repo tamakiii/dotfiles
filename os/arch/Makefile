@@ -16,9 +16,13 @@ install: \
 	~/.config/gitmux \
 	~/.config/git \
 	~/.config/claude \
-	~/.config/hypr
+	~/.config/hypr \
+	~/.local/share/applications/steam.desktop \
+	~/.local/share/applications/discord.desktop
 
 uninstall:
+	rm -f ~/.local/share/applications/discord.desktop
+	rm -f ~/.local/share/applications/steam.desktop
 	rm -rf ~/.config/hypr
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
@@ -71,3 +75,12 @@ uninstall:
 
 ~/.config/hypr: | .config/hypr
 	ln -sfnv $(abspath $|) $@
+
+~/.local/share/applications:
+	mkdir -p $@
+
+~/.local/share/applications/steam.desktop: ~/.local/share/applications | .local/share/applications/steam.desktop
+	ln -sfnv $(abspath $(word 2,$^)) $@
+
+~/.local/share/applications/discord.desktop: ~/.local/share/applications | .local/share/applications/discord.desktop
+	ln -sfnv $(abspath $(word 2,$^)) $@
