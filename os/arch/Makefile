@@ -9,7 +9,6 @@ install: \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
-	~/.claude.json \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -30,7 +29,6 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
-	rm -rf ~/.claude.json
 	rm -rf ~/.claude
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
@@ -68,9 +66,6 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude: | .claude
-	ln -sfnv $(abspath $|) $@
-
-~/.claude.json: | .claude.json
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
