@@ -10,3 +10,5 @@
 **/.claude/telemetry/
 **/.claude/history.jsonl
 **/.claude/stats-cache.json
+**/.claude/.credentials.json
+**/.claude.json
