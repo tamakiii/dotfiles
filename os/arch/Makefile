@@ -16,12 +16,14 @@ install: \
 	~/.config/git \
 	~/.config/claude \
 	~/.config/hypr \
+	~/.config/waybar \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
 
 uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
+	rm -rf ~/.config/waybar
 	rm -rf ~/.config/hypr
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
@@ -69,6 +71,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
+	ln -sfnv $(abspath $|) $@
+
+~/.config/waybar: | .config/waybar
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/share/applications:
