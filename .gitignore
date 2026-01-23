@@ -19,5 +19,9 @@
 **/.claude/history.jsonl
 **/.claude/stats-cache.json
 **/.claude/paste-cache/
+**/.claude/cache/
+**/.claude/cache/changelog.md
+**/.claude/plugins/known_marketplaces.json
+**/.claude/paste-cache/
 **/.claude.json
 **/.claude/.credentials.json
