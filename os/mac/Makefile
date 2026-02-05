@@ -9,6 +9,7 @@ install: \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
+	~/.claude/mcp.json \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -62,6 +63,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude: | .claude
+	ln -sfnv $(abspath $|) $@
+
+~/.claude/mcp.json: | .config/claude/mcp.json
 	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
