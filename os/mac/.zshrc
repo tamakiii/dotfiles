@@ -8,8 +8,12 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
-PROMPT="$(echo -e '\U1F9F8') %M:%c
+if command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+else
+  PROMPT="$(echo -e '\U1F9F8') %M:%c
 $ "
+fi
 
 autoload colors
 colors
@@ -23,10 +27,11 @@ setopt share_history
 setopt hist_reduce_blanks
 setopt hist_ignore_all_dups
 
-function fzf-history() {
-  BUFFER=$(history -n 1 | fzf --exact --no-sort +m --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort --query "$LBUFFER")
-  CURSOR=$#BUFFER
-}
+export FZF_DEFAULT_OPTS="
+  --preview 'bat --color=always --style=numbers --line-range=:500 {} 2>/dev/null || echo {}'
+  --bind='ctrl-/:toggle-preview'
+"
+export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {} 2>/dev/null || echo {}'"
+export FZF_ALT_C_OPTS="--preview 'ls -1 {}'"
 
-zle -N fzf-history
-bindkey '^r' fzf-history
+source <(fzf --zsh 2>/dev/null) || true

@@ -19,11 +19,13 @@ install: \
 	~/.config/ghostty \
 	~/.config/gitmux \
 	~/.config/git \
+	~/.config/starship.toml \
 	~/.config/claude \
 	~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 uninstall:
 	rm -rf ~/Library/Application\ Support/Claude/claude_desktop_config.json
+	rm -rf ~/.config/starship.toml
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
@@ -74,6 +76,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/git: | .config/git
+	ln -sfnv $(abspath $|) $@
+
+~/.config/starship.toml: | .config/starship.toml
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/claude: | .config/claude
