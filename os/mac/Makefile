@@ -66,8 +66,13 @@ uninstall:
 ~/.claude: | .claude
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/github-mcp-headers: | bin/github-mcp-headers
-	mkdir -p $(dir $@)
+~/.local:
+	mkdir -p $@
+
+~/.local/bin: ~/.local
+	mkdir -p $@
+
+~/.local/bin/github-mcp-headers: ~/.local/bin | bin/github-mcp-headers
 	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
