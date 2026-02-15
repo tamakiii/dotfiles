@@ -19,3 +19,4 @@
 **/.claude/history.jsonl
 **/.claude/stats-cache.json
 **/.claude/paste-cache/
+.venv/

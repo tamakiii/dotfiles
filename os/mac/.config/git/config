@@ -1,0 +1,30 @@
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	lg = log --oneline --graph --decorate
+	di = diff
+	unstage = reset HEAD --
+	last = log -1 HEAD
+
+[pull]
+	rebase = true
+
+[push]
+	autoSetupRemote = true
+
+[init]
+	defaultBranch = main
+
+[diff]
+	algorithm = histogram
+
+[merge]
+	conflictstyle = zdiff3
+
+[fetch]
+	prune = true
+
+[rerere]
+	enabled = true
