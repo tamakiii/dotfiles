@@ -21,16 +21,12 @@ colors
 autoload -Uz compinit
 compinit
 
-autoload history-search-end
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
 setopt share_history
 setopt hist_reduce_blanks
 setopt hist_ignore_all_dups
 
-export FZF_DEFAULT_OPTS="
-  --preview 'bat --color=always --style=numbers --line-range=:500 {} 2>/dev/null || echo {}'
-  --bind='ctrl-/:toggle-preview'
-"
+export FZF_DEFAULT_OPTS="--bind='ctrl-/:toggle-preview'"
 export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {} 2>/dev/null || echo {}'"
 export FZF_ALT_C_OPTS="--preview 'ls -1 {}'"
 

@@ -3,6 +3,7 @@ export LANGUAGE="en_US"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+typeset -U path
 path=(
   "$HOME/.local/bin"
   /opt/homebrew/opt/make/libexec/gnubin

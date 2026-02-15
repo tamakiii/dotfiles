@@ -35,6 +35,8 @@ uninstall:
 	rm -rf ~/.local/bin/github-mcp-headers
 	rm -rf ~/.claude
 	rm -rf ~/.ssh/config
+	rm -rf ~/.ssh/sockets
+	rm -rf ~/.ssh/config.d
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh

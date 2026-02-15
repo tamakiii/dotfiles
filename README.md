@@ -10,8 +10,9 @@ Personal dotfiles managed with Make and symlinks.
 
 ### Optional tools
 
-- [git-delta](https://github.com/dandavison/delta) - better git diffs (`brew install git-delta`)
 - [fzf](https://github.com/junegunn/fzf) - fuzzy finder (`brew install fzf`)
+- [bat](https://github.com/sharkdp/bat) - cat with syntax highlighting (`brew install bat`)
+- [Starship](https://starship.rs) - cross-shell prompt (`brew install starship`)
 - [gitmux](https://github.com/arl/gitmux) - git status in tmux (`brew install gitmux`)
 - [Helix](https://helix-editor.com) - text editor (`brew install helix`)
 - [Ghostty](https://ghostty.org) - terminal emulator
