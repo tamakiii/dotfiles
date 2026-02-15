@@ -37,7 +37,7 @@ uninstall:
 	mkdir $@
 
 ~/.zsh/antigen.zsh:
-	curl -L git.io/antigen > $@
+	curl -fsSL https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > $@
 
 ~/.zshrc: | .zshrc
 	ln -sfnv $(abspath $|) $@
