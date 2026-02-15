@@ -3,6 +3,9 @@
 **/.claude/file-history/
 **/.claude/projects/
 **/.claude/plans/
+**/.claude/plugins/cache/
+**/.claude/plugins/install-counts-cache.json
+**/.claude/plugins/installed_plugins.json
 **/.claude/plugins/known_marketplaces.json
 **/.claude/plugins/marketplaces/
 **/.claude/shell-snapshots/
