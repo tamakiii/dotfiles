@@ -5,7 +5,7 @@ help:
 
 install: \
 	~/.zsh \
-	~/.zsh/antigen.zsh \
+	~/.zsh/plugins \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
@@ -30,14 +30,13 @@ uninstall:
 	rm -rf ~/.claude
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
-	rm -rf ~/.zsh/antigen.zsh
 	rm -rf ~/.zsh
 
 ~/.zsh:
 	mkdir $@
 
-~/.zsh/antigen.zsh:
-	curl -fsSL https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > $@
+~/.zsh/plugins: ~/.zsh | .zsh/plugins
+	ln -sfnv $(abspath $|) $@
 
 ~/.zshrc: | .zshrc
 	ln -sfnv $(abspath $|) $@

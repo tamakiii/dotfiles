@@ -1,8 +1,5 @@
-source ~/.zsh/antigen.zsh
-
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen apply
+source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 umask 002
 bindkey -e
