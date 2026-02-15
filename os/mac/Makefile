@@ -6,10 +6,14 @@ help:
 install: \
 	~/.zsh \
 	~/.zsh/plugins \
+	~/.zsh/aliases.zsh \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
 	~/.local/bin/github-mcp-headers \
+	~/.ssh/config \
+	~/.ssh/sockets \
+	~/.ssh/config.d \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -28,6 +32,7 @@ uninstall:
 	rm -rf ~/.config/tmux
 	rm -rf ~/.local/bin/github-mcp-headers
 	rm -rf ~/.claude
+	rm -rf ~/.ssh/config
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh
@@ -37,6 +42,18 @@ uninstall:
 
 ~/.zsh/plugins: ~/.zsh | .zsh/plugins
 	ln -sfnv $(abspath $|) $@
+
+~/.zsh/aliases.zsh: ~/.zsh | .zsh/aliases.zsh
+	ln -sfnv $(abspath $|) $@
+
+~/.ssh/config: | .ssh/config
+	ln -sfnv $(abspath $|) $@
+
+~/.ssh/sockets:
+	mkdir -p $@
+
+~/.ssh/config.d:
+	mkdir -p $@
 
 ~/.zshrc: | .zshrc
 	ln -sfnv $(abspath $|) $@
