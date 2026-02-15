@@ -9,7 +9,7 @@ install: \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
-	~/.claude.json \
+	~/.local/bin/github-mcp-headers \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -26,7 +26,7 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
-	rm -rf ~/.claude.json
+	rm -rf ~/.local/bin/github-mcp-headers
 	rm -rf ~/.claude
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
@@ -66,7 +66,13 @@ uninstall:
 ~/.claude: | .claude
 	ln -sfnv $(abspath $|) $@
 
-~/.claude.json: | .claude.json
+~/.local:
+	mkdir -p $@
+
+~/.local/bin: ~/.local
+	mkdir -p $@
+
+~/.local/bin/github-mcp-headers: ~/.local/bin | bin/github-mcp-headers
 	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json

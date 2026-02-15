@@ -1,7 +1,10 @@
+**/.claude/cache/
 **/.claude/debug/
 **/.claude/file-history/
 **/.claude/projects/
 **/.claude/plans/
+**/.claude/plugins/known_marketplaces.json
+**/.claude/plugins/marketplaces/
 **/.claude/shell-snapshots/
 **/.claude/statsig/
 **/.claude/todos/
