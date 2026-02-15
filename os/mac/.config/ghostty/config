@@ -4,11 +4,18 @@ font-family = "Monaco"
 font-family = "PT Mono"
 font-family = "Noto Color Emoji"
 
+font-feature = -calt, -liga, -dlig
+font-thicken = true
+font-thicken-strength = 0
+alpha-blending = native
+
+cursor-style = block
+cursor-style-blink = false
+
 click-repeat-interval = 500
 shell-integration = none
 macos-titlebar-proxy-icon = hidden
 title = " "
 macos-titlebar-style = "tabs"
 linux-cgroup = single-instance
-gtk-titlebar = false
 auto-update-channel = stable
