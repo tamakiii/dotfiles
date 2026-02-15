@@ -4,21 +4,6 @@
 
 [core]
 	editor = hx
-	pager = delta
-
-[interactive]
-	diffFilter = delta --color-only
-
-[delta]
-	navigate = true
-	line-numbers = true
-	side-by-side = true
-
-[merge]
-	conflictstyle = diff3
-
-[diff]
-	colorMoved = default
 
 [alias]
 	st = status -sb
