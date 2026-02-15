@@ -17,5 +17,4 @@ shell-integration = none
 macos-titlebar-proxy-icon = hidden
 title = " "
 macos-titlebar-style = "tabs"
-linux-cgroup = single-instance
 auto-update-channel = stable

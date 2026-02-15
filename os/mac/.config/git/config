@@ -1,0 +1,20 @@
+[pull]
+	rebase = true
+
+[push]
+	autoSetupRemote = true
+
+[init]
+	defaultBranch = main
+
+[diff]
+	algorithm = histogram
+
+[merge]
+	conflictstyle = zdiff3
+
+[fetch]
+	prune = true
+
+[rerere]
+	enabled = true

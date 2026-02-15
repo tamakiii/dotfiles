@@ -1,5 +1,7 @@
 export LANG="en_US.UTF-8"
 export LANGUAGE="en_US"
+export EDITOR=hx
+export VISUAL=hx
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
