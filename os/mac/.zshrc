@@ -1,5 +1,5 @@
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 umask 022
 bindkey -e
@@ -20,8 +20,5 @@ setopt inc_append_history
 setopt hist_no_store
 setopt hist_reduce_blanks
 setopt hist_ignore_all_dups
-
-alias cat="bat --paging=never"
-alias grep="rg"
 
 source <(fzf --zsh)
