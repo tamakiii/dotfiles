@@ -1,0 +1,5 @@
+#!/bin/bash
+set -eu
+
+hex="${1#\#}"
+printf "\033[48;2;%d;%d;%dm    \033[0m #%s\n" "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}" "$hex"
