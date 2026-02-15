@@ -10,6 +10,8 @@
 **/.claude/plugins/marketplaces/
 **/.claude/shell-snapshots/
 **/.claude/statsig/
+**/.claude/tasks/
+**/.claude/teams/
 **/.claude/todos/
 **/.claude/ide/
 **/.claude/session-env/
