@@ -4,6 +4,7 @@ export LANGUAGE="en_US"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 paths=(
+  "$HOME/.local/bin"
   "/opt/homebrew/opt/make/libexec/gnubin"
   "/opt/homebrew/opt/coreutils/libexec/gnubin"
   "/opt/homebrew/opt/gnu-sed/libexec/gnubin"

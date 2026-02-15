@@ -3,7 +3,7 @@
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
-      "headersHelper": "/Users/tamakiii/.dotfiles/os/mac/bin/github-mcp-headers"
+      "headersHelper": "github-mcp-headers"
     }
   }
 }
