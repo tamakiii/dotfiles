@@ -10,6 +10,8 @@ install: \
 	~/.zprofile \
 	~/.claude \
 	~/.local/bin/github-mcp-headers \
+	~/.local/bin/gw \
+	~/.local/bin/tmux-auto-name-window \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -73,6 +75,12 @@ uninstall:
 	mkdir -p $@
 
 ~/.local/bin/github-mcp-headers: ~/.local/bin | bin/github-mcp-headers
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gw: ~/.local/bin | bin/gw
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-auto-name-window: ~/.local/bin | bin/tmux-auto-name-window
 	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
