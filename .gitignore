@@ -19,3 +19,5 @@
 **/.claude/history.jsonl
 **/.claude/stats-cache.json
 **/.claude/paste-cache/
+**/.claude.json
+**/.claude/.credentials.json
