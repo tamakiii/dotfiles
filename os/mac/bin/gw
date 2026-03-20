@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+
+usage() {
+  echo "Usage: gw <org/repo> [workspace]" >&2
+  exit 1
+}
+
+[ $# -ge 1 ] || usage
+
+repo="$1"
+base="$HOME/Git/$repo"
+
+if [ $# -ge 2 ]; then
+  workspace="$2"
+elif [ -d "$base/main" ]; then
+  workspace="main"
+elif [ -d "$base/master" ]; then
+  workspace="master"
+else
+  echo "error: no workspace found under $base (tried main, master)" >&2
+  exit 1
+fi
+
+dir="$base/$workspace"
+session="$repo"
+
+if ! [ -d "$dir" ]; then
+  echo "error: directory does not exist: $dir" >&2
+  exit 1
+fi
+
+if ! tmux has-session -t "=$session" 2>/dev/null; then
+  tmux new-session -d -s "$session" -n "$workspace" -c "$dir"
+  tmux set-option -t "$session:$workspace" automatic-rename off
+elif ! tmux list-windows -t "=$session" -F '#W' | grep -qx "$workspace"; then
+  tmux new-window -t "$session" -n "$workspace" -c "$dir"
+  tmux set-option -t "$session:$workspace" automatic-rename off
+fi
+
+if [ -n "${TMUX:-}" ]; then
+  tmux switch-client -t "$session:$workspace"
+else
+  tmux attach-session -t "$session:$workspace"
+fi

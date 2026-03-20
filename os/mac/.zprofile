@@ -3,8 +3,12 @@ export LANGUAGE="en_US"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
++# bun completions
++[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
 paths=(
   "$HOME/.local/bin"
+  "$HOME/.bun/bin"
   "/opt/homebrew/opt/make/libexec/gnubin"
   "/opt/homebrew/opt/coreutils/libexec/gnubin"
   "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
