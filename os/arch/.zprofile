@@ -9,6 +9,8 @@
 paths=(
     # Local project binaries
     "bin"
+    ".local/bin"
+    "$HOME/.local/bin"
     ".venv/bin"
 
     # Dotfiles-specific tools
@@ -24,7 +26,6 @@ paths=(
 
     # User-specific binaries
     "$HOME/.opencode/bin"
-    "$HOME/.local/bin"
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
     "$HOME/.npm-global/bin"
