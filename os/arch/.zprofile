@@ -23,11 +23,11 @@ paths=(
     "$HOME/.venv/bin"
 
     # User-specific binaries
-    "$HOME/.npm-global/bin"
     "$HOME/.opencode/bin"
     "$HOME/.local/bin"
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
+    "$HOME/.npm-global/bin"
 
     # System-wide binaries
     "/usr/local/bin"
