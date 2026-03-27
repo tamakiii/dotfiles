@@ -18,14 +18,15 @@ while IFS=$'\t' read -r cmd target label; do
 
     if echo "$content" | grep -qE "Do you want to (proceed|allow)"; then
       alerts+="${RED}⚠  ${label} (${target})${RESET}"$'\n'
-      alerts+="$(echo "$content" | grep -v '^[[:space:]]*$' | grep -vE '^[─━═ ]+$' | tail -6 | sed 's/^/   /')"$'\n\n'
+      alerts+="$(echo "$content" | sed -n '/Do you want/,$ p' | grep -v '^[[:space:]]*$' | head -6 | sed 's/^/   /')"$'\n\n'
     else
       time_str=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1) || true
       if [[ -n "$time_str" ]]; then
-        summaries+="${YELLOW}●${RESET}  ${label} (${target})  ${DIM}${time_str}${RESET}"$'\n'
+        printf -v line "${YELLOW}●${RESET}  %-50s ${DIM}%s${RESET}\n" "$label ($target)" "$time_str"
       else
-        summaries+="${DIM}○  ${label} (${target})${RESET}"$'\n'
+        printf -v line "${DIM}○  %s (%s)${RESET}\n" "$label" "$target"
       fi
+      summaries+="$line"
     fi
   fi
 done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}:#{window_index}.#{pane_index}	#{session_name}/#{window_name}')
