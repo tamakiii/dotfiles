@@ -20,12 +20,16 @@ install: \
 	~/.local/bin/pbpaste \
 	~/.local/bin/tmux-claude-panes \
 	~/.local/bin/tmux-claude-status \
+	~/.claude/bin/gh \
+	~/.openclaw/bin/gh \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
 
 uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
+	rm -f ~/.claude/bin/gh
+	rm -f ~/.openclaw/bin/gh
 	rm -f ~/.local/bin/tmux-claude-status
 	rm -f ~/.local/bin/tmux-claude-panes
 	rm -f ~/.local/bin/pbpaste
@@ -90,6 +94,18 @@ uninstall:
 
 ~/.local/bin/tmux-claude-status: | bin/tmux-claude-status
 	ln -sfnv $(abspath $|) $@
+
+~/.claude/bin:
+	mkdir -p $@
+
+~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
+	ln -sfnv $(abspath $(word 2,$^)) $@
+
+~/.openclaw/bin:
+	mkdir -p $@
+
+~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
+	ln -sfnv $(abspath $(word 2,$^)) $@
 
 ~/.local/share/applications:
 	mkdir -p $@

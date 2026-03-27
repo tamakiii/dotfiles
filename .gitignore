@@ -1,2 +1,3 @@
 **/.claude/*
-!**/.claude/skills
+!**/.claude/skills/
+!**/.claude/bin/
