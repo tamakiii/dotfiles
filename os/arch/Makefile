@@ -18,12 +18,16 @@ install: \
 	~/.config/hypr \
 	~/.local/bin/pbcopy \
 	~/.local/bin/pbpaste \
+	~/.local/bin/tmux-claude-panes \
+	~/.local/bin/tmux-claude-dashboard \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
 
 uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
+	rm -f ~/.local/bin/tmux-claude-dashboard
+	rm -f ~/.local/bin/tmux-claude-panes
 	rm -f ~/.local/bin/pbpaste
 	rm -f ~/.local/bin/pbcopy
 	rm -rf ~/.config/hypr
@@ -79,6 +83,12 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/pbpaste: | bin/pbpaste
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-dashboard: | bin/tmux-claude-dashboard
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/share/applications:

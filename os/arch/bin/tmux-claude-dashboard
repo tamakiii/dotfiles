@@ -1,0 +1,40 @@
+#!/bin/bash
+# Monitor all Claude Code panes in a single dashboard view
+# Usage: run directly or bind to a tmux key via run-shell
+
+set -euo pipefail
+
+render() {
+  while true; do
+    clear
+    found=0
+    while IFS=$'\t' read -r pid target label; do
+      if pgrep -P "$pid" -f claude >/dev/null 2>&1; then
+        printf '\e[1;34m━━━ %s (%s) ━━━\e[0m\n' "$label" "$target"
+        tmux capture-pane -t "$target" -p -S -8 | tail -8
+        echo
+        ((found++)) || true
+      fi
+    done < <(tmux list-panes -a -F '#{pane_pid}	#{session_name}:#{window_index}.#{pane_index}	#{session_name}/#{window_name}')
+
+    if [[ $found -eq 0 ]]; then
+      echo "No Claude panes found. Waiting..."
+    fi
+
+    printf '\e[2m── %s ──\e[0m' "$(date +%H:%M:%S)"
+    sleep 3
+  done
+}
+
+case "${1:-}" in
+  --render)
+    render
+    ;;
+  *)
+    if tmux list-windows -F '#{window_name}' | grep -q '^claude-dashboard$'; then
+      tmux select-window -t claude-dashboard
+    else
+      tmux new-window -n claude-dashboard "$(readlink -f "$0") --render"
+    fi
+    ;;
+esac

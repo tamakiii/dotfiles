@@ -1,0 +1,34 @@
+#!/bin/bash
+# Find and jump to tmux panes running Claude Code
+# Usage: bind to a tmux key via display-popup -E
+
+set -euo pipefail
+
+found=()
+
+while IFS=$'\t' read -r pid target label; do
+  if pgrep -P "$pid" -f claude >/dev/null 2>&1; then
+    found+=("${target}	${label}")
+  fi
+done < <(tmux list-panes -a -F '#{pane_pid}	#{session_name}:#{window_index}.#{pane_index}	#{session_name}/#{window_name}')
+
+case ${#found[@]} in
+  0)
+    echo "No Claude panes found"
+    sleep 1
+    exit 0
+    ;;
+  1)
+    tmux switch-client -t "${found[0]%%	*}"
+    ;;
+  *)
+    selected=$(printf '%s\n' "${found[@]}" | \
+      fzf --no-sort \
+        --prompt="Claude > " \
+        --delimiter=$'\t' \
+        --with-nth=2 \
+        --preview='tmux capture-pane -t {1} -p | tail -20' \
+        --preview-window=right:50%) || exit 0
+    tmux switch-client -t "${selected%%	*}"
+    ;;
+esac
