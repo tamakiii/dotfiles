@@ -67,7 +67,7 @@ while IFS=$'\t' read -r cmd session window path target; do
     bottom=$(echo "$content" | tail -10)
     if echo "$bottom" | grep -q "Do you want to" && echo "$bottom" | grep -q "Esc to cancel"; then
       header="${RED}⚠  ${session} / ${window}${RESET}${branch_str}${git_str}"
-      alert_entries+=("${target}	${header} ${DIM}— ${cmd} @ ${short_path}${RESET}")
+      alert_entries+=("${target}	${header}"$'\n'"   ${path_line}")
 
       print_alerts+="${header}"$'\n'
       print_alerts+="   ${path_line}"$'\n'
@@ -85,7 +85,7 @@ while IFS=$'\t' read -r cmd session window path target; do
       else
         header="${DIM}○  ${session} / ${window}${branch_str}${RESET}${git_str}"
       fi
-      normal_entries+=("${target}	${header} ${DIM}— ${cmd} @ ${short_path}${RESET}")
+      normal_entries+=("${target}	${header}"$'\n'"   ${path_line}")
 
       print_summaries+="${header}"$'\n'
       print_summaries+="   ${path_line}"$'\n'
@@ -103,14 +103,15 @@ case "${1:-}" in
     elif [[ ${#all[@]} -eq 1 ]]; then
       tmux switch-client -t "${all[0]%%	*}"
     else
-      selected=$(printf '%s\n' "${all[@]}" | \
-        fzf --ansi --no-sort \
+      selected=$(printf '%s\0' "${all[@]}" | \
+        fzf --read0 --ansi --no-sort \
           --prompt="Claude > " \
           --delimiter=$'\t' \
           --with-nth=2 \
           --preview='tmux capture-pane -e -t {1} -p | tail -25' \
-          --preview-window=right:50%) || exit 0
-      tmux switch-client -t "${selected%%	*}"
+          --preview-window=right:70%) || exit 0
+      target=$(head -1 <<< "$selected" | cut -f1)
+      tmux switch-client -t "$target"
     fi
     ;;
   *)
