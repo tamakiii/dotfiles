@@ -105,7 +105,7 @@ case "${1:-}" in
     else
       selected=$(printf '%s\0' "${all[@]}" | \
         fzf --read0 --ansi --no-sort --layout=reverse \
-          --prompt="Claude > " \
+          --prompt="> " \
           --delimiter=$'\t' \
           --with-nth=2 \
           --preview='tmux capture-pane -e -t {1} -p | tail -25' \
