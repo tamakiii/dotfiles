@@ -72,12 +72,15 @@ while IFS=$'\t' read -r cmd session window path target; do
       print_alerts+="   ${path_line}"$'\n'
       print_alerts+="$(echo "$content" | sed -n '/Do you want/,$ p' | grep -v '^[[:space:]]*$' | head -6 | sed 's/^/   /')"$'\n\n'
     else
-      time_str=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1) || true
-      time_part=""
-      [[ -n "$time_str" ]] && time_part="  ${DIM}${time_str}${RESET}"
+      # Active: ✽ Verb… (4m 3s · ↓ N tokens)
+      active_time=$(echo "$content" | grep -oE '\([0-9]+[hms]( [0-9]+[smh])? ·' | tail -1 | grep -oE '[0-9]+[hms]( [0-9]+[smh])?' | head -1) || true
+      # Completed: ✻ Verb for 1m 32s
+      completed_time=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1 | sed 's/^for //') || true
 
-      if [[ -n "$time_str" ]]; then
-        header="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${git_str}${time_part}"
+      if [[ -n "$active_time" ]]; then
+        header="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${git_str}  ${DIM}${active_time}${RESET}"
+      elif [[ -n "$completed_time" ]]; then
+        header="${DIM}◆${RESET}  ${session} / ${window}${branch_str}${git_str}  ${DIM}${completed_time}${RESET}"
       else
         header="${DIM}○  ${session} / ${window}${branch_str}${RESET}${git_str}"
       fi
