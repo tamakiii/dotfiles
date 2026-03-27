@@ -1,40 +1,41 @@
 #!/bin/bash
-# Monitor all Claude Code panes in a single dashboard view
-# Usage: run directly or bind to a tmux key via run-shell
+# Show status of all Claude Code panes
+# Usage: run in any pane, or bind to a tmux key
 
 set -euo pipefail
 
-render() {
-  while true; do
-    clear
-    found=0
-    while IFS=$'\t' read -r pid target label; do
-      if pgrep -P "$pid" -f claude >/dev/null 2>&1; then
-        printf '\e[1;34m━━━ %s (%s) ━━━\e[0m\n' "$label" "$target"
-        tmux capture-pane -t "$target" -p -S -8 | tail -8
-        echo
-        ((found++)) || true
-      fi
-    done < <(tmux list-panes -a -F '#{pane_pid}	#{session_name}:#{window_index}.#{pane_index}	#{session_name}/#{window_name}')
+RED=$'\033[1;31m'
+YELLOW=$'\033[1;33m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
 
-    if [[ $found -eq 0 ]]; then
-      echo "No Claude panes found. Waiting..."
-    fi
+summaries=""
+alerts=""
 
-    printf '\e[2m── %s ──\e[0m' "$(date +%H:%M:%S)"
-    sleep 3
-  done
-}
+while IFS=$'\t' read -r cmd target label; do
+  if [[ "$cmd" == "claude" ]]; then
+    content=$(tmux capture-pane -t "$target" -p -S -20)
 
-case "${1:-}" in
-  --render)
-    render
-    ;;
-  *)
-    if tmux list-windows -F '#{window_name}' | grep -q '^claude-dashboard$'; then
-      tmux select-window -t claude-dashboard
+    if echo "$content" | grep -qE "Do you want to (proceed|allow)"; then
+      alerts+="${RED}⚠  ${label} (${target})${RESET}"$'\n'
+      alerts+="$(echo "$content" | grep -v '^[[:space:]]*$' | grep -vE '^[─━═ ]+$' | tail -6 | sed 's/^/   /')"$'\n\n'
     else
-      tmux new-window -n claude-dashboard "$(readlink -f "$0") --render"
+      time_str=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1)
+      if [[ -n "$time_str" ]]; then
+        summaries+="${YELLOW}●${RESET}  ${label} (${target})  ${DIM}${time_str}${RESET}"$'\n'
+      else
+        summaries+="${DIM}○  ${label} (${target})${RESET}"$'\n'
+      fi
     fi
-    ;;
-esac
+  fi
+done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}:#{window_index}.#{pane_index}	#{session_name}/#{window_name}')
+
+if [[ -z "$summaries" && -z "$alerts" ]]; then
+  echo "No Claude panes found."
+else
+  [[ -n "$summaries" ]] && printf '%s' "$summaries"
+  if [[ -n "$alerts" ]]; then
+    [[ -n "$summaries" ]] && echo
+    printf '%s' "$alerts"
+  fi
+fi
