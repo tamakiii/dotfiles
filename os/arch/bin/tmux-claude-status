@@ -5,9 +5,43 @@
 set -euo pipefail
 
 RED=$'\033[1;31m'
+GREEN=$'\033[1;32m'
 YELLOW=$'\033[1;33m'
+MAGENTA=$'\033[1;35m'
 DIM=$'\033[2m'
 RESET=$'\033[0m'
+
+git_status() {
+  local path="$1"
+  local staged=0 modified=0 untracked=0
+  local parts=()
+
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    local x="${line:0:1}" y="${line:1:1}"
+    [[ "$x" =~ [MADRC] ]] && ((staged++)) || true
+    [[ "$y" =~ [MD] ]] && ((modified++)) || true
+    [[ "$x" == "?" ]] && ((untracked++)) || true
+  done < <(git -C "$path" status --porcelain 2>/dev/null)
+
+  local shortstat
+  shortstat=$(git -C "$path" diff HEAD --shortstat 2>/dev/null) || true
+  local ins del
+  ins=$(echo "$shortstat" | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+') || true
+  del=$(echo "$shortstat" | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+') || true
+
+  [[ $staged -gt 0 ]] && parts+=("${GREEN}● ${staged}${RESET}")
+  [[ $modified -gt 0 ]] && parts+=("${RED}✚ ${modified}${RESET}")
+  [[ $untracked -gt 0 ]] && parts+=("${MAGENTA}… ${untracked}${RESET}")
+  [[ -n "$ins" ]] && parts+=("${GREEN}+${ins}${RESET}")
+  [[ -n "$del" ]] && parts+=("${RED}-${del}${RESET}")
+
+  if [[ ${#parts[@]} -eq 0 ]]; then
+    echo "${GREEN}✔${RESET}"
+  else
+    echo "${parts[*]}"
+  fi
+}
 
 summaries=""
 alerts=""
@@ -17,12 +51,16 @@ while IFS=$'\t' read -r cmd session window path target; do
     short_path="${path/#$HOME/\~}"
     branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null) || true
     branch_str=""
-    [[ -n "$branch" ]] && branch_str=" ${DIM}(${branch})${RESET}"
+    git_str=""
+    if [[ -n "$branch" ]]; then
+      branch_str=" ${DIM}(${branch})${RESET}"
+      git_str=" $(git_status "$path")"
+    fi
 
     content=$(tmux capture-pane -t "$target" -p -S -20)
 
     if echo "$content" | grep -qE "Do you want to (proceed|allow)"; then
-      alerts+="${RED}⚠  ${session} / ${window}${RESET}${branch_str}"$'\n'
+      alerts+="${RED}⚠  ${session} / ${window}${RESET}${branch_str}${git_str}"$'\n'
       alerts+="   ${DIM}${cmd} @ ${short_path}${RESET}"$'\n'
       alerts+="$(echo "$content" | sed -n '/Do you want/,$ p' | grep -v '^[[:space:]]*$' | head -6 | sed 's/^/   /')"$'\n\n'
     else
@@ -31,9 +69,9 @@ while IFS=$'\t' read -r cmd session window path target; do
       [[ -n "$time_str" ]] && time_part="  ${DIM}${time_str}${RESET}"
 
       if [[ -n "$time_str" ]]; then
-        summaries+="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${time_part}"$'\n'
+        summaries+="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${git_str}${time_part}"$'\n'
       else
-        summaries+="${DIM}○  ${session} / ${window}${branch_str}${RESET}"$'\n'
+        summaries+="${DIM}○  ${session} / ${window}${branch_str}${RESET}${git_str}"$'\n'
       fi
       summaries+="   ${DIM}${cmd} @ ${short_path}${RESET}"$'\n'
     fi
