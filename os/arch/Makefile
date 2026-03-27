@@ -20,6 +20,7 @@ install: \
 	~/.local/bin/pbpaste \
 	~/.local/bin/tmux-claude-panes \
 	~/.local/bin/tmux-claude-status \
+	~/.local/bin/gh-app-token \
 	~/.claude/bin/gh \
 	~/.openclaw/bin/gh \
 	~/.local/share/applications/steam.desktop \
@@ -30,6 +31,7 @@ uninstall:
 	rm -f ~/.local/share/applications/steam.desktop
 	rm -f ~/.claude/bin/gh
 	rm -f ~/.openclaw/bin/gh
+	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/tmux-claude-status
 	rm -f ~/.local/bin/tmux-claude-panes
 	rm -f ~/.local/bin/pbpaste
@@ -90,6 +92,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gh-app-token: | bin/gh-app-token
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-claude-status: | bin/tmux-claude-status
