@@ -19,14 +19,14 @@ install: \
 	~/.local/bin/pbcopy \
 	~/.local/bin/pbpaste \
 	~/.local/bin/tmux-claude-panes \
-	~/.local/bin/tmux-claude-dashboard \
+	~/.local/bin/tmux-claude-status \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
 
 uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
-	rm -f ~/.local/bin/tmux-claude-dashboard
+	rm -f ~/.local/bin/tmux-claude-status
 	rm -f ~/.local/bin/tmux-claude-panes
 	rm -f ~/.local/bin/pbpaste
 	rm -f ~/.local/bin/pbcopy
@@ -88,7 +88,7 @@ uninstall:
 ~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-dashboard: | bin/tmux-claude-dashboard
+~/.local/bin/tmux-claude-status: | bin/tmux-claude-status
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/share/applications:
