@@ -104,7 +104,7 @@ case "${1:-}" in
       tmux switch-client -t "${all[0]%%	*}"
     else
       selected=$(printf '%s\0' "${all[@]}" | \
-        fzf --read0 --ansi --no-sort \
+        fzf --read0 --ansi --no-sort --layout=reverse \
           --prompt="Claude > " \
           --delimiter=$'\t' \
           --with-nth=2 \
