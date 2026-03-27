@@ -64,7 +64,8 @@ while IFS=$'\t' read -r cmd session window path target; do
     content=$(tmux capture-pane -t "$target" -p -S -20)
     path_line="${DIM}${cmd} @ ${short_path}${RESET}"
 
-    if echo "$content" | grep -qE "Do you want to (proceed|allow)"; then
+    bottom=$(echo "$content" | tail -10)
+    if echo "$bottom" | grep -q "Do you want to" && echo "$bottom" | grep -q "Esc to cancel"; then
       header="${RED}⚠  ${session} / ${window}${RESET}${branch_str}${git_str}"
       alert_entries+=("${target}	${header} ${DIM}— ${cmd} @ ${short_path}${RESET}")
 
