@@ -1,6 +1,7 @@
 #!/bin/bash
 # Show status of all Claude Code panes
 # Usage: run in any pane, or bind to a tmux key
+#   --select  interactive mode: pick a pane via fzf and jump to it
 
 set -euo pipefail
 
@@ -43,8 +44,11 @@ git_status() {
   fi
 }
 
-summaries=""
-alerts=""
+# Collect pane data
+normal_entries=()
+alert_entries=()
+print_summaries=""
+print_alerts=""
 
 while IFS=$'\t' read -r cmd session window path target; do
   if [[ "$cmd" == "claude" ]]; then
@@ -58,32 +62,62 @@ while IFS=$'\t' read -r cmd session window path target; do
     fi
 
     content=$(tmux capture-pane -t "$target" -p -S -20)
+    path_line="${DIM}${cmd} @ ${short_path}${RESET}"
 
     if echo "$content" | grep -qE "Do you want to (proceed|allow)"; then
-      alerts+="${RED}⚠  ${session} / ${window}${RESET}${branch_str}${git_str}"$'\n'
-      alerts+="   ${DIM}${cmd} @ ${short_path}${RESET}"$'\n'
-      alerts+="$(echo "$content" | sed -n '/Do you want/,$ p' | grep -v '^[[:space:]]*$' | head -6 | sed 's/^/   /')"$'\n\n'
+      header="${RED}⚠  ${session} / ${window}${RESET}${branch_str}${git_str}"
+      alert_entries+=("${target}	${header} ${DIM}— ${cmd} @ ${short_path}${RESET}")
+
+      print_alerts+="${header}"$'\n'
+      print_alerts+="   ${path_line}"$'\n'
+      print_alerts+="$(echo "$content" | sed -n '/Do you want/,$ p' | grep -v '^[[:space:]]*$' | head -6 | sed 's/^/   /')"$'\n\n'
     else
       time_str=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1) || true
       time_part=""
       [[ -n "$time_str" ]] && time_part="  ${DIM}${time_str}${RESET}"
 
       if [[ -n "$time_str" ]]; then
-        summaries+="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${git_str}${time_part}"$'\n'
+        header="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${git_str}${time_part}"
       else
-        summaries+="${DIM}○  ${session} / ${window}${branch_str}${RESET}${git_str}"$'\n'
+        header="${DIM}○  ${session} / ${window}${branch_str}${RESET}${git_str}"
       fi
-      summaries+="   ${DIM}${cmd} @ ${short_path}${RESET}"$'\n'
+      normal_entries+=("${target}	${header} ${DIM}— ${cmd} @ ${short_path}${RESET}")
+
+      print_summaries+="${header}"$'\n'
+      print_summaries+="   ${path_line}"$'\n'
     fi
   fi
 done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}')
 
-if [[ -z "$summaries" && -z "$alerts" ]]; then
-  echo "No Claude panes found."
-else
-  [[ -n "$summaries" ]] && printf '%s' "$summaries"
-  if [[ -n "$alerts" ]]; then
-    [[ -n "$summaries" ]] && echo
-    printf '%s' "$alerts"
-  fi
-fi
+case "${1:-}" in
+  --select)
+    all=("${alert_entries[@]}" "${normal_entries[@]}")
+    if [[ ${#all[@]} -eq 0 ]]; then
+      echo "No Claude panes found"
+      sleep 1
+      exit 0
+    elif [[ ${#all[@]} -eq 1 ]]; then
+      tmux switch-client -t "${all[0]%%	*}"
+    else
+      selected=$(printf '%s\n' "${all[@]}" | \
+        fzf --ansi --no-sort \
+          --prompt="Claude > " \
+          --delimiter=$'\t' \
+          --with-nth=2 \
+          --preview='tmux capture-pane -e -t {1} -p | tail -25' \
+          --preview-window=down:40%) || exit 0
+      tmux switch-client -t "${selected%%	*}"
+    fi
+    ;;
+  *)
+    if [[ -z "$print_summaries" && -z "$print_alerts" ]]; then
+      echo "No Claude panes found."
+    else
+      [[ -n "$print_summaries" ]] && printf '%s' "$print_summaries"
+      if [[ -n "$print_alerts" ]]; then
+        [[ -n "$print_summaries" ]] && echo
+        printf '%s' "$print_alerts"
+      fi
+    fi
+    ;;
+esac
