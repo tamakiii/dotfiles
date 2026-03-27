@@ -20,7 +20,7 @@ while IFS=$'\t' read -r cmd target label; do
       alerts+="${RED}⚠  ${label} (${target})${RESET}"$'\n'
       alerts+="$(echo "$content" | grep -v '^[[:space:]]*$' | grep -vE '^[─━═ ]+$' | tail -6 | sed 's/^/   /')"$'\n\n'
     else
-      time_str=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1)
+      time_str=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1) || true
       if [[ -n "$time_str" ]]; then
         summaries+="${YELLOW}●${RESET}  ${label} (${target})  ${DIM}${time_str}${RESET}"$'\n'
       else
