@@ -90,7 +90,7 @@ while IFS=$'\t' read -r cmd session window path target; do
       print_summaries+="   ${path_line}"$'\n'
     fi
   fi
-done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}')
+done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}' | sort -t$'\t' -k2,2)
 
 case "${1:-}" in
   --select)
@@ -108,7 +108,7 @@ case "${1:-}" in
           --delimiter=$'\t' \
           --with-nth=2 \
           --preview='tmux capture-pane -e -t {1} -p | tail -25' \
-          --preview-window=down:40%) || exit 0
+          --preview-window=right:50%) || exit 0
       tmux switch-client -t "${selected%%	*}"
     fi
     ;;
