@@ -16,14 +16,30 @@ install: \
 	~/.config/git \
 	~/.config/claude \
 	~/.config/hypr \
-	~/.config/waybar \
+	~/.local/bin/pbcopy \
+	~/.local/bin/pbpaste \
+	~/.local/bin/tmux-claude-panes \
+	~/.local/bin/tmux-claude-status \
+	~/.local/bin/tmux-claude-launch \
+	~/.local/bin/tmux-claude-send \
+	~/.local/bin/gh-app-token \
+	~/.claude/bin/gh \
+	~/.openclaw/bin/gh \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
 
 uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
-	rm -rf ~/.config/waybar
+	rm -f ~/.claude/bin/gh
+	rm -f ~/.openclaw/bin/gh
+	rm -f ~/.local/bin/gh-app-token
+	rm -f ~/.local/bin/tmux-claude-send
+	rm -f ~/.local/bin/tmux-claude-launch
+	rm -f ~/.local/bin/tmux-claude-status
+	rm -f ~/.local/bin/tmux-claude-panes
+	rm -f ~/.local/bin/pbpaste
+	rm -f ~/.local/bin/pbcopy
 	rm -rf ~/.config/hypr
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
@@ -73,8 +89,38 @@ uninstall:
 ~/.config/hypr: | .config/hypr
 	ln -sfnv $(abspath $|) $@
 
-~/.config/waybar: | .config/waybar
+~/.local/bin/pbcopy: | bin/pbcopy
 	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/pbpaste: | bin/pbpaste
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gh-app-token: | bin/gh-app-token
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-status: | bin/tmux-claude-status
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-launch: | bin/tmux-claude-launch
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-send: | bin/tmux-claude-send
+	ln -sfnv $(abspath $|) $@
+
+~/.claude/bin:
+	mkdir -p $@
+
+~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
+	ln -sfnv $(abspath $(word 2,$^)) $@
+
+~/.openclaw/bin:
+	mkdir -p $@
+
+~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
+	ln -sfnv $(abspath $(word 2,$^)) $@
 
 ~/.local/share/applications:
 	mkdir -p $@

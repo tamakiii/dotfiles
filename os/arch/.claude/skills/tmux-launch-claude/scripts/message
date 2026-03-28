@@ -1,0 +1,45 @@
+#!/bin/bash
+# Send a message to Claude Code running in a tmux pane
+# Designed for programmatic use by Claude via Bash tool
+#
+# Usage:
+#   tmux-claude-send --list                    List panes running claude
+#   tmux-claude-send <target> <message>        Send message to claude pane
+
+set -euo pipefail
+
+if [[ "${1:-}" == "--list" ]]; then
+  while IFS=$'\t' read -r cmd session window_name path tmux_target; do
+    if [[ "$cmd" == "claude" ]]; then
+      branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null) || true
+      short_path="${path/#$HOME/\~}"
+      printf '%s\t%s\t%s\t%s\t%s\n' "$tmux_target" "$session" "$window_name" "$short_path" "${branch:-}"
+    fi
+  done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}' | sort -t$'\t' -k2,2)
+  exit 0
+fi
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: tmux-claude-send <target> <message>" >&2
+  echo "       tmux-claude-send --list" >&2
+  exit 1
+fi
+
+target="$1"
+message="$2"
+
+# Verify pane exists and is running claude
+cmd=$(tmux display-message -t "$target" -p '#{pane_current_command}' 2>/dev/null) || {
+  echo "Error: pane $target not found" >&2
+  exit 1
+}
+
+if [[ "$cmd" != "claude" ]]; then
+  echo "Error: pane $target is running '$cmd', not claude" >&2
+  exit 1
+fi
+
+tmux send-keys -t "$target" -l "$message"
+tmux send-keys -t "$target" Enter
+
+echo "Sent message to $target"

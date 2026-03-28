@@ -1,0 +1,90 @@
+#!/bin/bash
+# Launch Claude Code in a tmux pane
+# Designed for programmatic use by Claude via Bash tool
+#
+# Usage:
+#   tmux-claude-launch --list [--dir <path>]                 List idle (zsh) panes
+#   tmux-claude-launch --target <target> [--message <msg>]   Launch claude in pane
+
+set -euo pipefail
+
+dir=""
+target=""
+message=""
+list=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --list) list=true; shift ;;
+    --dir) dir="$2"; shift 2 ;;
+    --target) target="$2"; shift 2 ;;
+    --message) message="$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if $list; then
+  found=false
+  while IFS=$'\t' read -r cmd session window_name path tmux_target; do
+    if [[ "$cmd" == "zsh" ]]; then
+      if [[ -z "$dir" ]] || [[ "$path" == "$dir" ]]; then
+        branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null) || true
+        short_path="${path/#$HOME/\~}"
+        printf '%s\t%s\t%s\t%s\t%s\n' "$tmux_target" "$session" "$window_name" "$short_path" "${branch:-}"
+        found=true
+      fi
+    fi
+  done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}' | sort -t$'\t' -k2,2)
+
+  if ! $found; then
+    if [[ -n "$dir" ]]; then
+      echo "No idle panes found in: $dir" >&2
+    else
+      echo "No idle panes found" >&2
+    fi
+    exit 1
+  fi
+  exit 0
+fi
+
+if [[ -z "$target" ]]; then
+  echo "Error: --target is required" >&2
+  echo "Usage: tmux-claude-launch --target <session:window.pane> [--message <msg>]" >&2
+  exit 1
+fi
+
+# Verify pane exists and is idle
+cmd=$(tmux display-message -t "$target" -p '#{pane_current_command}' 2>/dev/null) || {
+  echo "Error: pane $target not found" >&2
+  exit 1
+}
+
+if [[ "$cmd" != "zsh" ]]; then
+  echo "Error: pane $target is running '$cmd', expected idle shell (zsh)" >&2
+  exit 1
+fi
+
+# Launch claude
+tmux send-keys -t "$target" "claude" Enter
+
+# If message provided, wait for claude to start then send
+if [[ -n "$message" ]]; then
+  for i in $(seq 1 30); do
+    sleep 1
+    cmd=$(tmux display-message -t "$target" -p '#{pane_current_command}')
+    [[ "$cmd" == "claude" ]] && break
+  done
+
+  if [[ "$cmd" != "claude" ]]; then
+    echo "Error: claude did not start within 30s in $target" >&2
+    exit 1
+  fi
+
+  # Wait for claude to initialize its TUI
+  sleep 3
+
+  tmux send-keys -t "$target" -l "$message"
+  tmux send-keys -t "$target" Enter
+fi
+
+echo "Launched claude in $target"

@@ -9,6 +9,8 @@
 paths=(
     # Local project binaries
     "bin"
+    ".local/bin"
+    "$HOME/.local/bin"
     ".venv/bin"
 
     # Dotfiles-specific tools
@@ -24,9 +26,9 @@ paths=(
 
     # User-specific binaries
     "$HOME/.opencode/bin"
-    "$HOME/.local/bin"
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
+    "$HOME/.npm-global/bin"
 
     # System-wide binaries
     "/usr/local/bin"
@@ -49,6 +51,9 @@ PATH="$NEW:$PATH"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# OpenClaw Completion
+source "$HOME/.openclaw/completions/openclaw.zsh"
 
 # Aliases
 alias hx=helix
