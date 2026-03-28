@@ -14,8 +14,9 @@ set -euo pipefail
 # Output: a short-lived installation token (expires ~1h) on stdout.
 #
 # Example:
-#   gh-app-token 3170903 118588430 <(pass show tamakiii/github.com/tamakiii-claude.pem)
-#   gh-app-token 3170903 118588430 /path/to/key.pem
+#   gh-app-token "$(pass show tamakiii/github.com/tamakiii-claude/app-id)" \
+#                "$(pass show tamakiii/github.com/tamakiii-claude/installation-id)" \
+#                <(pass show tamakiii/github.com/tamakiii-claude.pem)
 
 APP_ID="${1:-}"
 INSTALLATION_ID="${2:-}"

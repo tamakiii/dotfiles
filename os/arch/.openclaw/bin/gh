@@ -8,6 +8,9 @@ REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "${REAL_PATH}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-export GH_TOKEN="$("${REPO_ROOT}/bin/gh-app-token" 3170976 118589159 <(pass show tamakiii/github.com/tamakiii-openclaw.pem))"
+export GH_TOKEN="$("${REPO_ROOT}/bin/gh-app-token" \
+  "$(pass show tamakiii/github.com/tamakiii-openclaw/app-id)" \
+  "$(pass show tamakiii/github.com/tamakiii-openclaw/installation-id)" \
+  <(pass show tamakiii/github.com/tamakiii-openclaw.pem))"
 
 exec /usr/bin/gh "$@"
