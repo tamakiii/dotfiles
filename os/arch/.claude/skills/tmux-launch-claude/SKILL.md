@@ -12,8 +12,8 @@ Send tasks to Claude Code instances running in other tmux panes. If Claude is al
 This skill bundles two scripts in its `scripts/` directory. Reference them via the skill path:
 
 ```
-<skill-path>/scripts/tmux-claude-launch
-<skill-path>/scripts/tmux-claude-send
+<skill-path>/scripts/launch
+<skill-path>/scripts/message
 ```
 
 Both output tab-separated fields: `target  session  window_name  path  branch`
@@ -41,7 +41,7 @@ Resolve `~` to the full home path before passing to scripts.
 ### Step 2: Check if Claude is already running there
 
 ```bash
-<skill-path>/scripts/tmux-claude-send --list
+<skill-path>/scripts/message --list
 ```
 
 Look for a pane whose path matches the target workspace. If found, skip to Step 4.
@@ -49,7 +49,7 @@ Look for a pane whose path matches the target workspace. If found, skip to Step 
 ### Step 3: Find an idle pane and launch Claude
 
 ```bash
-<skill-path>/scripts/tmux-claude-launch --list --dir <workspace-path>
+<skill-path>/scripts/launch --list --dir <workspace-path>
 ```
 
 - **One idle pane** — use it directly.
@@ -67,7 +67,7 @@ Look for a pane whose path matches the target workspace. If found, skip to Step 
 If Claude is **already running** in the target pane (found in Step 2):
 
 ```bash
-<skill-path>/scripts/tmux-claude-send <target> "$(cat <<'EOF'
+<skill-path>/scripts/message <target> "$(cat <<'EOF'
 <task message>
 EOF
 )"
@@ -76,7 +76,7 @@ EOF
 If Claude **needs to be launched** (from Step 3):
 
 ```bash
-<skill-path>/scripts/tmux-claude-launch --target <target> --message "$(cat <<'EOF'
+<skill-path>/scripts/launch --target <target> --message "$(cat <<'EOF'
 <task message>
 EOF
 )"
@@ -101,15 +101,15 @@ User: "Have another Claude add input validation to the API endpoints in the acru
 
 ```bash
 # Step 2: Check for existing Claude
-<skill-path>/scripts/tmux-claude-send --list
+<skill-path>/scripts/message --list
 # Output shows no Claude pane in ~/Git/tamakiii/example/acrux
 
 # Step 3: Find idle pane
-<skill-path>/scripts/tmux-claude-launch --list --dir ~/Git/tamakiii/example/acrux
+<skill-path>/scripts/launch --list --dir ~/Git/tamakiii/example/acrux
 # Output: example:1.2  example  zsh  ~/Git/.../acrux  add/feature
 
 # Step 4: Launch and send
-<skill-path>/scripts/tmux-claude-launch --target example:1.2 --message "$(cat <<'EOF'
+<skill-path>/scripts/launch --target example:1.2 --message "$(cat <<'EOF'
 Add input validation to all API endpoints in src/api/. Each endpoint should validate:
 - Required fields are present
 - Field types match the schema
