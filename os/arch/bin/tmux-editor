@@ -8,7 +8,8 @@ set -euo pipefail
 
 if [[ -n "${TMUX:-}" ]]; then
   channel="editor-$$"
-  tmux display-popup -E -x R -w 50% -h 100% "helix '$1'; tmux wait-for -S '$channel'"
+  pane_width=$(tmux display-message -p '#{pane_width}')
+  tmux display-popup -E -x "$pane_width" -w 50% -h 100% "helix '$1'; tmux wait-for -S '$channel'"
   tmux wait-for "$channel"
 else
   helix "$1"
