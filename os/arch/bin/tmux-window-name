@@ -1,7 +1,7 @@
 #!/bin/bash
 # Output window label for tmux automatic-rename-format
 # Usage: tmux-window-name <path> <pane_pid> <pane_current_command>
-# Output: dir/process(branch) +N-M
+# Output: dir/process
 
 path="${1:-.}"
 pid="${2:-}"
@@ -17,20 +17,4 @@ if [[ "$cmd" == "node" && -n "$pid" ]]; then
   pgrep -P "$pid" -f codex >/dev/null 2>&1 && label="codex"
 fi
 
-# Branch name
-branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null) || true
-
-# Git diff +/-
-shortstat=$(git -C "$path" diff HEAD --shortstat 2>/dev/null) || true
-ins=$(echo "$shortstat" | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+') || true
-del=$(echo "$shortstat" | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+') || true
-diff=""
-[[ -n "$ins" ]] && diff="+${ins}"
-[[ -n "$del" ]] && diff="${diff}-${del}"
-
-# Build output
-out="${dir}/${label}"
-[[ -n "$branch" ]] && out+="(${branch})"
-[[ -n "$diff" ]] && out+=" ${diff}"
-
-echo "$out"
+echo "${dir}/${label}"
