@@ -1,0 +1,22 @@
+#!/bin/bash
+# Rename all tmux sessions based on the most common git repo across panes
+# For each session: collect org/repo from all panes, pick the most frequent, rename.
+# Non-git sessions are left as-is.
+
+set -euo pipefail
+
+while IFS= read -r session; do
+  repos=()
+  while IFS= read -r path; do
+    remote=$(git -C "$path" remote get-url origin 2>/dev/null) || continue
+    org_repo=$(echo "$remote" | sed -E 's#.*[:/]([^/]+/[^/]+)(\.git)$#\1#; s#.*[:/]([^/]+/[^/]+)$#\1#')
+    [[ -n "$org_repo" ]] && repos+=("$org_repo")
+  done < <(tmux list-panes -t "=$session" -s -F '#{pane_current_path}')
+
+  if [[ ${#repos[@]} -gt 0 ]]; then
+    most_common=$(printf '%s\n' "${repos[@]}" | sort | uniq -c | sort -rn | head -1 | sed 's/^[[:space:]]*[0-9]* //')
+    if [[ -n "$most_common" && "$most_common" != "$session" ]]; then
+      tmux rename-session -t "$session" "$most_common" 2>/dev/null || true
+    fi
+  fi
+done < <(tmux list-sessions -F '#{session_name}')
