@@ -14,6 +14,6 @@ scrollback=$(tmux capture-pane -p -S -500 2>/dev/null || true)
 tmux split-window -v -l 50% "helix '$1'; tmux wait-for -S '$channel'"
 
 # Show captured scrollback in the top pane via less (start at bottom)
-printf '%s\n' "$scrollback" | less -R +G
+printf '%s\n' "$scrollback"
 
 tmux wait-for "$channel"
