@@ -1,6 +1,6 @@
 #!/bin/bash
 # Navigate Claude Code panes via tmux display-menu
-# Groups by session (like choose-tree), alerts first, shows pane title
+# Layout mimics choose-tree: grouped by session, with window index
 
 set -euo pipefail
 
@@ -9,14 +9,11 @@ has_entries=false
 last_session=""
 key=0
 
-# Sort: alerts first, then active, then idle; within each group by session
 while IFS=$'\t' read -r target status session window path branch title; do
   has_entries=true
 
-  # Session separator
   if [[ "$session" != "$last_session" ]]; then
-    [[ -n "$last_session" ]] && menu_args+=("" "" "")
-    menu_args+=("($session)" "" "")
+    menu_args+=("$session" "" "")
     last_session="$session"
   fi
 
@@ -26,17 +23,14 @@ while IFS=$'\t' read -r target status session window path branch title; do
     *)      prefix="  " ;;
   esac
 
-  label="${prefix}${window}"
-  [[ -n "$title" ]] && label="${label} — ${title}"
+  idx="${target##*:}"
+  idx="${idx%%.*}"
+  label="${prefix}${idx}: ${window}"
+  [[ -n "$title" ]] && label="${label}  ${title}"
 
   menu_args+=("$label" "$key" "switch-client -t '$target'")
   key=$(( key + 1 ))
-done < <(tmux-claude-status | awk -F'\t' '{
-  if ($2 == "alert") order = 0
-  else if ($2 == "active") order = 1
-  else order = 2
-  print order "\t" $0
-}' | sort -t$'\t' -k1,1n -k4,4 | cut -f2-)
+done < <(tmux-claude-status)
 
 if [[ "$has_entries" == false ]]; then
   tmux display-message "No Claude panes"
