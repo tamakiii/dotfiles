@@ -6,6 +6,7 @@
 set -euo pipefail
 
 channel="editor-$$"
+scrollback=$(tmux capture-pane -p -S -500 2>/dev/null || true)
 tmux split-window -v -l 70% "helix '$1'; tmux wait-for -S '$channel'"
-echo
+printf '%s\n' "$scrollback"
 tmux wait-for "$channel"
