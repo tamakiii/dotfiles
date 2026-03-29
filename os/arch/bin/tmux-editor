@@ -7,4 +7,5 @@ set -euo pipefail
 
 channel="editor-$$"
 tmux split-window -v -l 70% "helix '$1'; tmux wait-for -S '$channel'"
+echo
 tmux wait-for "$channel"
