@@ -7,14 +7,13 @@ set -euo pipefail
 
 channel="editor-$$"
 
-# Capture scrollback before it's lost (Claude clears its TUI, but
-# tmux may still have content in the scroll history)
+# Capture scrollback (Claude clears its TUI, but tmux retains history)
 scrollback=$(tmux capture-pane -p -S -500 2>/dev/null || true)
 
-# Open helix in a split below
-tmux split-window -v -l 70% "helix '$1'; tmux wait-for -S '$channel'"
+# Open helix in a split below (50% height)
+tmux split-window -v -l 50% "helix '$1'; tmux wait-for -S '$channel'"
 
-# Show captured scrollback in the top pane (this terminal)
-printf '%s\n' "$scrollback" | grep -v '^$' | tail -50
+# Show captured scrollback in the top pane via less (start at bottom)
+printf '%s\n' "$scrollback" | less -R +G
 
 tmux wait-for "$channel"
