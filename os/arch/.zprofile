@@ -55,7 +55,7 @@ export NVM_DIR="$HOME/.nvm"
 # OpenClaw Completion
 source "$HOME/.openclaw/completions/openclaw.zsh"
 
-export EDITOR=helix
+export EDITOR=tmux-editor
 
 # Aliases
 alias hx=helix
