@@ -5,11 +5,7 @@ description: "Automate the full PR creation workflow: detect changes, create a b
 
 # Create PR
 
-Create a pull request from the current working state — branching, staging, committing, pushing, and opening the PR in one flow. This replaces the manual multi-step sequence the supervisor does repeatedly.
-
-## Why this exists
-
-The supervisor frequently goes through the same sequence: checkout main, pull, create branch, stage files, commit, push, then create the PR via `.claude/bin/gh`. This skill collapses that into a single action so the user can just say "create a PR" and it happens.
+Create a pull request from the current working state — branching, staging, committing, pushing, and opening the PR in one flow.
 
 ## How to use
 
@@ -79,7 +75,7 @@ Write a commit message based on the diff content. Follow the repo's commit messa
 git commit -m "$(cat <<'EOF'
 <descriptive message>
 
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 EOF
 )"
 ```
@@ -98,7 +94,7 @@ Skip this step if the branch is already pushed and up-to-date with the remote.
 
 ### Step 5: Create the PR
 
-Use `.claude/bin/gh` (not plain `gh`) to create the PR as `tamakiii-claude[bot]`. Always specify `--repo` explicitly.
+Use `.claude/bin/gh` (not plain `gh`) to create the PR as `tamakiii-claude[bot]`. Always specify `--repo` explicitly using the value derived in Step 1.
 
 ```bash
 .claude/bin/gh pr create --repo <owner/repo> --title "<title>" --body "$(cat <<'EOF'
@@ -150,7 +146,6 @@ Use what they provide instead of auto-generating.
 
 ## Important context
 
-- Always use `.claude/bin/gh` for PR creation — this posts as `tamakiii-claude[bot]`, which is the correct identity for supervisor actions. Never use bare `gh`.
-- Always specify `--repo <owner/repo>` explicitly — don't rely on git remote inference.
+- Always use `.claude/bin/gh` for PR creation — this posts as `tamakiii-claude[bot]`. Never use bare `gh`.
+- Always specify `--repo <owner/repo>` explicitly — derive from `git remote get-url origin` when not provided.
 - Use heredocs for multi-line PR bodies to preserve formatting.
-- The default target repo is derived from the `origin` remote URL.

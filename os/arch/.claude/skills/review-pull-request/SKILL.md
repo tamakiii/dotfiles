@@ -1,15 +1,11 @@
 ---
 name: review-pull-request
-description: Review a GitHub pull request as tamakiii-claude[bot] (the supervisor bot). Use this whenever the user wants to review a PR, check a PR, look at a diff, give feedback on a PR, or mentions a GitHub PR URL. Trigger on phrases like "review PR", "review this PR", "check the PR", "look at PR #N", "review https://github.com/...", "/review-pull-request", or "/review-pr". Also trigger when the user pastes a GitHub PR URL and wants feedback on it.
+description: Review a GitHub pull request as tamakiii-claude[bot]. Use this whenever the user wants to review a PR, check a PR, look at a diff, give feedback on a PR, or mentions a GitHub PR URL. Trigger on phrases like "review PR", "review this PR", "check the PR", "look at PR #N", "review https://github.com/...", "/review-pull-request", or "/review-pr". Also trigger when the user pastes a GitHub PR URL and wants feedback on it.
 ---
 
 # Review PR
 
-Review a pull request as the supervisor bot (`tamakiii-claude[bot]`) and post a structured review comment. This replaces the manual flow of fetching the diff, reading it, composing feedback, and posting — all in one step.
-
-## Why this exists
-
-The supervisor reviews agent PRs frequently. Each review involves the same steps: fetch PR metadata, read the diff, check against project conventions, and post structured feedback. This skill standardizes the review format and ensures nothing is missed.
+Review a pull request as `tamakiii-claude[bot]` and post a structured review comment. This replaces the manual flow of fetching the diff, reading it, composing feedback, and posting — all in one step.
 
 ## How to use
 
@@ -18,8 +14,11 @@ The user provides a PR reference — either a number, a URL, or "the open PR". T
 ### Step 1: Parse the request
 
 Extract from the user's message:
-- **PR number** — from a number, URL (`https://github.com/tamakiii/sandbox-bevy/pull/3`), or context ("the open PR")
-- **Repo** — from the URL, or default to `tamakiii/sandbox-bevy` (the agent workspace). If the PR is on `tamakiii/openclaw-workspace`, use that instead.
+- **PR number** — from a number, URL (e.g. `https://github.com/tamakiii/dotfiles/pull/186`), or context ("the open PR")
+- **Repo** — from the URL, or derive from the current directory's origin remote:
+  ```bash
+  git remote get-url origin | sed 's|.*github.com[:/]||;s|\.git$||'
+  ```
 - **Review type** — if the user says "approve", "request changes", or just wants a comment (default: comment)
 
 ### Step 2: Gather context
@@ -40,29 +39,19 @@ Run these in parallel — they're independent:
 .claude/bin/gh api repos/<repo>/pulls/<N>/reviews --jq '.[] | {state: .state, body: .body}'
 ```
 
-If the PR is on `tamakiii/sandbox-bevy`, also read project context:
-```bash
-# Current ROADMAP to check alignment
-cat ~/Git/tamakiii/sandbox-bevy/main/memory/ROADMAP.md
-
-# TOOLS.md for API convention reference
-cat ~/Git/tamakiii/sandbox-bevy/main/TOOLS.md
-```
-
 ### Step 3: Analyze the diff
 
 Read the full diff carefully. Check for:
 
 **Correctness:**
-- Does the code compile? (Look for obvious syntax errors, missing imports)
-- Are the right APIs used? (Cross-reference with TOOLS.md if available)
-- Are there logic errors?
+- Does the code work? (Look for obvious syntax errors, missing dependencies, broken references)
+- Are shell scripts correct? (quoting, variable expansion, exit codes)
+- Are config files valid? (YAML/TOML/JSON syntax, correct option names)
 
 **Convention adherence:**
-- Does it follow the patterns in TOOLS.md? (e.g., Bevy 0.18 APIs)
-- Branch naming: `phaseN/short-description`
+- Does it follow existing patterns in the repo?
 - Commit messages: descriptive, match the actual changes
-- Are workspace files (ROADMAP.md, DEVLOG.md) updated?
+- Are there CLAUDE.md or project convention violations?
 
 **Scope:**
 - Does the PR match its stated purpose? (title vs actual changes)
@@ -73,6 +62,7 @@ Read the full diff carefully. Check for:
 - No secrets or credentials in the diff
 - No force-pushes or history rewrites
 - No changes to files outside the expected scope
+- Shell scripts don't introduce injection risks
 
 ### Step 4: Compose the review
 
@@ -97,6 +87,7 @@ Guidelines for the review content:
 - If everything looks clean, say so — don't invent problems
 - If a previous review exists, check whether its feedback was addressed
 - Keep it concise — the user reads these frequently
+- Omit sections that have no items (e.g., skip "Fix before merge" if there are none)
 
 ### Step 5: Post the review
 
@@ -128,59 +119,19 @@ EOF
 
 After posting, show the user a summary of what was posted and the review action taken.
 
-### Step 6: Write REVIEW_FEEDBACK.md (for sandbox-bevy PRs with requested changes)
-
-If the review requested changes (not just approval) and the PR is on `tamakiii/sandbox-bevy`, write actionable fix items into the agent's `memory/REVIEW_FEEDBACK.md` so the agent can pick them up autonomously on its next session.
-
-1. Ensure the agent workspace is on main:
-   ```bash
-   git -C ~/Git/tamakiii/sandbox-bevy/main checkout main
-   git -C ~/Git/tamakiii/sandbox-bevy/main pull openclaw main
-   ```
-
-2. Write `memory/REVIEW_FEEDBACK.md` on main with this format:
-   ```markdown
-   # Pending Review Feedback
-
-   ## PR #N: branch-name
-   Branch: branch-name
-
-   - [ ] File — specific fix instruction
-   - [ ] File — specific fix instruction
-   ```
-
-   Important: include the `Branch:` line so the agent knows which branch to checkout.
-   Each item must be atomic and actionable — the agent's 27b model needs explicit instructions, not vague requests. Reference file paths and what to change.
-
-3. Commit and push to main:
-   ```bash
-   git -C ~/Git/tamakiii/sandbox-bevy/main add memory/REVIEW_FEEDBACK.md
-   git -C ~/Git/tamakiii/sandbox-bevy/main commit -m "Add review feedback for agent"
-   ```
-   Push via the `openclaw` remote (credential helper handles auth):
-   ```bash
-   git -C ~/Git/tamakiii/sandbox-bevy/main push openclaw main
-   ```
-
-The agent's AGENTS.md instructs it to check REVIEW_FEEDBACK.md on main before ROADMAP.md. When it sees unchecked items, it checks out the specified branch, fixes them, commits, and pushes.
-
-Skip this step if:
-- The review is an approval (no changes needed)
-- The PR is not on sandbox-bevy (other repos don't have this mechanism)
-
 ## Examples
 
 ### Review by PR number
 
-User: "review PR #3 on sandbox-bevy"
+User: "review PR #186"
 
-→ Fetch PR #3 from `tamakiii/sandbox-bevy`, analyze diff, post review comment.
+→ Derive repo from `origin`, fetch PR #186, analyze diff, post review comment.
 
 ### Review by URL
 
-User: "can you review https://github.com/tamakiii/openclaw-workspace/pull/4"
+User: "can you review https://github.com/tamakiii/dotfiles/pull/186"
 
-→ Extract repo `tamakiii/openclaw-workspace` and PR `4` from URL, analyze, post review.
+→ Extract repo `tamakiii/dotfiles` and PR `186` from URL, analyze, post review.
 
 ### Review and approve
 
@@ -196,9 +147,8 @@ User: "review the PR again"
 
 ## Important context
 
-- Supervisor identity: `.claude/bin/gh` posts as `tamakiii-claude[bot]`
-- Primary agent repo: `tamakiii/sandbox-bevy`
-- Supervisor repo: `tamakiii/openclaw-workspace`
-- Agent workspace files: ROADMAP.md, DEVLOG.md, TOOLS.md, AGENTS.md in `~/Git/tamakiii/sandbox-bevy/main`
-- The agent uses Bevy 0.18 — check TOOLS.md for correct API patterns
+- Identity: `.claude/bin/gh` posts as `tamakiii-claude[bot]`
+- Always use `.claude/bin/gh`, never bare `gh`
+- Always specify `--repo <owner/repo>` explicitly
+- Derive repo from `git remote get-url origin` when not provided in the user's message
 - If reviewing a follow-up after feedback, explicitly note which items are addressed
