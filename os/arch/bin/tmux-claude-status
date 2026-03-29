@@ -1,128 +1,25 @@
 #!/bin/bash
-# Show status of all Claude Code panes
-# Usage: run in any pane, or bind to a tmux key
-#   --select  interactive mode: pick a pane via fzf and jump to it
+# Machine-readable status of all Claude Code panes
+# Output: TSV (target, status, session, window, path, branch)
+# Status: alert (permission prompt), active (working), idle (waiting)
 
 set -euo pipefail
 
-RED=$'\033[1;31m'
-GREEN=$'\033[1;32m'
-YELLOW=$'\033[1;33m'
-MAGENTA=$'\033[1;35m'
-DIM=$'\033[2m'
-RESET=$'\033[0m'
-
-git_status() {
-  local path="$1"
-  local staged=0 modified=0 untracked=0
-  local parts=()
-
-  while IFS= read -r line; do
-    [[ -z "$line" ]] && continue
-    local x="${line:0:1}" y="${line:1:1}"
-    [[ "$x" =~ [MADRC] ]] && ((staged++)) || true
-    [[ "$y" =~ [MD] ]] && ((modified++)) || true
-    [[ "$x" == "?" ]] && ((untracked++)) || true
-  done < <(git -C "$path" status --porcelain 2>/dev/null)
-
-  local shortstat
-  shortstat=$(git -C "$path" diff HEAD --shortstat 2>/dev/null) || true
-  local ins del
-  ins=$(echo "$shortstat" | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+') || true
-  del=$(echo "$shortstat" | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+') || true
-
-  [[ $staged -gt 0 ]] && parts+=("${GREEN}● ${staged}${RESET}")
-  [[ $modified -gt 0 ]] && parts+=("${RED}✚ ${modified}${RESET}")
-  [[ $untracked -gt 0 ]] && parts+=("${MAGENTA}… ${untracked}${RESET}")
-  [[ -n "$ins" ]] && parts+=("${GREEN}+${ins}${RESET}")
-  [[ -n "$del" ]] && parts+=("${RED}-${del}${RESET}")
-
-  if [[ ${#parts[@]} -eq 0 ]]; then
-    echo "${GREEN}✔${RESET}"
-  else
-    echo "${parts[*]}"
-  fi
-}
-
-# Collect pane data
-normal_entries=()
-alert_entries=()
-print_summaries=""
-print_alerts=""
-
 while IFS=$'\t' read -r cmd session window path target; do
-  if [[ "$cmd" == "claude" ]]; then
-    short_path="${path/#$HOME/\~}"
-    branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null) || true
-    branch_str=""
-    git_str=""
-    if [[ -n "$branch" ]]; then
-      branch_str=" ${DIM}(${branch})${RESET}"
-      git_str=" $(git_status "$path")"
-    fi
+  [[ "$cmd" == "claude" ]] || continue
 
-    content=$(tmux capture-pane -t "$target" -p -S -20)
-    path_line="${DIM}${cmd} @ ${short_path}${RESET}"
+  branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null) || branch=""
 
-    bottom=$(echo "$content" | tail -10)
-    if echo "$bottom" | grep -q "Do you want to" && echo "$bottom" | grep -q "Esc to cancel"; then
-      header="${RED}⚠  ${session} / ${window}${RESET}${branch_str}${git_str}"
-      alert_entries+=("${target}	${header}"$'\n'"   ${path_line}")
+  content=$(tmux capture-pane -t "$target" -p -S -20 2>/dev/null) || continue
+  bottom=$(echo "$content" | tail -10)
 
-      print_alerts+="${header}"$'\n'
-      print_alerts+="   ${path_line}"$'\n'
-      print_alerts+="$(echo "$content" | sed -n '/Do you want/,$ p' | grep -v '^[[:space:]]*$' | head -6 | sed 's/^/   /')"$'\n\n'
-    else
-      # Active: ✽ Verb… (4m 3s · ↓ N tokens)
-      active_time=$(echo "$content" | grep -oE '\([0-9]+[hms]( [0-9]+[smh])? ·' | tail -1 | grep -oE '[0-9]+[hms]( [0-9]+[smh])?' | head -1) || true
-      # Completed: ✻ Verb for 1m 32s
-      completed_time=$(echo "$content" | grep -oE 'for [0-9]+[hms]( [0-9]+[smh])?' | tail -1 | sed 's/^for //') || true
-
-      if [[ -n "$active_time" ]]; then
-        header="${YELLOW}●${RESET}  ${session} / ${window}${branch_str}${git_str}  ${DIM}${active_time}${RESET}"
-      elif [[ -n "$completed_time" ]]; then
-        header="${DIM}◆${RESET}  ${session} / ${window}${branch_str}${git_str}  ${DIM}${completed_time}${RESET}"
-      else
-        header="${DIM}○  ${session} / ${window}${branch_str}${RESET}${git_str}"
-      fi
-      normal_entries+=("${target}	${header}"$'\n'"   ${path_line}")
-
-      print_summaries+="${header}"$'\n'
-      print_summaries+="   ${path_line}"$'\n'
-    fi
+  if echo "$bottom" | grep -q "Do you want to" && echo "$bottom" | grep -q "Esc to cancel"; then
+    status="alert"
+  elif echo "$content" | grep -qE '\([0-9]+[hms]( [0-9]+[smh])? ·'; then
+    status="active"
+  else
+    status="idle"
   fi
-done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}' | sort -t$'\t' -k2,2)
 
-case "${1:-}" in
-  --select)
-    all=("${alert_entries[@]}" "${normal_entries[@]}")
-    if [[ ${#all[@]} -eq 0 ]]; then
-      echo "No Claude panes found"
-      sleep 1
-      exit 0
-    elif [[ ${#all[@]} -eq 1 ]]; then
-      tmux switch-client -t "${all[0]%%	*}"
-    else
-      selected=$(printf '%s\0' "${all[@]}" | \
-        fzf --read0 --ansi --no-sort --layout=reverse \
-          --prompt="> " \
-          --delimiter=$'\t' \
-          --with-nth=2 \
-          --preview='tmux capture-pane -e -t {1} -p | tail -25' \
-          --preview-window=right:70%) || exit 0
-      target=$(head -1 <<< "$selected" | cut -f1)
-      tmux switch-client -t "$target"
-    fi
-    ;;
-  *)
-    if [[ -z "$print_summaries" && -z "$print_alerts" ]]; then
-      echo "No Claude panes found."
-    else
-      [[ -n "$print_summaries" ]] && printf '%s' "$print_summaries"
-      if [[ -n "$print_alerts" ]]; then
-        [[ -n "$print_summaries" ]] && echo
-        printf '%s' "$print_alerts"
-      fi
-    fi
-    ;;
-esac
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$target" "$status" "$session" "$window" "$path" "$branch"
+done < <(tmux list-panes -a -F '#{pane_current_command}	#{session_name}	#{window_name}	#{pane_current_path}	#{session_name}:#{window_index}.#{pane_index}' | sort -t$'\t' -k2,2)
