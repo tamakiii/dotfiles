@@ -1,12 +1,15 @@
 #!/bin/bash
-# Open helix in a tmux split below
-# Use as EDITOR=tmux-editor so tools like Claude Code's C-x C-e
-# open the editor in a separate pane.
+# Open helix in a tmux popup overlay
+# Symlinked as a "GUI editor" name (e.g. codium) from Claude Code's
+# whitelist so it doesn't clear the TUI when invoking C-x C-e.
+# Claude's last response stays visible underneath the popup.
 
 set -euo pipefail
 
-channel="editor-$$"
-scrollback=$(tmux capture-pane -p -S -500 2>/dev/null || true)
-tmux split-window -v -l 70% "helix '$1'; tmux wait-for -S '$channel'"
-printf '%s\n' "$scrollback"
-tmux wait-for "$channel"
+if [[ -n "${TMUX:-}" ]]; then
+  channel="editor-$$"
+  tmux display-popup -E -x R -w 50% -h 100% "helix '$1'; tmux wait-for -S '$channel'"
+  tmux wait-for "$channel"
+else
+  helix "$1"
+fi

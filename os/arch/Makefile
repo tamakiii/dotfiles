@@ -26,6 +26,7 @@ install: \
 	~/.local/bin/tmux-claude-launch \
 	~/.local/bin/tmux-claude-send \
 	~/.local/bin/tmux-editor \
+	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
 	~/.claude/bin/gh \
 	~/.openclaw/bin/gh \
@@ -38,6 +39,7 @@ uninstall:
 	rm -f ~/.claude/bin/gh
 	rm -f ~/.openclaw/bin/gh
 	rm -f ~/.local/bin/gh-app-token
+	rm -f ~/.local/bin/codium
 	rm -f ~/.local/bin/tmux-editor
 	rm -f ~/.local/bin/tmux-claude-send
 	rm -f ~/.local/bin/tmux-claude-launch
@@ -129,6 +131,9 @@ uninstall:
 
 ~/.local/bin/tmux-editor: | bin/tmux-editor
 	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/codium: | ~/.local/bin/tmux-editor
+	ln -sfnv tmux-editor $@
 
 ~/.claude/bin:
 	mkdir -p $@
