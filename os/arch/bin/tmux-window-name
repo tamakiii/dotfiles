@@ -1,19 +1,12 @@
 #!/bin/bash
-# Output git org/repo/worktree for use in tmux automatic-rename-format
+# Output git worktree name for use in tmux automatic-rename-format
 # Usage: tmux-window-name <path>
 
 path="${1:-.}"
 
-remote=$(git -C "$path" remote get-url origin 2>/dev/null)
-if [[ -z "$remote" ]]; then
+toplevel=$(git -C "$path" rev-parse --show-toplevel 2>/dev/null)
+if [[ -n "$toplevel" ]]; then
+  basename "$toplevel"
+else
   basename "$path"
-  exit 0
 fi
-
-# Parse org/repo from git@github.com:org/repo.git or https://github.com/org/repo.git
-org_repo=$(echo "$remote" | sed -E 's#.*[:/]([^/]+/[^/]+)(\.git)$#\1#; s#.*[:/]([^/]+/[^/]+)$#\1#')
-
-# Worktree name = basename of git toplevel
-worktree=$(basename "$(git -C "$path" rev-parse --show-toplevel 2>/dev/null)")
-
-echo "${org_repo}/${worktree}"
