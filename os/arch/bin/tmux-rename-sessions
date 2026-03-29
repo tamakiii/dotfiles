@@ -9,8 +9,8 @@ while IFS= read -r session; do
   repos=()
   while IFS= read -r path; do
     remote=$(git -C "$path" remote get-url origin 2>/dev/null) || continue
-    org_repo=$(echo "$remote" | sed -E 's#.*[:/]([^/]+/[^/]+)(\.git)$#\1#; s#.*[:/]([^/]+/[^/]+)$#\1#')
-    [[ -n "$org_repo" ]] && repos+=("$org_repo")
+    repo=$(echo "$remote" | sed -E 's#.*[:/][^/]+/([^/]+)(\.git)$#\1#; s#.*[:/][^/]+/([^/]+)$#\1#')
+    [[ -n "$repo" ]] && repos+=("$repo")
   done < <(tmux list-panes -t "=$session" -s -F '#{pane_current_path}')
 
   if [[ ${#repos[@]} -gt 0 ]]; then
