@@ -75,7 +75,7 @@ Write a commit message based on the diff content. Follow the repo's commit messa
 git commit -m "$(cat <<'EOF'
 <descriptive message>
 
-Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 ```
