@@ -1,10 +1,10 @@
 #!/bin/bash
-# Open $EDITOR in a tmux split pane, wait for it to close
+# Open helix in a tmux popup overlay, wait for it to close
 # Use as EDITOR=tmux-editor so tools like Claude Code's C-x C-e
-# keep the current view visible while editing in a new pane.
+# keep the current view visible underneath the popup.
 
 set -euo pipefail
 
 channel="editor-$$"
-tmux split-window -v "helix '$1'; tmux wait-for -S '$channel'"
+tmux display-popup -E -w 80% -h 60% "helix '$1'; tmux wait-for -S '$channel'"
 tmux wait-for "$channel"
