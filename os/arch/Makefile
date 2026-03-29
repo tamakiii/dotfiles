@@ -18,6 +18,9 @@ install: \
 	~/.config/hypr \
 	~/.local/bin/pbcopy \
 	~/.local/bin/pbpaste \
+	~/.local/bin/tmux-window-name \
+	~/.local/bin/tmux-pane-label \
+	~/.local/bin/tmux-rename-sessions \
 	~/.local/bin/tmux-claude-panes \
 	~/.local/bin/tmux-claude-status \
 	~/.local/bin/tmux-claude-launch \
@@ -36,6 +39,9 @@ uninstall:
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/tmux-claude-send
 	rm -f ~/.local/bin/tmux-claude-launch
+	rm -f ~/.local/bin/tmux-rename-sessions
+	rm -f ~/.local/bin/tmux-pane-label
+	rm -f ~/.local/bin/tmux-window-name
 	rm -f ~/.local/bin/tmux-claude-status
 	rm -f ~/.local/bin/tmux-claude-panes
 	rm -f ~/.local/bin/pbpaste
@@ -93,6 +99,15 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/pbpaste: | bin/pbpaste
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-window-name: | bin/tmux-window-name
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-pane-label: | bin/tmux-pane-label
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-rename-sessions: | bin/tmux-rename-sessions
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
