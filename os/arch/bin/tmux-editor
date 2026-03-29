@@ -1,19 +1,10 @@
 #!/bin/bash
-# Open helix in a tmux split below, showing captured scrollback above
+# Open helix in a tmux split below
 # Use as EDITOR=tmux-editor so tools like Claude Code's C-x C-e
-# keep the last output visible while editing.
+# open the editor in a separate pane.
 
 set -euo pipefail
 
 channel="editor-$$"
-
-# Capture scrollback (Claude clears its TUI, but tmux retains history)
-scrollback=$(tmux capture-pane -p -S -500 2>/dev/null || true)
-
-# Open helix in a split below (50% height)
-tmux split-window -v -l 50% "helix '$1'; tmux wait-for -S '$channel'"
-
-# Show captured scrollback in the top pane via less (start at bottom)
-printf '%s\n' "$scrollback"
-
+tmux split-window -v -l 70% "helix '$1'; tmux wait-for -S '$channel'"
 tmux wait-for "$channel"
