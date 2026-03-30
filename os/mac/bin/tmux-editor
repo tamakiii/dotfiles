@@ -1,0 +1,22 @@
+#!/bin/bash
+# Open helix in a tmux popup overlay on the right side
+# Symlinked as a "GUI editor" name (e.g. codium) from Claude Code's
+# whitelist so it doesn't clear the TUI when invoking C-x C-e.
+# Captures pane scrollback as a read-only reference buffer in helix.
+
+set -euo pipefail
+
+if [[ -n "${TMUX:-}" ]]; then
+  channel="editor-$$"
+  context=$(mktemp /tmp/claude-context-XXXXXX)
+  tmux capture-pane -p -S -500 > "$context"
+
+  pane_width=$(tmux display-message -p '#{pane_width}')
+  tmux display-popup -E -x "$pane_width" -w 50% -h 100% \
+    "helix '$1' '$context'; tmux wait-for -S '$channel'"
+  tmux wait-for "$channel"
+
+  rm -f "$context"
+else
+  helix "$1"
+fi

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Output a label for a tmux pane based on its running process
+# Usage: tmux-pane-label <pane_pid> <pane_current_command>
+
+pid="${1:-}"
+cmd="${2:-}"
+
+case "$cmd" in
+  claude) echo "claude" ;;
+  node)
+    if pgrep -P "$pid" -f codex >/dev/null 2>&1; then
+      echo "codex"
+    else
+      echo "$cmd"
+    fi
+    ;;
+  *) echo "$cmd" ;;
+esac

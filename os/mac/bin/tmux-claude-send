@@ -1,0 +1,34 @@
+#!/bin/bash
+# Send a message to Claude Code running in a tmux pane
+# Designed for programmatic use by Claude via Bash tool
+#
+# Usage:
+#   tmux-claude-send <target> <message>        Send message to claude pane
+#   tmux-claude-status                         List panes (use for discovery)
+
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: tmux-claude-send <target> <message>" >&2
+  echo "       tmux-claude-status                    (list panes)" >&2
+  exit 1
+fi
+
+target="$1"
+message="$2"
+
+# Verify pane exists and is running claude
+cmd=$(tmux display-message -t "$target" -p '#{pane_current_command}' 2>/dev/null) || {
+  echo "Error: pane $target not found" >&2
+  exit 1
+}
+
+if [[ "$cmd" != "claude" ]]; then
+  echo "Error: pane $target is running '$cmd', not claude" >&2
+  exit 1
+fi
+
+tmux send-keys -t "$target" -l "$message"
+tmux send-keys -t "$target" Enter
+
+echo "Sent message to $target"
