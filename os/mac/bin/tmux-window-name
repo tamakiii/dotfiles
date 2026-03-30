@@ -1,0 +1,20 @@
+#!/bin/bash
+# Output window label for tmux automatic-rename-format
+# Usage: tmux-window-name <path> <pane_pid> <pane_current_command>
+# Output: dir (process)
+
+path="${1:-.}"
+pid="${2:-}"
+cmd="${3:-}"
+
+# Directory name (worktree basename)
+toplevel=$(git -C "$path" rev-parse --show-toplevel 2>/dev/null)
+dir=$(basename "${toplevel:-$path}")
+
+# Process label
+label="$cmd"
+if [[ "$cmd" == "node" && -n "$pid" ]]; then
+  pgrep -P "$pid" -f codex >/dev/null 2>&1 && label="codex"
+fi
+
+echo "${dir} (${label})"

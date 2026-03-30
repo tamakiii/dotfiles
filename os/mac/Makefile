@@ -11,7 +11,15 @@ install: \
 	~/.claude \
 	~/.local/bin/github-mcp-headers \
 	~/.local/bin/gw \
-	~/.local/bin/tmux-auto-name-window \
+	~/.local/bin/tmux-window-name \
+	~/.local/bin/tmux-pane-label \
+	~/.local/bin/tmux-rename-sessions \
+	~/.local/bin/tmux-claude-panes \
+	~/.local/bin/tmux-claude-status \
+	~/.local/bin/tmux-claude-launch \
+	~/.local/bin/tmux-claude-send \
+	~/.local/bin/tmux-editor \
+	~/.local/bin/codium \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -28,6 +36,15 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
+	rm -f ~/.local/bin/codium
+	rm -f ~/.local/bin/tmux-editor
+	rm -f ~/.local/bin/tmux-claude-send
+	rm -f ~/.local/bin/tmux-claude-launch
+	rm -f ~/.local/bin/tmux-claude-status
+	rm -f ~/.local/bin/tmux-claude-panes
+	rm -f ~/.local/bin/tmux-rename-sessions
+	rm -f ~/.local/bin/tmux-pane-label
+	rm -f ~/.local/bin/tmux-window-name
 	rm -rf ~/.local/bin/github-mcp-headers
 	rm -rf ~/.claude
 	rm -rf ~/.zprofile
@@ -80,8 +97,32 @@ uninstall:
 ~/.local/bin/gw: ~/.local/bin | bin/gw
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-auto-name-window: ~/.local/bin | bin/tmux-auto-name-window
+~/.local/bin/tmux-window-name: ~/.local/bin | bin/tmux-window-name
 	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-pane-label: ~/.local/bin | bin/tmux-pane-label
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-rename-sessions: ~/.local/bin | bin/tmux-rename-sessions
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-panes: ~/.local/bin | bin/tmux-claude-panes
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-status: ~/.local/bin | bin/tmux-claude-status
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-launch: ~/.local/bin | bin/tmux-claude-launch
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-claude-send: ~/.local/bin | bin/tmux-claude-send
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-editor: ~/.local/bin | bin/tmux-editor
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/codium: | ~/.local/bin/tmux-editor
+	ln -sfnv tmux-editor $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
 	cp "$|" "$@"
