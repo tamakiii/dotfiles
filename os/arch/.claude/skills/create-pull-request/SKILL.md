@@ -1,6 +1,6 @@
 ---
 name: create-pull-request
-description: "Automate the full PR creation workflow: detect changes, create a branch from main, stage, commit, push, and open a PR via .claude/bin/gh as tamakiii-claude[bot]. Trigger whenever the user says 'create a PR', 'create new PR', '/create-pull-request', '/create-pr', 'push and create a PR', 'open a PR', 'make a PR', 'PR this', or any variation that implies they want their current changes turned into a pull request. Also trigger when the user finishes a task and says something like 'ship it' or 'send it' in the context of creating a PR."
+description: "Automate the full PR creation workflow: detect changes, create a branch from main, stage, commit, push, and open a PR via ~/.claude/bin/gh as tamakiii-claude[bot]. Trigger whenever the user says 'create a PR', 'create new PR', '/create-pull-request', '/create-pr', 'push and create a PR', 'open a PR', 'make a PR', 'PR this', or any variation that implies they want their current changes turned into a pull request. Also trigger when the user finishes a task and says something like 'ship it' or 'send it' in the context of creating a PR."
 ---
 
 # Create PR
@@ -94,10 +94,10 @@ Skip this step if the branch is already pushed and up-to-date with the remote.
 
 ### Step 5: Create the PR
 
-Use `.claude/bin/gh` (not plain `gh`) to create the PR as `tamakiii-claude[bot]`. Always specify `--repo` explicitly using the value derived in Step 1.
+Use `~/.claude/bin/gh` (not plain `gh`) to create the PR as `tamakiii-claude[bot]`. Always specify `--repo` explicitly using the value derived in Step 1.
 
 ```bash
-.claude/bin/gh pr create --repo <owner/repo> --title "<title>" --body "$(cat <<'EOF'
+~/.claude/bin/gh pr create --repo <owner/repo> --title "<title>" --body "$(cat <<'EOF'
 ## Summary
 - <bullet points describing what changed and why>
 
@@ -146,6 +146,6 @@ Use what they provide instead of auto-generating.
 
 ## Important context
 
-- Always use `.claude/bin/gh` for PR creation — this posts as `tamakiii-claude[bot]`. Never use bare `gh`.
+- Always use `~/.claude/bin/gh` for PR creation — this posts as `tamakiii-claude[bot]`. Never use bare `gh`.
 - Always specify `--repo <owner/repo>` explicitly — derive from `git remote get-url origin` when not provided.
 - Use heredocs for multi-line PR bodies to preserve formatting.

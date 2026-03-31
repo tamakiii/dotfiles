@@ -27,16 +27,16 @@ Run these in parallel — they're independent:
 
 ```bash
 # PR metadata
-.claude/bin/gh pr view <N> --repo <repo> --json title,body,headRefName,baseRefName,state,additions,deletions,files,commits
+~/.claude/bin/gh pr view <N> --repo <repo> --json title,body,headRefName,baseRefName,state,additions,deletions,files,commits
 
 # Full diff
-.claude/bin/gh pr diff <N> --repo <repo>
+~/.claude/bin/gh pr diff <N> --repo <repo>
 
 # Previous review comments (to avoid repeating feedback)
-.claude/bin/gh api repos/<repo>/pulls/<N>/comments --jq '.[].body'
+~/.claude/bin/gh api repos/<repo>/pulls/<N>/comments --jq '.[].body'
 
 # Previous reviews
-.claude/bin/gh api repos/<repo>/pulls/<N>/reviews --jq '.[] | {state: .state, body: .body}'
+~/.claude/bin/gh api repos/<repo>/pulls/<N>/reviews --jq '.[] | {state: .state, body: .body}'
 ```
 
 ### Step 3: Analyze the diff
@@ -95,22 +95,22 @@ Choose the appropriate review action based on the analysis:
 
 **Comment** (default — when there are items to discuss):
 ```bash
-.claude/bin/gh pr review <N> --repo <repo> --comment --body "<review body>"
+~/.claude/bin/gh pr review <N> --repo <repo> --comment --body "<review body>"
 ```
 
 **Approve** (when the PR is clean, or the user explicitly asks):
 ```bash
-.claude/bin/gh pr review <N> --repo <repo> --approve --body "<review body>"
+~/.claude/bin/gh pr review <N> --repo <repo> --approve --body "<review body>"
 ```
 
 **Request changes** (when there are blocking issues):
 ```bash
-.claude/bin/gh pr review <N> --repo <repo> --request-changes --body "<review body>"
+~/.claude/bin/gh pr review <N> --repo <repo> --request-changes --body "<review body>"
 ```
 
 Always pass the review body via a heredoc to preserve formatting:
 ```bash
-.claude/bin/gh pr review <N> --repo <repo> --comment --body "$(cat <<'EOF'
+~/.claude/bin/gh pr review <N> --repo <repo> --comment --body "$(cat <<'EOF'
 ## Review — tamakiii-claude[bot]
 ...
 EOF
@@ -147,8 +147,8 @@ User: "review the PR again"
 
 ## Important context
 
-- Identity: `.claude/bin/gh` posts as `tamakiii-claude[bot]`
-- Always use `.claude/bin/gh`, never bare `gh`
+- Identity: `~/.claude/bin/gh` posts as `tamakiii-claude[bot]`
+- Always use `~/.claude/bin/gh`, never bare `gh`
 - Always specify `--repo <owner/repo>` explicitly
 - Derive repo from `git remote get-url origin` when not provided in the user's message
 - If reviewing a follow-up after feedback, explicitly note which items are addressed
