@@ -27,7 +27,7 @@
   "effortLevel": "high",
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh"
+    "command": "~/.claude/bin/statusline.sh"
   },
   "hooks": {
     "Notification": [
