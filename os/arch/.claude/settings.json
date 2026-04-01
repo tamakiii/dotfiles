@@ -11,24 +11,6 @@
       "Bash(gh *)"
     ]
   },
-  "enabledPlugins": {
-    "document-skills@anthropic-agent-skills": true,
-    "claude-api@anthropic-agent-skills": true,
-    "example-skills@anthropic-agent-skills": true
-  },
-  "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    }
-  },
-  "effortLevel": "high",
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/bin/statusline.sh"
-  },
   "hooks": {
     "Notification": [
       {
@@ -41,5 +23,30 @@
         ]
       }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/bin/statusline.sh"
+  },
+  "enabledPlugins": {
+    "document-skills@anthropic-agent-skills": true,
+    "claude-api@anthropic-agent-skills": true,
+    "example-skills@anthropic-agent-skills": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
+  },
+  "effortLevel": "high"
 }
