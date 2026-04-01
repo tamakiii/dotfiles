@@ -1,103 +1,106 @@
 ---
 name: review-pull-request-adversarially
 description: |
-  PRに対して「建設的な敵対的レビュー」を実施する。通常のコードレビューではなく、前提・設計判断・問題設定そのものを批判的に検証する。
-  「adversarial review」「devil's advocate review」「批判的レビュー」「このPR本当に大丈夫？」「設計の穴を探して」「PRを厳しくレビューして」「red team this PR」「challenge this PR」に関するリクエストで使用。
-  Use this when the user wants a critical, assumption-challenging review of a PR — not just code style and bugs, but questioning whether the approach itself is sound.
+  Perform a constructive adversarial review of a pull request. Goes beyond standard code review (bugs, style, tests) to critically examine assumptions, design decisions, and problem framing.
+  Use this when the user says "adversarial review", "devil's advocate review", "red team this PR", "challenge this PR", "poke holes in this", "is this PR actually sound?", or asks for a critical/skeptical review of a PR's approach rather than its code quality.
 metadata:
   short-description: Adversarial PR review — challenge assumptions, not just code
 ---
 
 # Adversarial PR Review
 
-通常のコードレビュー（バグ、スタイル、テストカバレッジ）とは異なる。このスキルは問題設定・前提・設計判断の妥当性を批判的に検証する。
+This skill is distinct from standard code review. It critically examines whether the PR's approach itself is sound — the problem framing, unstated assumptions, and design decisions — not just whether the code is correct.
 
-The goal is **constructive** adversarial — strengthen the PR by finding what's wrong in logic, framing, and assumptions, not just code.
+The goal is **constructive** adversarial: strengthen the PR by finding what's wrong in logic, framing, and assumptions.
+
+## Background
+
+For deeper context on the adversarial review philosophy, terminology (devil's advocate review, red team review, cross-model review, adversarial debate), review depth levels, and when this approach adds value vs. noise, read `references/concepts.md`.
 
 ## Why this matters
 
-単一のモデルが自分の出力をレビューすると、同じバイアスに影響される。異なる視点から意図的に前提を疑うことで、見落としを発見できる。
+A single model reviewing its own output suffers from the same biases that produced it. Deliberately challenging assumptions from a different perspective surfaces blind spots that standard review misses.
 
 ## How to use
 
 ### Step 1: Identify the PR
 
-ユーザーのメッセージからPR参照を抽出する：
+Extract the PR reference from the user's message — a number, URL, or "the open PR":
 
 ```bash
-# PR番号、URL、または「open PR」から特定
-# リポジトリは URL またはリモートから導出
 git remote get-url origin | sed 's|.*github.com[:/]||;s|\.git$||'
 ```
 
 ### Step 2: Gather context
 
-並列で実行：
+Run in parallel:
 
 ```bash
-# PR メタデータ
+# PR metadata
 gh pr view <N> --repo <repo> --json title,body,headRefName,baseRefName,state,additions,deletions,files,commits
 
-# 完全な diff
+# Full diff
 gh pr diff <N> --repo <repo>
 
-# PR コメント（既存の議論を確認）
+# Existing discussion
 gh api repos/<owner>/<repo>/pulls/<N>/comments
 
-# コミット履歴で意図を理解
+# Commit history to understand intent
 gh pr view <N> --repo <repo> --json commits --jq '.commits[].messageHeadline'
 ```
 
 ### Step 3: Adversarial review — three phases
 
-PR の diff と説明を読んだ上で、以下の3段階で検証する。
+After reading the diff and description, adopt the adversarial posture: **start from the assumption that the approach is wrong**, then look for evidence. This is the key shift — instead of building a case for the PR, you are dismantling one. The goal is not to confirm the PR is good, but to find where it is weak.
+
+Probe these categories across all phases: hidden assumptions, unstated constraints, unconsidered alternatives, failure modes, scope creep risks, over-engineering signals.
 
 #### Phase 1: Problem framing review
 
-PRが解決しようとしている問題そのものを疑う：
+Challenge the problem the PR claims to solve:
 
-- このPRが解決すると主張している問題は何か？
-- その問題設定は正確か、それとも別の根本原因を隠していないか？
-- ユーザー、環境、制約について暗黙の前提はないか？
-- 議論なしに暗黙的に却下された代替案はないか？
+- What problem does this PR claim to solve?
+- Is the problem statement accurate, or does it mask a different root cause?
+- Are there unstated assumptions about users, environment, or constraints?
+- Were alternatives implicitly rejected without discussion?
 
 #### Phase 2: Logical coherence
 
-実装とゴールの整合性を検証する：
+Verify alignment between the implementation and the goal:
 
-- 実装は本当に述べられた問題を解決しているか？
-- ゴールとアプローチの間に論理的なギャップはないか？
-- エッジケースは認識されているか、それとも暗黙的に無視されているか？
-- 循環論法がないか（「Xが必要、なぜならYを作ったから、YはXを必要とする」）
+- Does the implementation actually solve the stated problem?
+- Are there logical gaps between the goal and the approach?
+- Are edge cases acknowledged or silently ignored?
+- Is there circular reasoning ("we need X because we built Y which needs X")?
 
 #### Phase 3: Future failure pre-mortem
 
-このPRがマージされた後の未来から逆算する：
+Reason backward from a future where this PR caused problems:
 
-- このPRが3ヶ月後に問題を起こしたとして、3文のインシデントレポートを書く
-- 技術的負債を生む最も可能性の高い経路は何か？
-- 将来のコントリビューターが最も誤解しそうな点は何か？
+- Write a 3-sentence incident report as if this PR caused an issue 3 months after shipping
+- What is the most likely path to technical debt?
+- What will future contributors most likely misunderstand?
 
-### Step 4: Quality check — filter performative skepticism
+### Step 4: Filter performative skepticism
 
-各指摘について自己検証する。「もっともらしく聞こえるが実質のない批判」を排除するためのルール：
+Self-check each finding. The risk is generating objections that sound substantive but are shallow — playing devil's advocate just to seem thorough.
 
-**すべての批判に対して具体的な代替案を提示すること。** 代替案を提案できないなら、その批判はおそらく表面的。削除する。
+**Every critique must include a concrete alternative.** If you cannot propose what "better" looks like, the critique is probably superficial. Remove it.
 
-指摘を以下の基準でフィルタリング：
-- 「これは本当に問題か、それとも好みの違いか？」
-- 「代替案は実際に実現可能か？」
-- 「この指摘はPRの著者にとって actionable か？」
+Filter findings against these questions:
+- "Is this a real problem, or just a preference?"
+- "Is the proposed alternative actually feasible?"
+- "Is this finding actionable for the PR author?"
 
 ### Step 5: Format and post
 
-`gh` を使ってレビューコメントを投稿する。常に `--repo` を明示する。
+Use `gh` to post the review comment. Always specify `--repo` explicitly.
 
 ```bash
 gh pr review <N> --repo <repo> --comment --body "$(cat <<'EOF'
 ## Adversarial Review 🔍
 
-> このレビューは通常のコードレビューとは異なり、前提・設計判断・問題設定の妥当性を批判的に検証するものです。
+> This review goes beyond standard code review to critically examine assumptions, design decisions, and problem framing.
 
 ### Problem Framing
 <findings>
@@ -124,38 +127,38 @@ EOF
 
 #### Severity levels
 
-- **Fatal flaw**: このままマージすると重大な問題が発生する可能性が高い
-- **Significant concern**: 対応しないと将来的にリスクとなる
-- **Worth discussing**: 改善の余地があるが、ブロッカーではない
+- **Fatal flaw**: Merging as-is is likely to cause a significant problem
+- **Significant concern**: Creates future risk if not addressed
+- **Worth discussing**: Room for improvement, but not a blocker
 
 #### Confidence levels
 
-- **High**: diffから直接確認できる具体的な問題
-- **Medium**: コンテキストに基づく合理的な推論
-- **Low**: 可能性の指摘、追加調査が必要
+- **High**: Specific issue directly verifiable from the diff
+- **Medium**: Reasonable inference based on context
+- **Low**: Possible concern, needs further investigation
 
 ### What this skill does NOT do
 
-- 通常のコードレビュー（バグ、スタイル、テストカバレッジ）
-- approve / request changes の判定 → 常に comment として投稿
-- 些末な批判やスタイルの好みに関する指摘
+- Standard code review (bugs, style, test coverage) — use a regular review for that
+- Approve or request changes — always posts as a comment
+- Nitpick style preferences or trivial concerns
 
 ## Edge cases
 
-**PRにdescriptionがない場合:**
-コミットメッセージとdiffから意図を推測する。推測であることを明記する。
+**PR has no description:**
+Infer intent from commit messages and the diff. State clearly that the review is based on inference.
 
-**trivialな変更（typo修正、依存関係更新など）の場合:**
-「このPRは adversarial review の対象として適切ではありません」と伝え、通常のレビューを提案する。
+**Trivial changes (typo fixes, dependency updates, etc.):**
+Tell the user this PR is not a good candidate for adversarial review, and suggest a standard review instead.
 
-**既にadversarial reviewが投稿されている場合:**
-前回のレビューを読み、新しい指摘がある場合のみ追加投稿する。
+**Adversarial review already posted:**
+Read the previous review. Only post again if there are new findings.
 
 ## Multi-perspective mode
 
-ユーザーが「もっと深く」「徹底的に」と求めた場合、4つの視点に分解する：
+When the user asks for a deeper or more thorough review, decompose into four perspectives:
 
-- **The Skeptic**: この機能全体が不要である理由は？
-- **The Architect**: 暗黙的に却下された設計代替案は、本当により悪かったのか？
-- **The User**: これは述べられた問題を解決しているか、それとも別の問題を解決しているか？
-- **The Maintainer (6ヶ月後)**: 何が混乱を招き、何が後悔されるか？
+- **The Skeptic**: Why might this entire feature be unnecessary?
+- **The Architect**: Were implicitly rejected design alternatives actually worse?
+- **The User**: Does this solve the stated problem, or a different one?
+- **The Maintainer (6 months later)**: What will be confusing or regrettable?
