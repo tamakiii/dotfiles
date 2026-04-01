@@ -9,6 +9,7 @@ install: \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
+	~/.codex \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -57,6 +58,7 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
+	rm -rf ~/.codex
 	rm -rf ~/.claude
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
@@ -94,6 +96,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude: | .claude
+	ln -sfnv $(abspath $|) $@
+
+~/.codex: | .codex
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
