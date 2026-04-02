@@ -8,6 +8,7 @@ install: \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.zprofile \
+	~/.claude/settings.json \
 	~/.claude/bin/gh \
 	~/.codex/bin/gh \
 	~/.openclaw/bin/gh \
@@ -59,6 +60,7 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
+	rm -f ~/.claude/settings.json
 	rm -f ~/.claude/bin/gh
 	rm -f ~/.codex/bin/gh
 	rm -f ~/.openclaw/bin/gh
@@ -138,6 +140,9 @@ uninstall:
 
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
 	ln -sfnv tmux-editor $@
+
+~/.claude/settings.json: | .claude/settings.json
+	ln -sfnv $(abspath $|) $@
 
 ~/.claude/bin:
 	mkdir -p $@
