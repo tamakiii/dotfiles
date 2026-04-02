@@ -8,7 +8,6 @@ install: \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.zprofile \
-	~/.claude \
 	~/.local/bin/github-mcp-headers \
 	~/.local/bin/gw \
 	~/.local/bin/tmux-window-name \
@@ -46,7 +45,6 @@ uninstall:
 	rm -f ~/.local/bin/tmux-pane-label
 	rm -f ~/.local/bin/tmux-window-name
 	rm -rf ~/.local/bin/github-mcp-headers
-	rm -rf ~/.claude
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -80,9 +78,6 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/claude: | .config/claude
-	ln -sfnv $(abspath $|) $@
-
-~/.claude: | .claude
 	ln -sfnv $(abspath $|) $@
 
 ~/.local:
