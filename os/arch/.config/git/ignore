@@ -1,5 +1,5 @@
 .DS_Store
-.codex
+/.codex
 nohup.out
 *.local.json
 *.local
