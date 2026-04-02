@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Pull Request"
+  short_description: "Review and respond on a GitHub PR"
+  default_prompt: "Use $review-pull-request to inspect a GitHub pull request and post a review."
