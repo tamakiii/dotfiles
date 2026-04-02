@@ -31,12 +31,14 @@ install: \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
 	~/.local/bin/gh \
-	~/.local/share/applications/steam.desktop \
-	~/.local/share/applications/discord.desktop
+	~/.codex/skills/create-pull-request \
+	~/.codex/skills/review-pull-request \
+	~/.codex/skills/review-pull-request-adversarially
 
 uninstall:
-	rm -f ~/.local/share/applications/discord.desktop
-	rm -f ~/.local/share/applications/steam.desktop
+	rm -f ~/.codex/skills/review-pull-request-adversarially
+	rm -f ~/.codex/skills/review-pull-request
+	rm -f ~/.codex/skills/create-pull-request
 	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
@@ -155,11 +157,14 @@ uninstall:
 ~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.local/share/applications:
+~/.codex/skills:
 	mkdir -p $@
 
-~/.local/share/applications/steam.desktop: ~/.local/share/applications | .local/share/applications/steam.desktop
-	ln -sfnv $(abspath $(word 2,$^)) $@
+~/.codex/skills/create-pull-request: ~/.codex/skills | .codex/skills/create-pull-request
+	ln -sfnv $(abspath $|) $@
 
-~/.local/share/applications/discord.desktop: ~/.local/share/applications | .local/share/applications/discord.desktop
-	ln -sfnv $(abspath $(word 2,$^)) $@
+~/.codex/skills/review-pull-request: ~/.codex/skills | .codex/skills/review-pull-request
+	ln -sfnv $(abspath $|) $@
+
+~/.codex/skills/review-pull-request-adversarially: ~/.codex/skills | .codex/skills/review-pull-request-adversarially
+	ln -sfnv $(abspath $|) $@
