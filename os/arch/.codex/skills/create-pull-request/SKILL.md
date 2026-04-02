@@ -74,12 +74,12 @@ If the branch already has an upstream, push normally only when the local branch 
 
 ### 5. Create the pull request
 
-Always use the local wrapper at `/home/tamakiii/.dotfiles/os/arch/.codex/bin/gh` so the PR is created as `tamakiii-codex[bot]`. Always pass `--repo` explicitly.
+Always use the local wrapper at `~/.codex/bin/gh` so the PR is created as `tamakiii-doppelganger[bot]`. Always pass `--repo` explicitly.
 
 Before creating a new PR, check whether one already exists for the current branch:
 
 ```bash
-/home/tamakiii/.dotfiles/os/arch/.codex/bin/gh pr list --repo <owner/repo> --head <branch-name> --json number,url
+~/.codex/bin/gh pr list --repo <owner/repo> --head <branch-name> --json number,url
 ```
 
 If a PR already exists, report the URL instead of creating a duplicate.
@@ -87,7 +87,7 @@ If a PR already exists, report the URL instead of creating a duplicate.
 When creating a PR:
 
 ```bash
-/home/tamakiii/.dotfiles/os/arch/.codex/bin/gh pr create --repo <owner/repo> --title "<title>" --body "$(cat <<'EOF'
+~/.codex/bin/gh pr create --repo <owner/repo> --title "<title>" --body "$(cat <<'EOF'
 ## Summary
 - <what changed>
 - <why it changed>
@@ -128,7 +128,7 @@ After creating the PR, tell the user:
 
 ## Important Details
 
-- Use `/home/tamakiii/.dotfiles/os/arch/.codex/bin/gh`, not bare `gh`.
+- Use `~/.codex/bin/gh`, not bare `gh`.
 - Always pass `--repo <owner/repo>` explicitly.
 - Derive `<owner/repo>` from `origin` when the user did not specify it.
 - Keep staging selective; never sweep unrelated local edits into the PR.
