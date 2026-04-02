@@ -5,7 +5,7 @@ description: Review a GitHub pull request by fetching its metadata, diff, and pr
 
 # Review Pull Request
 
-Review a pull request end to end: resolve the PR reference, inspect the changes carefully, decide whether to approve or request changes, and post the review as `tamakiii-doppelganger[bot]`.
+Review a pull request end to end: resolve the PR reference, inspect the changes carefully, decide whether to approve or request changes, and post the review as `tamakiii-codex[bot]`.
 
 ## Workflow
 
@@ -25,10 +25,10 @@ Run these in parallel:
 
 ```bash
 git remote get-url origin | sed 's|.*github.com[:/]||;s|\.git$||'
-~/.local/bin/gh pr view <N> --repo <repo> --json title,body,headRefName,baseRefName,state,additions,deletions,files,commits
-~/.local/bin/gh pr diff <N> --repo <repo>
-~/.local/bin/gh api repos/<repo>/pulls/<N>/comments --jq '.[].body'
-~/.local/bin/gh api repos/<repo>/pulls/<N>/reviews --jq '.[] | {state: .state, body: .body}'
+~/.codex/bin/gh pr view <N> --repo <repo> --json title,body,headRefName,baseRefName,state,additions,deletions,files,commits
+~/.codex/bin/gh pr diff <N> --repo <repo>
+~/.codex/bin/gh api repos/<repo>/pulls/<N>/comments --jq '.[].body'
+~/.codex/bin/gh api repos/<repo>/pulls/<N>/reviews --jq '.[] | {state: .state, body: .body}'
 ```
 
 Use the review comments and prior reviews to avoid repeating already-addressed feedback.
@@ -75,7 +75,7 @@ Guidelines:
 
 ### 5. Post the review
 
-Always use `~/.local/bin/gh` so the review is posted as `tamakiii-doppelganger[bot]`.
+Always use `~/.codex/bin/gh` so the review is posted as `tamakiii-codex[bot]`.
 
 Choose the action from the findings:
 
@@ -86,7 +86,7 @@ Choose the action from the findings:
 Example:
 
 ```bash
-~/.local/bin/gh pr review <N> --repo <repo> --request-changes --body "$(cat <<'EOF'
+~/.codex/bin/gh pr review <N> --repo <repo> --request-changes --body "$(cat <<'EOF'
 ## Review
 
 ### Fix before merge
@@ -105,7 +105,7 @@ After posting, summarize:
 
 ## Important Details
 
-- Use `~/.local/bin/gh`, not bare `gh`.
+- Use `~/.codex/bin/gh`, not bare `gh`.
 - Always pass `--repo <owner/repo>` explicitly.
 - Derive the repo from `origin` when it is not present in the request.
 - Default to a code-review mindset: findings first, summary second.
