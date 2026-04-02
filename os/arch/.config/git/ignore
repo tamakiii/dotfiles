@@ -1,5 +1,6 @@
 .DS_Store
 nohup.out
 *.local.json
-*.local/
 *.local
+*.local/
+!.local/
