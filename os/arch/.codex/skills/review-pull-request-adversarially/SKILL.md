@@ -29,10 +29,11 @@ Run these in parallel:
 ~/.codex/bin/gh pr view <N> --repo <repo> --json title,body,headRefName,baseRefName,state,additions,deletions,files,commits
 ~/.codex/bin/gh pr diff <N> --repo <repo>
 ~/.codex/bin/gh api repos/<repo>/pulls/<N>/comments
+~/.codex/bin/gh api repos/<repo>/pulls/<N>/reviews
 ~/.codex/bin/gh pr view <N> --repo <repo> --json commits --jq '.commits[].messageHeadline'
 ```
 
-Read the PR body, commit messages, and existing discussion before forming objections. If the PR description is missing or weak, say explicitly that parts of the review are inferred from the diff.
+Read the PR body, commit messages, existing discussion, and prior reviews before forming objections. If the PR description is missing or weak, say explicitly that parts of the review are inferred from the diff.
 
 ### 3. Review adversarially in three phases
 
@@ -93,7 +94,7 @@ If the PR is trivial, say so and suggest a standard review instead. Good candida
 - mechanical dependency bumps
 - obvious low-risk config churn
 
-If an adversarial review already exists, read it first and only post again when you have materially new findings.
+If an adversarial review already exists in either prior review comments or reviews, read it first and only post again when you have materially new findings.
 
 ### 6. Post the review
 
