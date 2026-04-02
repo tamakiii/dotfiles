@@ -8,8 +8,9 @@ install: \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.zprofile \
-	~/.claude \
-	~/.codex \
+	~/.claude/bin/gh \
+	~/.codex/bin/gh \
+	~/.openclaw/bin/gh \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -29,18 +30,14 @@ install: \
 	~/.local/bin/tmux-editor \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
-	~/.claude/bin/gh \
-	~/.codex/bin/gh \
-	~/.openclaw/bin/gh \
+	~/.local/bin/gh \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
 
 uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
-	rm -f ~/.claude/bin/gh
-	rm -f ~/.codex/bin/gh
-	rm -f ~/.openclaw/bin/gh
+	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
 	rm -f ~/.local/bin/tmux-editor
@@ -60,8 +57,9 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
-	rm -rf ~/.claude
-	rm -rf ~/.codex
+	rm -f ~/.claude/bin/gh
+	rm -f ~/.codex/bin/gh
+	rm -f ~/.openclaw/bin/gh
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -97,12 +95,6 @@ uninstall:
 ~/.config/claude: | .config/claude
 	ln -sfnv $(abspath $|) $@
 
-~/.claude: | .claude
-	ln -sfnv $(abspath $|) $@
-
-~/.codex: | .codex
-	ln -sfnv $(abspath $|) $@
-
 ~/.config/hypr: | .config/hypr
 	ln -sfnv $(abspath $|) $@
 
@@ -125,6 +117,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh-app-token: | bin/gh-app-token
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gh: | .local/bin/gh
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-claude-status: | bin/tmux-claude-status

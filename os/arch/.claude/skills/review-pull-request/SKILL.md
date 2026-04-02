@@ -91,26 +91,22 @@ Guidelines for the review content:
 
 ### Step 5: Post the review
 
-Choose the appropriate review action based on the analysis:
+Select the review action based on the review content — not a default:
 
-**Comment** (default — when there are items to discuss):
-```bash
-~/.claude/bin/gh pr review <N> --repo <repo> --comment --body "<review body>"
-```
+- **`--request-changes`** — when the review includes a "Fix before merge" section with items. Blocking issues must show up as "changes requested" on the PR.
+- **`--approve`** — when there are no blocking issues (no "Fix before merge" section, or the user explicitly asks to approve).
+- **`--comment`** — only when the user explicitly asks for a comment-only review.
 
-**Approve** (when the PR is clean, or the user explicitly asks):
 ```bash
-~/.claude/bin/gh pr review <N> --repo <repo> --approve --body "<review body>"
-```
+# Request changes (has "Fix before merge" items)
+~/.claude/bin/gh pr review <N> --repo <repo> --request-changes --body "$(cat <<'EOF'
+## Review — tamakiii-claude[bot]
+...
+EOF
+)"
 
-**Request changes** (when there are blocking issues):
-```bash
-~/.claude/bin/gh pr review <N> --repo <repo> --request-changes --body "<review body>"
-```
-
-Always pass the review body via a heredoc to preserve formatting:
-```bash
-~/.claude/bin/gh pr review <N> --repo <repo> --comment --body "$(cat <<'EOF'
+# Approve (no blocking issues)
+~/.claude/bin/gh pr review <N> --repo <repo> --approve --body "$(cat <<'EOF'
 ## Review — tamakiii-claude[bot]
 ...
 EOF

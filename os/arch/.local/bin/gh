@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Wrapper for gh CLI that authenticates as tamakiii-doppelganger[bot].
+# Usage: .local/bin/gh pr review 2 --repo tamakiii/sandbox-bevy --approve
+
+REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "${REAL_PATH}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+export GH_TOKEN="$("${REPO_ROOT}/bin/gh-app-token" \
+  "$(pass show tamakiii/github.com/tamakiii-doppelganger/app-id)" \
+  "$(pass show tamakiii/github.com/tamakiii-doppelganger/installation-id)" \
+  <(pass show tamakiii/github.com/tamakiii-doppelganger.pem))"
+
+exec /usr/bin/gh "$@"
