@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Bundled gh wrapper for this plugin.
+# Select the GitHub App identity with CODEX_GH_PROFILE:
+#   CODEX_GH_PROFILE=codex
+#   CODEX_GH_PROFILE=doppelganger
+#
+# Required dependencies:
+# - gh
+# - gh-app-token
+# - pass
+#
+# Required pass entries:
+# - tamakiii/github.com/tamakiii-codex/app-id
+# - tamakiii/github.com/tamakiii-codex/installation-id
+# - tamakiii/github.com/tamakiii-codex.pem
+# - tamakiii/github.com/tamakiii-doppelganger/app-id
+# - tamakiii/github.com/tamakiii-doppelganger/installation-id
+# - tamakiii/github.com/tamakiii-doppelganger.pem
+
+profile="${CODEX_GH_PROFILE:-codex}"
+pass_bin="${PASS_BIN:-pass}"
+gh_bin="${GH_BIN:-gh}"
+gh_app_token_bin="${GH_APP_TOKEN_BIN:-gh-app-token}"
+
+case "$profile" in
+  codex)
+    app_name="tamakiii-codex"
+    ;;
+  doppelganger)
+    app_name="tamakiii-doppelganger"
+    ;;
+  *)
+    echo "Unsupported CODEX_GH_PROFILE: $profile" >&2
+    exit 2
+    ;;
+esac
+
+app_prefix="tamakiii/github.com/${app_name}"
+
+export GH_TOKEN="$("$gh_app_token_bin" \
+  "$("$pass_bin" show "${app_prefix}/app-id")" \
+  "$("$pass_bin" show "${app_prefix}/installation-id")" \
+  <("$pass_bin" show "${app_prefix}.pem"))"
+
+exec "$gh_bin" "$@"

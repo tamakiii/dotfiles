@@ -1,0 +1,39 @@
+{
+  "name": "github-workflow",
+  "version": "0.1.0",
+  "description": "Portable GitHub workflow plugin with bundled Codex skills and gh wrapper.",
+  "author": {
+    "name": "tamakiii",
+    "email": "tamakiii@users.noreply.github.com",
+    "url": "https://github.com/tamakiii"
+  },
+  "homepage": "https://github.com/tamakiii/codex-marketplace",
+  "repository": "https://github.com/tamakiii/codex-marketplace",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "workflow",
+    "skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "GitHub Workflow",
+    "shortDescription": "PR creation and review workflow skills",
+    "longDescription": "Packages reusable create-pull-request and review-pull-request Codex skills with a bundled gh wrapper that can switch between bot identities.",
+    "developerName": "tamakiii",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/tamakiii/codex-marketplace",
+    "privacyPolicyURL": "https://github.com/tamakiii/codex-marketplace",
+    "termsOfServiceURL": "https://github.com/tamakiii/codex-marketplace",
+    "defaultPrompt": [
+      "Use $create-pull-request to open a PR for this repo.",
+      "Use $review-pull-request to review PR #123.",
+      "Use $review-pull-request to approve the open PR."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

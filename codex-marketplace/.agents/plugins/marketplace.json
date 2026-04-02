@@ -1,0 +1,20 @@
+{
+  "name": "tamakiii-marketplace",
+  "interface": {
+    "displayName": "tamakiii Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "github-workflow",
+      "source": {
+        "source": "local",
+        "path": "./plugins/github-workflow"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
