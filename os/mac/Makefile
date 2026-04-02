@@ -19,6 +19,8 @@ install: \
 	~/.local/bin/tmux-claude-send \
 	~/.local/bin/tmux-editor \
 	~/.local/bin/codium \
+	~/.local/bin/gh-app-token \
+	~/.local/bin/gh \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -35,6 +37,8 @@ uninstall:
 	rm -rf ~/.config/ghostty
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
+	rm -f ~/.local/bin/gh
+	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
 	rm -f ~/.local/bin/tmux-editor
 	rm -f ~/.local/bin/tmux-claude-send
@@ -118,6 +122,12 @@ uninstall:
 
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
 	ln -sfnv tmux-editor $@
+
+~/.local/bin/gh-app-token: ~/.local/bin | bin/gh-app-token
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gh: ~/.local/bin | .local/bin/gh
+	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
 	cp "$|" "$@"

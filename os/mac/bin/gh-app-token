@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Generate a GitHub App installation token.
+#
+# Usage:
+#   gh-app-token <app-id> <installation-id> <pem-file>
+#
+# Arguments:
+#   app-id           GitHub App ID
+#   installation-id  GitHub App Installation ID
+#   pem-file         Path to the .pem private key (or process substitution)
+#
+# Output: a short-lived installation token (expires ~1h) on stdout.
+#
+# Example:
+#   gh-app-token "$(pass show tamakiii/github.com/tamakiii-claude/app-id)" \
+#                "$(pass show tamakiii/github.com/tamakiii-claude/installation-id)" \
+#                <(pass show tamakiii/github.com/tamakiii-claude.pem)
+
+APP_ID="${1:-}"
+INSTALLATION_ID="${2:-}"
+PEM_FILE="${3:-}"
+
+if [[ -z "$APP_ID" ]] || [[ -z "$INSTALLATION_ID" ]] || [[ -z "$PEM_FILE" ]]; then
+  echo "Usage: gh-app-token <app-id> <installation-id> <pem-file>" >&2
+  exit 1
+fi
+
+base64url() {
+  openssl base64 -A | tr '+/' '-_' | tr -d '='
+}
+
+now=$(date +%s)
+iat=$((now - 60))
+exp=$((now + 300))
+
+header='{"alg":"RS256","typ":"JWT"}'
+payload=$(printf '{"iss":"%s","iat":%d,"exp":%d}' "$APP_ID" "$iat" "$exp")
+
+header_b64=$(printf '%s' "$header" | base64url)
+payload_b64=$(printf '%s' "$payload" | base64url)
+
+unsigned="${header_b64}.${payload_b64}"
+
+signature=$(printf '%s' "$unsigned" \
+  | openssl dgst -sha256 -sign "$PEM_FILE" \
+  | base64url)
+
+jwt="${unsigned}.${signature}"
+
+token=$(curl -s -X POST \
+  -H "Authorization: Bearer ${jwt}" \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/app/installations/${INSTALLATION_ID}/access_tokens" \
+  | jq -r '.token // empty')
+
+if [[ -z "$token" ]]; then
+  echo "Error: failed to obtain installation token" >&2
+  exit 1
+fi
+
+printf '%s' "$token"

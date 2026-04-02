@@ -13,4 +13,4 @@ export GH_TOKEN="$("${REPO_ROOT}/bin/gh-app-token" \
   "$(pass show tamakiii/github.com/tamakiii-doppelganger/installation-id)" \
   <(pass show tamakiii/github.com/tamakiii-doppelganger.pem))"
 
-exec /usr/bin/gh "$@"
+exec /opt/homebrew/bin/gh "$@"
