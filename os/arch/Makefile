@@ -9,6 +9,7 @@ install: \
 	~/.zshrc \
 	~/.zprofile \
 	~/.claude \
+	~/.codex \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty \
@@ -29,6 +30,7 @@ install: \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
 	~/.claude/bin/gh \
+	~/.codex/bin/gh \
 	~/.openclaw/bin/gh \
 	~/.local/share/applications/steam.desktop \
 	~/.local/share/applications/discord.desktop
@@ -37,6 +39,7 @@ uninstall:
 	rm -f ~/.local/share/applications/discord.desktop
 	rm -f ~/.local/share/applications/steam.desktop
 	rm -f ~/.claude/bin/gh
+	rm -f ~/.codex/bin/gh
 	rm -f ~/.openclaw/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
@@ -58,6 +61,7 @@ uninstall:
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -rf ~/.claude
+	rm -rf ~/.codex
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -94,6 +98,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude: | .claude
+	ln -sfnv $(abspath $|) $@
+
+~/.codex: | .codex
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
@@ -139,13 +146,19 @@ uninstall:
 	mkdir -p $@
 
 ~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
-	ln -sfnv $(abspath $(word 2,$^)) $@
+	ln -sfnv $(abspath $|) $@
+
+~/.codex/bin:
+	mkdir -p $@
+
+~/.codex/bin/gh: ~/.codex/bin | .codex/bin/gh
+	ln -sfnv $(abspath $|) $@
 
 ~/.openclaw/bin:
 	mkdir -p $@
 
 ~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
-	ln -sfnv $(abspath $(word 2,$^)) $@
+	ln -sfnv $(abspath $|) $@
 
 ~/.local/share/applications:
 	mkdir -p $@
