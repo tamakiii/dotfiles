@@ -10,6 +10,7 @@ install: \
 	~/.zprofile \
 	~/.claude/settings.json \
 	~/.claude/bin/gh \
+	~/.claude/bin/statusline.sh \
 	~/.codex/bin/gh \
 	~/.openclaw/bin/gh \
 	~/.config/tmux \
@@ -59,6 +60,7 @@ uninstall:
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -f ~/.claude/settings.json
+	rm -f ~/.claude/bin/statusline.sh
 	rm -f ~/.claude/bin/gh
 	rm -f ~/.codex/bin/gh
 	rm -f ~/.openclaw/bin/gh
@@ -146,6 +148,9 @@ uninstall:
 	mkdir -p $@
 
 ~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
+	ln -sfnv $(abspath $|) $@
+
+~/.claude/bin/statusline.sh: ~/.claude/bin | .claude/bin/statusline.sh
 	ln -sfnv $(abspath $|) $@
 
 ~/.codex/bin:
