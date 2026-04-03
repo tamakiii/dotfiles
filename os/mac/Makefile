@@ -27,10 +27,12 @@ install: \
 	~/.config/gitmux \
 	~/.config/git \
 	~/.config/claude \
+	~/.claude/skills \
 	~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 uninstall:
 	rm -rf ~/Library/Application\ Support/Claude/claude_desktop_config.json
+	rm -rf ~/.claude/skills
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
@@ -127,6 +129,9 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh: ~/.local/bin | .local/bin/gh
+	ln -sfnv $(abspath $|) $@
+
+~/.claude/skills: | .claude/skills
 	ln -sfnv $(abspath $|) $@
 
 ~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
