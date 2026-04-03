@@ -11,6 +11,23 @@
       "Bash(gh *)"
     ]
   },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '\\a'"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/bin/statusline.sh"
+  },
   "enabledPlugins": {
     "document-skills@anthropic-agent-skills": true,
     "claude-api@anthropic-agent-skills": true,
@@ -24,22 +41,5 @@
       }
     }
   },
-  "effortLevel": "high",
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/bin/statusline.sh"
-  },
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "printf '\\a'"
-          }
-        ]
-      }
-    ]
-  }
+  "effortLevel": "high"
 }

@@ -10,6 +10,7 @@ install: \
 	~/.zprofile \
 	~/.claude/settings.json \
 	~/.claude/bin/gh \
+	~/.claude/bin/statusline.sh \
 	~/.codex/bin/gh \
 	~/.openclaw/bin/gh \
 	~/.config/tmux \
@@ -32,14 +33,12 @@ install: \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
 	~/.local/bin/gh \
-	~/.codex/skills/create-pull-request \
-	~/.codex/skills/review-pull-request \
-	~/.codex/skills/review-pull-request-adversarially
+	~/.claude/skills \
+	~/.codex/skills
 
 uninstall:
-	rm -f ~/.codex/skills/review-pull-request-adversarially
-	rm -f ~/.codex/skills/review-pull-request
-	rm -f ~/.codex/skills/create-pull-request
+	rm -rf ~/.codex/skills
+	rm -rf ~/.claude/skills
 	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
@@ -61,6 +60,7 @@ uninstall:
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -f ~/.claude/settings.json
+	rm -f ~/.claude/bin/statusline.sh
 	rm -f ~/.claude/bin/gh
 	rm -f ~/.codex/bin/gh
 	rm -f ~/.openclaw/bin/gh
@@ -150,6 +150,9 @@ uninstall:
 ~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
 	ln -sfnv $(abspath $|) $@
 
+~/.claude/bin/statusline.sh: ~/.claude/bin | .claude/bin/statusline.sh
+	ln -sfnv $(abspath $|) $@
+
 ~/.codex/bin:
 	mkdir -p $@
 
@@ -162,14 +165,8 @@ uninstall:
 ~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.codex/skills:
-	mkdir -p $@
-
-~/.codex/skills/create-pull-request: ~/.codex/skills | .codex/skills/create-pull-request
+~/.claude/skills: | .claude/skills
 	ln -sfnv $(abspath $|) $@
 
-~/.codex/skills/review-pull-request: ~/.codex/skills | .codex/skills/review-pull-request
-	ln -sfnv $(abspath $|) $@
-
-~/.codex/skills/review-pull-request-adversarially: ~/.codex/skills | .codex/skills/review-pull-request-adversarially
+~/.codex/skills: | .codex/skills
 	ln -sfnv $(abspath $|) $@
