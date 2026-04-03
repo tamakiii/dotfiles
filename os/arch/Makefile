@@ -32,14 +32,12 @@ install: \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
 	~/.local/bin/gh \
-	~/.codex/skills/create-pull-request \
-	~/.codex/skills/review-pull-request \
-	~/.codex/skills/review-pull-request-adversarially
+	~/.claude/skills \
+	~/.codex/skills
 
 uninstall:
-	rm -f ~/.codex/skills/review-pull-request-adversarially
-	rm -f ~/.codex/skills/review-pull-request
-	rm -f ~/.codex/skills/create-pull-request
+	rm -rf ~/.codex/skills
+	rm -rf ~/.claude/skills
 	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
@@ -162,14 +160,8 @@ uninstall:
 ~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.codex/skills:
-	mkdir -p $@
-
-~/.codex/skills/create-pull-request: ~/.codex/skills | .codex/skills/create-pull-request
+~/.claude/skills: | .claude/skills
 	ln -sfnv $(abspath $|) $@
 
-~/.codex/skills/review-pull-request: ~/.codex/skills | .codex/skills/review-pull-request
-	ln -sfnv $(abspath $|) $@
-
-~/.codex/skills/review-pull-request-adversarially: ~/.codex/skills | .codex/skills/review-pull-request-adversarially
+~/.codex/skills: | .codex/skills
 	ln -sfnv $(abspath $|) $@
