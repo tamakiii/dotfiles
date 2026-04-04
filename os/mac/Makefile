@@ -1,4 +1,5 @@
 ROOT := ../..
+MYFILES := $(ROOT)/.local/src/tamakiii/myfiles
 
 .PHONY: help install uninstall
 
@@ -29,11 +30,9 @@ install: \
 	~/.config/gitmux \
 	~/.config/git \
 	~/.config/claude \
-	~/.claude/skills \
-	~/Library/Application\ Support/Claude/claude_desktop_config.json
+	~/.claude/skills
 
 uninstall:
-	rm -rf ~/Library/Application\ Support/Claude/claude_desktop_config.json
 	rm -rf ~/.claude/skills
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
@@ -85,7 +84,7 @@ uninstall:
 ~/.config/git: | .config/git
 	ln -sfnv $(abspath $|) $@
 
-~/.config/claude: | .config/claude
+~/.config/claude: | $(MYFILES)/os/mac/.config/claude
 	ln -sfnv $(abspath $|) $@
 
 ~/.local:
@@ -133,8 +132,5 @@ uninstall:
 ~/.local/bin/gh: ~/.local/bin | .local/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.claude/skills: | .claude/skills
+~/.claude/skills: | $(MYFILES)/os/mac/.claude/skills
 	ln -sfnv $(abspath $|) $@
-
-~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
-	cp "$|" "$@"

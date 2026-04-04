@@ -1,4 +1,0 @@
-interface:
-  display_name: "Review Pull Request Adversarially"
-  short_description: "Challenge a pull request's assumptions"
-  default_prompt: "Use $review-pull-request-adversarially to stress test PR #123 from a skeptical design and framing perspective."

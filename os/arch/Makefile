@@ -1,4 +1,5 @@
 ROOT := ../..
+MYFILES := $(ROOT)/.local/src/tamakiii/myfiles
 
 .PHONY: help install uninstall
 
@@ -98,7 +99,7 @@ uninstall:
 ~/.config/git: | .config/git
 	ln -sfnv $(abspath $|) $@
 
-~/.config/claude: | .config/claude
+~/.config/claude: | $(MYFILES)/os/arch/.config/claude
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
@@ -143,32 +144,32 @@ uninstall:
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
 	ln -sfnv tmux-editor $@
 
-~/.claude/settings.json: | .claude/settings.json
+~/.claude/settings.json: | $(MYFILES)/.claude/settings.json
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude/bin:
 	mkdir -p $@
 
-~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
+~/.claude/bin/gh: ~/.claude/bin | $(MYFILES)/os/arch/.claude/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.claude/bin/statusline.sh: ~/.claude/bin | .claude/bin/statusline.sh
+~/.claude/bin/statusline.sh: ~/.claude/bin | $(MYFILES)/.claude/bin/statusline.sh
 	ln -sfnv $(abspath $|) $@
 
 ~/.codex/bin:
 	mkdir -p $@
 
-~/.codex/bin/gh: ~/.codex/bin | .codex/bin/gh
+~/.codex/bin/gh: ~/.codex/bin | $(MYFILES)/os/arch/.codex/bin/gh
 	ln -sfnv $(abspath $|) $@
 
 ~/.openclaw/bin:
 	mkdir -p $@
 
-~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
+~/.openclaw/bin/gh: ~/.openclaw/bin | $(MYFILES)/os/arch/.openclaw/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.claude/skills: | .claude/skills
+~/.claude/skills: | $(MYFILES)/os/arch/.claude/skills
 	ln -sfnv $(abspath $|) $@
 
-~/.codex/skills: | .codex/skills
+~/.codex/skills: | $(MYFILES)/os/arch/.codex/skills
 	ln -sfnv $(abspath $|) $@
