@@ -9,9 +9,10 @@ export GH_TOKEN="$("${HOME}/.local/bin/gh-app-token" \
   "$(pass show tamakiii/github.com/tamakiii-doppelganger/installation-id)" \
   <(pass show tamakiii/github.com/tamakiii-doppelganger.pem))"
 
-# Find the real gh binary, skipping this wrapper
-for p in /usr/bin/gh /opt/homebrew/bin/gh; do
-  [ -x "$p" ] && exec "$p" "$@"
+# Find the real gh binary, excluding this wrapper
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+for p in $(type -ap gh); do
+  [ "$(readlink -f "$p")" != "$SELF" ] && exec "$p" "$@"
 done
 echo "gh: not found" >&2
 exit 1
