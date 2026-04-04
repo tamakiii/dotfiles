@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Manage GitHub App installations declaratively from config files.
+#
+# Usage:
+#   gh-apps status [app-name]  — compare config vs actual repos
+#   gh-apps diff   [app-name]  — show what needs to change
+#   gh-apps sync   [app-name]  — print step-by-step instructions for manual actions
+#
+# Config: $MYFILES/github/apps/<app-name>.json
+
+MYFILES="${HOME}/.dotfiles/.local/src/tamakiii/myfiles"
+APPS_DIR="${MYFILES}/github/apps"
+
+if [[ ! -d "$APPS_DIR" ]]; then
+  echo "gh-apps: config directory not found: $APPS_DIR" >&2
+  exit 1
+fi
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: gh-apps <status|diff|sync> [app-name]" >&2
+  echo "" >&2
+  echo "Available apps:" >&2
+  for f in "$APPS_DIR"/*.json; do
+    basename "$f" .json | sed 's/^/  /' >&2
+  done
+  exit 1
+fi
+
+COMMAND="$1"
+shift
+FILTER="${1:-}"
+
+list_apps() {
+  if [[ -n "$FILTER" ]]; then
+    echo "$FILTER"
+  else
+    for f in "$APPS_DIR"/*.json; do
+      basename "$f" .json
+    done
+  fi
+}
+
+get_config_repos() {
+  local app="$1"
+  jq -r '.repos[]' "$APPS_DIR/$app.json" | sort
+}
+
+get_actual_repos() {
+  local app="$1"
+  gh-as "$app" api installation/repositories --paginate 2>/dev/null \
+    | jq -r '.repositories[].full_name' | sort
+}
+
+get_installation_id() {
+  local app="$1"
+  jq -r '."installation-id"' "$APPS_DIR/$app.json"
+}
+
+get_app_slug() {
+  local app="$1"
+  echo "$app"
+}
+
+cmd_status() {
+  local apps
+  apps=$(list_apps)
+  for app in $apps; do
+    if [[ ! -f "$APPS_DIR/$app.json" ]]; then
+      echo "ERROR: config not found: $APPS_DIR/$app.json" >&2
+      continue
+    fi
+    echo "=== $app ==="
+    local config_repos actual_repos
+    config_repos=$(get_config_repos "$app")
+    actual_repos=$(get_actual_repos "$app")
+
+    local all_repos
+    all_repos=$(echo -e "$config_repos\n$actual_repos" | sort -u)
+
+    for repo in $all_repos; do
+      local in_config in_actual
+      in_config=$(echo "$config_repos" | grep -Fx "$repo" > /dev/null && echo y || echo n)
+      in_actual=$(echo "$actual_repos" | grep -Fx "$repo" > /dev/null && echo y || echo n)
+      if [[ "$in_config" == "y" && "$in_actual" == "y" ]]; then
+        echo "  OK: $repo"
+      elif [[ "$in_config" == "y" && "$in_actual" == "n" ]]; then
+        echo "  MISSING: $repo (in config but not installed)"
+      elif [[ "$in_config" == "n" && "$in_actual" == "y" ]]; then
+        echo "  EXTRA: $repo (installed but not in config)"
+      fi
+    done
+    echo
+  done
+}
+
+cmd_diff() {
+  local apps
+  apps=$(list_apps)
+  local changes=0
+  for app in $apps; do
+    if [[ ! -f "$APPS_DIR/$app.json" ]]; then
+      echo "ERROR: config not found: $APPS_DIR/$app.json" >&2
+      continue
+    fi
+    local config_repos actual_repos
+    config_repos=$(get_config_repos "$app")
+    actual_repos=$(get_actual_repos "$app")
+
+    local to_add to_remove
+    to_add=$(comm -23 <(echo "$config_repos") <(echo "$actual_repos"))
+    to_remove=$(comm -13 <(echo "$config_repos") <(echo "$actual_repos"))
+
+    if [[ -n "$to_add" ]]; then
+      while IFS= read -r repo; do
+        echo "ADD: $app ← $repo"
+        changes=1
+      done <<< "$to_add"
+    fi
+    if [[ -n "$to_remove" ]]; then
+      while IFS= read -r repo; do
+        echo "REMOVE: $app ← $repo (installed but not in config)"
+        changes=1
+      done <<< "$to_remove"
+    fi
+  done
+  if [[ $changes -eq 0 ]]; then
+    echo "No changes needed."
+  fi
+}
+
+cmd_sync() {
+  local apps
+  apps=$(list_apps)
+  local has_changes=0
+  for app in $apps; do
+    if [[ ! -f "$APPS_DIR/$app.json" ]]; then
+      echo "ERROR: config not found: $APPS_DIR/$app.json" >&2
+      continue
+    fi
+    local config_repos actual_repos
+    config_repos=$(get_config_repos "$app")
+    actual_repos=$(get_actual_repos "$app")
+    local installation_id
+    installation_id=$(get_installation_id "$app")
+
+    local to_add to_remove
+    to_add=$(comm -23 <(echo "$config_repos") <(echo "$actual_repos"))
+    to_remove=$(comm -13 <(echo "$config_repos") <(echo "$actual_repos"))
+
+    if [[ -z "$to_add" && -z "$to_remove" ]]; then
+      echo "OK: $app — all repos match config"
+      continue
+    fi
+
+    has_changes=1
+    echo "=== $app ==="
+    echo ""
+    echo "GitHub App repos can't be modified via API."
+    echo "Follow these steps to update the installation:"
+    echo ""
+    echo "  1. Open the installation settings:"
+    echo "     https://github.com/settings/installations/$installation_id"
+    echo ""
+    echo "  2. Click \"Repository access\" section"
+    echo ""
+
+    if [[ -n "$to_add" ]]; then
+      echo "  3. Add these repositories:"
+      while IFS= read -r repo; do
+        local repo_name
+        repo_name=$(echo "$repo" | cut -d/ -f2)
+        echo "     - $repo_name"
+      done <<< "$to_add"
+      echo ""
+    fi
+
+    if [[ -n "$to_remove" ]]; then
+      echo "  3. Remove these repositories (installed but not in config):"
+      while IFS= read -r repo; do
+        local repo_name
+        repo_name=$(echo "$repo" | cut -d/ -f2)
+        echo "     - $repo_name"
+      done <<< "$to_remove"
+      echo ""
+    fi
+
+    echo "  4. Click \"Save\""
+    echo ""
+    echo "After updating, run 'gh-apps status $app' to verify."
+    echo ""
+  done
+
+  if [[ $has_changes -eq 0 ]]; then
+    echo "All apps match their config. Nothing to do."
+  fi
+}
+
+case "$COMMAND" in
+  status) cmd_status ;;
+  diff)   cmd_diff ;;
+  sync)   cmd_sync ;;
+  *)
+    echo "Unknown command: $COMMAND" >&2
+    echo "Usage: gh-apps <status|diff|sync> [app-name]" >&2
+    exit 1
+    ;;
+esac

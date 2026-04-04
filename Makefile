@@ -32,6 +32,7 @@ install: \
 	~/.local/bin/gh-app-token \
 	~/.local/bin/gh \
 	~/.local/bin/gh-as \
+	~/.local/bin/gh-apps \
 	~/.local/bin/gh-webhooks
 	$(MAKE) -C .local/src/tamakiii/myfiles install
 	$(MAKE) -C os/$(OS) install
@@ -40,6 +41,7 @@ uninstall:
 	$(MAKE) -C os/$(OS) uninstall
 	$(MAKE) -C .local/src/tamakiii/myfiles uninstall
 	rm -f ~/.local/bin/gh-webhooks
+	rm -f ~/.local/bin/gh-apps
 	rm -f ~/.local/bin/gh-as
 	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
@@ -71,7 +73,7 @@ check:
 		~/.local/bin/tmux-claude-status ~/.local/bin/tmux-claude-launch \
 		~/.local/bin/tmux-claude-send ~/.local/bin/tmux-editor \
 		~/.local/bin/codium ~/.local/bin/gh-app-token ~/.local/bin/gh \
-		~/.local/bin/gh-as ~/.local/bin/gh-webhooks \
+		~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks \
 	; do \
 		if [ ! -e "$$link" ]; then \
 			echo "BROKEN: $$link"; err=1; \
@@ -146,6 +148,9 @@ check:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh-as: | bin/gh-as
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gh-apps: | bin/gh-apps
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh-webhooks: | bin/gh-webhooks
