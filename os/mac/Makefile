@@ -1,5 +1,4 @@
 ROOT := ../..
-MYFILES := $(ROOT)/.local/src/tamakiii/myfiles
 
 .PHONY: help install uninstall
 
@@ -29,13 +28,9 @@ install: \
 	~/.config/ghostty/config \
 	~/.config/ghostty/themes \
 	~/.config/gitmux \
-	~/.config/git \
-	~/.config/claude \
-	~/.claude/skills
+	~/.config/git
 
 uninstall:
-	rm -rf ~/.claude/skills
-	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty/themes
@@ -92,9 +87,6 @@ uninstall:
 ~/.config/git: | .config/git
 	ln -sfnv $(abspath $|) $@
 
-~/.config/claude: | $(MYFILES)/os/mac/.config/claude
-	ln -sfnv $(abspath $|) $@
-
 ~/.local:
 	mkdir -p $@
 
@@ -138,7 +130,4 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh: ~/.local/bin | .local/bin/gh
-	ln -sfnv $(abspath $|) $@
-
-~/.claude/skills: | $(MYFILES)/os/mac/.claude/skills
 	ln -sfnv $(abspath $|) $@

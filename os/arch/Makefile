@@ -1,5 +1,4 @@
 ROOT := ../..
-MYFILES := $(ROOT)/.local/src/tamakiii/myfiles
 
 .PHONY: help install uninstall
 
@@ -11,18 +10,12 @@ install: \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.zprofile \
-	~/.claude/settings.json \
-	~/.claude/bin/gh \
-	~/.claude/bin/statusline.sh \
-	~/.codex/bin/gh \
-	~/.openclaw/bin/gh \
 	~/.config/tmux \
 	~/.config/helix \
 	~/.config/ghostty/config \
 	~/.config/ghostty/themes \
 	~/.config/gitmux \
 	~/.config/git \
-	~/.config/claude \
 	~/.config/hypr \
 	~/.local/bin/pbcopy \
 	~/.local/bin/pbpaste \
@@ -36,13 +29,9 @@ install: \
 	~/.local/bin/tmux-editor \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
-	~/.local/bin/gh \
-	~/.claude/skills \
-	~/.codex/skills
+	~/.local/bin/gh
 
 uninstall:
-	rm -rf ~/.codex/skills
-	rm -rf ~/.claude/skills
 	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
@@ -57,18 +46,12 @@ uninstall:
 	rm -f ~/.local/bin/pbpaste
 	rm -f ~/.local/bin/pbcopy
 	rm -rf ~/.config/hypr
-	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty/themes
 	rm -f ~/.config/ghostty/config
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
-	rm -f ~/.claude/settings.json
-	rm -f ~/.claude/bin/statusline.sh
-	rm -f ~/.claude/bin/gh
-	rm -f ~/.codex/bin/gh
-	rm -f ~/.openclaw/bin/gh
 	rm -rf ~/.zprofile
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -105,9 +88,6 @@ uninstall:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/git: | .config/git
-	ln -sfnv $(abspath $|) $@
-
-~/.config/claude: | $(MYFILES)/os/arch/.config/claude
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
@@ -151,33 +131,3 @@ uninstall:
 
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
 	ln -sfnv tmux-editor $@
-
-~/.claude/settings.json: | $(MYFILES)/.claude/settings.json
-	ln -sfnv $(abspath $|) $@
-
-~/.claude/bin:
-	mkdir -p $@
-
-~/.claude/bin/gh: ~/.claude/bin | $(MYFILES)/os/arch/.claude/bin/gh
-	ln -sfnv $(abspath $|) $@
-
-~/.claude/bin/statusline.sh: ~/.claude/bin | $(MYFILES)/.claude/bin/statusline.sh
-	ln -sfnv $(abspath $|) $@
-
-~/.codex/bin:
-	mkdir -p $@
-
-~/.codex/bin/gh: ~/.codex/bin | $(MYFILES)/os/arch/.codex/bin/gh
-	ln -sfnv $(abspath $|) $@
-
-~/.openclaw/bin:
-	mkdir -p $@
-
-~/.openclaw/bin/gh: ~/.openclaw/bin | $(MYFILES)/os/arch/.openclaw/bin/gh
-	ln -sfnv $(abspath $|) $@
-
-~/.claude/skills: | $(MYFILES)/os/arch/.claude/skills
-	ln -sfnv $(abspath $|) $@
-
-~/.codex/skills: | $(MYFILES)/os/arch/.codex/skills
-	ln -sfnv $(abspath $|) $@
