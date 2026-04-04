@@ -28,8 +28,13 @@ shift
 
 list_hooks() {
   local repo="$1"
-  gh-as tamakiii-doppelganger api "repos/$repo/hooks" \
-    --jq '.[] | {id, url: .config.url, events, active}' 2>/dev/null || true
+  gh-as tamakiii-doppelganger api "repos/$repo/hooks" 2>/dev/null || true
+}
+
+find_hook() {
+  local repo="$1" url="$2"
+  gh-as tamakiii-doppelganger api "repos/$repo/hooks" 2>/dev/null \
+    | jq -r --arg url "$url" '.[] | select(.config.url == $url)' || true
 }
 
 find_hook_id() {
@@ -42,15 +47,21 @@ cmd_status() {
   local names
   names=$(jq -r 'keys[]' "$CONFIG")
   for name in $names; do
-    local repos
-    repos=$(jq -r --arg n "$name" '.[$n].repos[]' "$CONFIG")
+    local url repos
+    url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
+    repos=$(jq -r --arg n "$name" '.[$n].repositories | keys[]' "$CONFIG")
     for repo in $repos; do
-      local url
-      url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
       local hook_id
       hook_id=$(find_hook_id "$repo" "$url")
       if [[ -n "$hook_id" ]]; then
-        echo "OK: $repo ← $name (hook $hook_id)"
+        local actual_events desired_events
+        actual_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
+        desired_events=$(jq -c --arg n "$name" --arg r "$repo" '.[$n].repositories[$r].events | sort' "$CONFIG")
+        if [[ "$actual_events" == "$desired_events" ]]; then
+          echo "OK: $repo ← $name (hook $hook_id)"
+        else
+          echo "DRIFT: $repo ← $name (hook $hook_id, events differ)"
+        fi
       else
         echo "MISSING: $repo ← $name"
       fi
@@ -63,23 +74,25 @@ cmd_diff() {
   names=$(jq -r 'keys[]' "$CONFIG")
   local changes=0
   for name in $names; do
-    local url events repos
+    local url repos
     url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
-    events=$(jq -c --arg n "$name" '.[$n].events' "$CONFIG")
-    repos=$(jq -r --arg n "$name" '.[$n].repos[]' "$CONFIG")
+    repos=$(jq -r --arg n "$name" '.[$n].repositories | keys[]' "$CONFIG")
     for repo in $repos; do
       local hook_id
       hook_id=$(find_hook_id "$repo" "$url")
       if [[ -z "$hook_id" ]]; then
-        echo "CREATE: $repo ← $name"
+        local desired_events
+        desired_events=$(jq -c --arg n "$name" --arg r "$repo" '.[$n].repositories[$r].events | sort' "$CONFIG")
+        echo "CREATE: $repo ← $name ($desired_events)"
         changes=1
       else
-        local current_events
-        current_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
-        local desired_events
-        desired_events=$(echo "$events" | jq -c 'sort')
-        if [[ "$current_events" != "$desired_events" ]]; then
+        local actual_events desired_events
+        actual_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
+        desired_events=$(jq -c --arg n "$name" --arg r "$repo" '.[$n].repositories[$r].events | sort' "$CONFIG")
+        if [[ "$actual_events" != "$desired_events" ]]; then
           echo "UPDATE: $repo ← $name (events differ)"
+          echo "  actual:  $actual_events"
+          echo "  desired: $desired_events"
           changes=1
         fi
       fi
@@ -94,12 +107,14 @@ cmd_sync() {
   local names
   names=$(jq -r 'keys[]' "$CONFIG")
   for name in $names; do
-    local url content_type events repos
+    local url content_type
     url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
     content_type=$(jq -r --arg n "$name" '.[$n].content_type // "json"' "$CONFIG")
-    events=$(jq -c --arg n "$name" '.[$n].events' "$CONFIG")
-    repos=$(jq -r --arg n "$name" '.[$n].repos[]' "$CONFIG")
+    local repos
+    repos=$(jq -r --arg n "$name" '.[$n].repositories | keys[]' "$CONFIG")
     for repo in $repos; do
+      local events
+      events=$(jq -c --arg n "$name" --arg r "$repo" '.[$n].repositories[$r].events' "$CONFIG")
       local hook_id
       hook_id=$(find_hook_id "$repo" "$url")
       local payload
@@ -112,11 +127,10 @@ cmd_sync() {
         echo "CREATE: $repo ← $name"
         gh-as tamakiii-doppelganger api "repos/$repo/hooks" --method POST --input - <<< "$payload" > /dev/null
       else
-        local current_events
-        current_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
-        local desired_events
+        local actual_events desired_events
+        actual_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
         desired_events=$(echo "$events" | jq -c 'sort')
-        if [[ "$current_events" != "$desired_events" ]]; then
+        if [[ "$actual_events" != "$desired_events" ]]; then
           echo "UPDATE: $repo ← $name (events)"
           gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" --method PATCH --input - <<< "$payload" > /dev/null
         else
