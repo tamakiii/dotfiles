@@ -18,7 +18,8 @@ install: \
 	~/.openclaw/bin/gh \
 	~/.config/tmux \
 	~/.config/helix \
-	~/.config/ghostty \
+	~/.config/ghostty/config \
+	~/.config/ghostty/themes \
 	~/.config/gitmux \
 	~/.config/git \
 	~/.config/claude \
@@ -59,7 +60,8 @@ uninstall:
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
-	rm -rf ~/.config/ghostty
+	rm -rf ~/.config/ghostty/themes
+	rm -f ~/.config/ghostty/config
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -f ~/.claude/settings.json
@@ -90,7 +92,13 @@ uninstall:
 ~/.config/helix: | $(ROOT)/.config/helix
 	ln -sfnv $(abspath $|) $@
 
-~/.config/ghostty: | .config/ghostty
+~/.config/ghostty:
+	mkdir -p $@
+
+~/.config/ghostty/config: ~/.config/ghostty | .config/ghostty/config
+	ln -sfnv $(abspath $|) $@
+
+~/.config/ghostty/themes: ~/.config/ghostty | $(ROOT)/.config/ghostty/themes
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/gitmux: | .config/gitmux
