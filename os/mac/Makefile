@@ -66,7 +66,7 @@ uninstall:
 ~/.zprofile: | .zprofile
 	ln -sfnv $(abspath $|) $@
 
-~/.config/tmux: | .config/tmux
+~/.config/tmux: | $(ROOT)/.config/tmux
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/helix: | $(ROOT)/.config/helix
@@ -81,10 +81,10 @@ uninstall:
 ~/.config/ghostty/themes: ~/.config/ghostty | $(ROOT)/.config/ghostty/themes
 	ln -sfnv $(abspath $|) $@
 
-~/.config/gitmux: | .config/gitmux
+~/.config/gitmux: | $(ROOT)/.config/gitmux
 	ln -sfnv $(abspath $|) $@
 
-~/.config/git: | .config/git
+~/.config/git: | $(ROOT)/.config/git
 	ln -sfnv $(abspath $|) $@
 
 ~/.local:
@@ -129,5 +129,5 @@ uninstall:
 ~/.local/bin/gh-app-token: ~/.local/bin | $(ROOT)/bin/gh-app-token
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/gh: ~/.local/bin | .local/bin/gh
+~/.local/bin/gh: ~/.local/bin | $(ROOT)/bin/gh
 	ln -sfnv $(abspath $|) $@
