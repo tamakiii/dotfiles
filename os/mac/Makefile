@@ -136,5 +136,5 @@ uninstall:
 ~/.claude/skills: | .claude/skills
 	ln -sfnv $(abspath $|) $@
 
-~/Library/Application\ Support/Claude/claude_desktop_config.json: | $(ROOT)/Library/Application\ Support/Claude/claude_desktop_config.json
+~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
 	cp "$|" "$@"
