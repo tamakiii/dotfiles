@@ -3,8 +3,6 @@ export LANGUAGE="en_US"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-+# bun completions
-+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 paths=(
   "$HOME/.local/bin"

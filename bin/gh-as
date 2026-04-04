@@ -52,7 +52,15 @@ fetch_secret() {
       pass show "$ref"
       ;;
     security)
-      security find-generic-password -s "$ref" -w
+      local raw
+      raw=$(security find-generic-password -s "$ref" -w)
+      # macOS keychain hex-encodes values containing newlines (e.g. PEM keys);
+      # detect hex output and decode with xxd -r -p
+      if [[ "$raw" =~ ^[0-9a-fA-F]+$ ]] && (( ${#raw} > 512 )) && (( ${#raw} % 2 == 0 )); then
+        printf '%s' "$raw" | xxd -r -p
+      else
+        printf '%s' "$raw"
+      fi
       ;;
     *)
       echo "gh-as: unsupported backend: $backend" >&2
