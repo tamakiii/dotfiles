@@ -30,13 +30,15 @@ install: \
 	~/.local/bin/tmux-editor \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
-	~/.local/bin/gh
+	~/.local/bin/gh \
+	~/.local/bin/gh-as
 	$(MAKE) -C .local/src/tamakiii/myfiles install
 	$(MAKE) -C os/$(OS) install
 
 uninstall:
 	$(MAKE) -C os/$(OS) uninstall
 	$(MAKE) -C .local/src/tamakiii/myfiles uninstall
+	rm -f ~/.local/bin/gh-as
 	rm -f ~/.local/bin/gh
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
@@ -67,6 +69,7 @@ check:
 		~/.local/bin/tmux-claude-status ~/.local/bin/tmux-claude-launch \
 		~/.local/bin/tmux-claude-send ~/.local/bin/tmux-editor \
 		~/.local/bin/codium ~/.local/bin/gh-app-token ~/.local/bin/gh \
+		~/.local/bin/gh-as \
 	; do \
 		if [ ! -e "$$link" ]; then \
 			echo "BROKEN: $$link"; err=1; \
@@ -138,4 +141,7 @@ check:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh: | bin/gh
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/gh-as: | bin/gh-as
 	ln -sfnv $(abspath $|) $@

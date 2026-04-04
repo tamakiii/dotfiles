@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run gh CLI authenticated as a GitHub App.
+#
+# Usage:
+#   gh-as <app-name> [gh args...]
+#
+# Reads app credentials from ~/.config/gh-as/config.json.
+#
+# Example:
+#   gh-as tamakiii-claude pr review 2 --repo tamakiii/sandbox-bevy --approve
+#   gh-as tamakiii-doppelganger pr create --title "..."
+
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/gh-as/config.json"
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: gh-as <app-name> [gh args...]" >&2
+  echo "" >&2
+  if [[ -f "$CONFIG" ]]; then
+    echo "Available apps:" >&2
+    jq -r '.apps | keys[]' "$CONFIG" | sed 's/^/  /' >&2
+  fi
+  exit 1
+fi
+
+APP_NAME="$1"
+shift
+
+if [[ ! -f "$CONFIG" ]]; then
+  echo "gh-as: config not found: $CONFIG" >&2
+  exit 1
+fi
+
+app_config=$(jq -e --arg name "$APP_NAME" '.apps[$name] // empty' "$CONFIG" 2>/dev/null) || {
+  echo "gh-as: unknown app: $APP_NAME" >&2
+  echo "Available apps:" >&2
+  jq -r '.apps | keys[]' "$CONFIG" | sed 's/^/  /' >&2
+  exit 1
+}
+
+backend=$(echo "$app_config" | jq -r '.backend')
+app_id_ref=$(echo "$app_config" | jq -r '."app-id"')
+installation_id_ref=$(echo "$app_config" | jq -r '."installation-id"')
+private_key_ref=$(echo "$app_config" | jq -r '."private-key"')
+
+# Fetch secrets based on backend
+fetch_secret() {
+  local ref="$1"
+  case "$backend" in
+    pass)
+      pass show "$ref"
+      ;;
+    security)
+      security find-generic-password -s "$ref" -w
+      ;;
+    *)
+      echo "gh-as: unsupported backend: $backend" >&2
+      exit 1
+      ;;
+  esac
+}
+
+app_id=$(fetch_secret "$app_id_ref")
+installation_id=$(fetch_secret "$installation_id_ref")
+
+export GH_TOKEN="$("${HOME}/.local/bin/gh-app-token" \
+  "$app_id" \
+  "$installation_id" \
+  <(fetch_secret "$private_key_ref"))"
+
+# Find the real gh binary, excluding wrappers
+SELF_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+for p in $(type -ap gh); do
+  real="$(readlink -f "$p")"
+  # Skip if it's in our bin dir (the gh wrapper) or is gh-as itself
+  [[ "$(dirname "$real")" == "$SELF_DIR" ]] && continue
+  exec "$p" "$@"
+done
+echo "gh: not found" >&2
+exit 1
