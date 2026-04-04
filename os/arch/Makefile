@@ -1,3 +1,6 @@
+ROOT := ../..
+MYFILES := $(ROOT)/.local/src/tamakiii/myfiles
+
 .PHONY: help install uninstall
 
 help:
@@ -15,7 +18,8 @@ install: \
 	~/.openclaw/bin/gh \
 	~/.config/tmux \
 	~/.config/helix \
-	~/.config/ghostty \
+	~/.config/ghostty/config \
+	~/.config/ghostty/themes \
 	~/.config/gitmux \
 	~/.config/git \
 	~/.config/claude \
@@ -56,7 +60,8 @@ uninstall:
 	rm -rf ~/.config/claude
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
-	rm -rf ~/.config/ghostty
+	rm -rf ~/.config/ghostty/themes
+	rm -f ~/.config/ghostty/config
 	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -f ~/.claude/settings.json
@@ -75,7 +80,7 @@ uninstall:
 ~/.zsh/antigen.zsh:
 	curl -L git.io/antigen > $@
 
-~/.zshrc: | .zshrc
+~/.zshrc: | $(ROOT)/.zshrc
 	ln -sfnv $(abspath $|) $@
 
 ~/.zprofile: | .zprofile
@@ -84,10 +89,16 @@ uninstall:
 ~/.config/tmux: | .config/tmux
 	ln -sfnv $(abspath $|) $@
 
-~/.config/helix: | .config/helix
+~/.config/helix: | $(ROOT)/.config/helix
 	ln -sfnv $(abspath $|) $@
 
-~/.config/ghostty: | .config/ghostty
+~/.config/ghostty:
+	mkdir -p $@
+
+~/.config/ghostty/config: ~/.config/ghostty | .config/ghostty/config
+	ln -sfnv $(abspath $|) $@
+
+~/.config/ghostty/themes: ~/.config/ghostty | $(ROOT)/.config/ghostty/themes
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/gitmux: | .config/gitmux
@@ -96,7 +107,7 @@ uninstall:
 ~/.config/git: | .config/git
 	ln -sfnv $(abspath $|) $@
 
-~/.config/claude: | .config/claude
+~/.config/claude: | $(MYFILES)/os/arch/.config/claude
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/hypr: | .config/hypr
@@ -108,65 +119,65 @@ uninstall:
 ~/.local/bin/pbpaste: | bin/pbpaste
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-window-name: | bin/tmux-window-name
+~/.local/bin/tmux-window-name: | $(ROOT)/bin/tmux-window-name
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-pane-label: | bin/tmux-pane-label
+~/.local/bin/tmux-pane-label: | $(ROOT)/bin/tmux-pane-label
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-rename-sessions: | bin/tmux-rename-sessions
+~/.local/bin/tmux-rename-sessions: | $(ROOT)/bin/tmux-rename-sessions
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
+~/.local/bin/tmux-claude-panes: | $(ROOT)/bin/tmux-claude-panes
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/gh-app-token: | bin/gh-app-token
+~/.local/bin/gh-app-token: | $(ROOT)/bin/gh-app-token
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh: | .local/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-status: | bin/tmux-claude-status
+~/.local/bin/tmux-claude-status: | $(ROOT)/bin/tmux-claude-status
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-launch: | bin/tmux-claude-launch
+~/.local/bin/tmux-claude-launch: | $(ROOT)/bin/tmux-claude-launch
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-send: | bin/tmux-claude-send
+~/.local/bin/tmux-claude-send: | $(ROOT)/bin/tmux-claude-send
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-editor: | bin/tmux-editor
+~/.local/bin/tmux-editor: | $(ROOT)/bin/tmux-editor
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
 	ln -sfnv tmux-editor $@
 
-~/.claude/settings.json: | .claude/settings.json
+~/.claude/settings.json: | $(MYFILES)/.claude/settings.json
 	ln -sfnv $(abspath $|) $@
 
 ~/.claude/bin:
 	mkdir -p $@
 
-~/.claude/bin/gh: ~/.claude/bin | .claude/bin/gh
+~/.claude/bin/gh: ~/.claude/bin | $(MYFILES)/os/arch/.claude/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.claude/bin/statusline.sh: ~/.claude/bin | .claude/bin/statusline.sh
+~/.claude/bin/statusline.sh: ~/.claude/bin | $(MYFILES)/.claude/bin/statusline.sh
 	ln -sfnv $(abspath $|) $@
 
 ~/.codex/bin:
 	mkdir -p $@
 
-~/.codex/bin/gh: ~/.codex/bin | .codex/bin/gh
+~/.codex/bin/gh: ~/.codex/bin | $(MYFILES)/os/arch/.codex/bin/gh
 	ln -sfnv $(abspath $|) $@
 
 ~/.openclaw/bin:
 	mkdir -p $@
 
-~/.openclaw/bin/gh: ~/.openclaw/bin | .openclaw/bin/gh
+~/.openclaw/bin/gh: ~/.openclaw/bin | $(MYFILES)/os/arch/.openclaw/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.claude/skills: | .claude/skills
+~/.claude/skills: | $(MYFILES)/os/arch/.claude/skills
 	ln -sfnv $(abspath $|) $@
 
-~/.codex/skills: | .codex/skills
+~/.codex/skills: | $(MYFILES)/os/arch/.codex/skills
 	ln -sfnv $(abspath $|) $@

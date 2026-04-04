@@ -1,4 +1,0 @@
-interface:
-  display_name: "Create Pull Request"
-  short_description: "Create and open a GitHub PR"
-  default_prompt: "Use $create-pull-request to turn the current worktree into a GitHub pull request."
