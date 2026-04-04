@@ -1,3 +1,5 @@
+ROOT := ../..
+
 .PHONY: help install uninstall
 
 help:
@@ -62,7 +64,7 @@ uninstall:
 ~/.zsh/antigen.zsh:
 	curl -L git.io/antigen > $@
 
-~/.zshrc: | .zshrc
+~/.zshrc: | $(ROOT)/.zshrc
 	ln -sfnv $(abspath $|) $@
 
 ~/.zprofile: | .zprofile
@@ -71,7 +73,7 @@ uninstall:
 ~/.config/tmux: | .config/tmux
 	ln -sfnv $(abspath $|) $@
 
-~/.config/helix: | .config/helix
+~/.config/helix: | $(ROOT)/.config/helix
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/ghostty: | .config/ghostty
@@ -98,34 +100,34 @@ uninstall:
 ~/.local/bin/gw: ~/.local/bin | bin/gw
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-window-name: ~/.local/bin | bin/tmux-window-name
+~/.local/bin/tmux-window-name: ~/.local/bin | $(ROOT)/bin/tmux-window-name
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-pane-label: ~/.local/bin | bin/tmux-pane-label
+~/.local/bin/tmux-pane-label: ~/.local/bin | $(ROOT)/bin/tmux-pane-label
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-rename-sessions: ~/.local/bin | bin/tmux-rename-sessions
+~/.local/bin/tmux-rename-sessions: ~/.local/bin | $(ROOT)/bin/tmux-rename-sessions
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-panes: ~/.local/bin | bin/tmux-claude-panes
+~/.local/bin/tmux-claude-panes: ~/.local/bin | $(ROOT)/bin/tmux-claude-panes
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-status: ~/.local/bin | bin/tmux-claude-status
+~/.local/bin/tmux-claude-status: ~/.local/bin | $(ROOT)/bin/tmux-claude-status
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-launch: ~/.local/bin | bin/tmux-claude-launch
+~/.local/bin/tmux-claude-launch: ~/.local/bin | $(ROOT)/bin/tmux-claude-launch
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-send: ~/.local/bin | bin/tmux-claude-send
+~/.local/bin/tmux-claude-send: ~/.local/bin | $(ROOT)/bin/tmux-claude-send
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-editor: ~/.local/bin | bin/tmux-editor
+~/.local/bin/tmux-editor: ~/.local/bin | $(ROOT)/bin/tmux-editor
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
 	ln -sfnv tmux-editor $@
 
-~/.local/bin/gh-app-token: ~/.local/bin | bin/gh-app-token
+~/.local/bin/gh-app-token: ~/.local/bin | $(ROOT)/bin/gh-app-token
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh: ~/.local/bin | .local/bin/gh
@@ -134,5 +136,5 @@ uninstall:
 ~/.claude/skills: | .claude/skills
 	ln -sfnv $(abspath $|) $@
 
-~/Library/Application\ Support/Claude/claude_desktop_config.json: | Library/Application\ Support/Claude/claude_desktop_config.json
+~/Library/Application\ Support/Claude/claude_desktop_config.json: | $(ROOT)/Library/Application\ Support/Claude/claude_desktop_config.json
 	cp "$|" "$@"

@@ -1,3 +1,5 @@
+ROOT := ../..
+
 .PHONY: help install uninstall
 
 help:
@@ -75,7 +77,7 @@ uninstall:
 ~/.zsh/antigen.zsh:
 	curl -L git.io/antigen > $@
 
-~/.zshrc: | .zshrc
+~/.zshrc: | $(ROOT)/.zshrc
 	ln -sfnv $(abspath $|) $@
 
 ~/.zprofile: | .zprofile
@@ -84,7 +86,7 @@ uninstall:
 ~/.config/tmux: | .config/tmux
 	ln -sfnv $(abspath $|) $@
 
-~/.config/helix: | .config/helix
+~/.config/helix: | $(ROOT)/.config/helix
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/ghostty: | .config/ghostty
@@ -108,34 +110,34 @@ uninstall:
 ~/.local/bin/pbpaste: | bin/pbpaste
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-window-name: | bin/tmux-window-name
+~/.local/bin/tmux-window-name: | $(ROOT)/bin/tmux-window-name
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-pane-label: | bin/tmux-pane-label
+~/.local/bin/tmux-pane-label: | $(ROOT)/bin/tmux-pane-label
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-rename-sessions: | bin/tmux-rename-sessions
+~/.local/bin/tmux-rename-sessions: | $(ROOT)/bin/tmux-rename-sessions
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-panes: | bin/tmux-claude-panes
+~/.local/bin/tmux-claude-panes: | $(ROOT)/bin/tmux-claude-panes
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/gh-app-token: | bin/gh-app-token
+~/.local/bin/gh-app-token: | $(ROOT)/bin/gh-app-token
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh: | .local/bin/gh
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-status: | bin/tmux-claude-status
+~/.local/bin/tmux-claude-status: | $(ROOT)/bin/tmux-claude-status
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-launch: | bin/tmux-claude-launch
+~/.local/bin/tmux-claude-launch: | $(ROOT)/bin/tmux-claude-launch
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-claude-send: | bin/tmux-claude-send
+~/.local/bin/tmux-claude-send: | $(ROOT)/bin/tmux-claude-send
 	ln -sfnv $(abspath $|) $@
 
-~/.local/bin/tmux-editor: | bin/tmux-editor
+~/.local/bin/tmux-editor: | $(ROOT)/bin/tmux-editor
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/codium: | ~/.local/bin/tmux-editor
