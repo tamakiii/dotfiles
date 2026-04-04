@@ -5,8 +5,6 @@ else
   OS := arch
 endif
 
-ANTIGEN_URL := https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh
-
 .PHONY: help install uninstall check
 
 help:
@@ -86,7 +84,7 @@ check:
 	mkdir $@
 
 ~/.zsh/antigen.zsh:
-	curl -fL $(ANTIGEN_URL) > $@
+	curl -fL https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > $@
 
 ~/.zshrc: | .zshrc
 	ln -sfnv $(abspath $|) $@
