@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Manage GitHub webhooks declaratively from a config file.
+#
+# Usage:
+#   gh-webhooks sync    — create/update webhooks to match config
+#   gh-webhooks status  — show current webhook state per repo
+#   gh-webhooks diff    — show what sync would change
+#
+# Config: $MYFILES/github/webhooks.json
+
+MYFILES="${HOME}/.dotfiles/.local/src/tamakiii/myfiles"
+CONFIG="${MYFILES}/github/webhooks.json"
+
+if [[ ! -f "$CONFIG" ]]; then
+  echo "gh-webhooks: config not found: $CONFIG" >&2
+  exit 1
+fi
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: gh-webhooks <sync|status|diff>" >&2
+  exit 1
+fi
+
+COMMAND="$1"
+shift
+
+list_hooks() {
+  local repo="$1"
+  gh-as tamakiii-doppelganger api "repos/$repo/hooks" \
+    --jq '.[] | {id, url: .config.url, events, active}' 2>/dev/null || true
+}
+
+find_hook_id() {
+  local repo="$1" url="$2"
+  gh-as tamakiii-doppelganger api "repos/$repo/hooks" 2>/dev/null \
+    | jq -r --arg url "$url" '.[] | select(.config.url == $url) | .id' || true
+}
+
+cmd_status() {
+  local names
+  names=$(jq -r 'keys[]' "$CONFIG")
+  for name in $names; do
+    local repos
+    repos=$(jq -r --arg n "$name" '.[$n].repos[]' "$CONFIG")
+    for repo in $repos; do
+      local url
+      url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
+      local hook_id
+      hook_id=$(find_hook_id "$repo" "$url")
+      if [[ -n "$hook_id" ]]; then
+        echo "OK: $repo ← $name (hook $hook_id)"
+      else
+        echo "MISSING: $repo ← $name"
+      fi
+    done
+  done
+}
+
+cmd_diff() {
+  local names
+  names=$(jq -r 'keys[]' "$CONFIG")
+  local changes=0
+  for name in $names; do
+    local url events repos
+    url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
+    events=$(jq -c --arg n "$name" '.[$n].events' "$CONFIG")
+    repos=$(jq -r --arg n "$name" '.[$n].repos[]' "$CONFIG")
+    for repo in $repos; do
+      local hook_id
+      hook_id=$(find_hook_id "$repo" "$url")
+      if [[ -z "$hook_id" ]]; then
+        echo "CREATE: $repo ← $name"
+        changes=1
+      else
+        local current_events
+        current_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
+        local desired_events
+        desired_events=$(echo "$events" | jq -c 'sort')
+        if [[ "$current_events" != "$desired_events" ]]; then
+          echo "UPDATE: $repo ← $name (events differ)"
+          changes=1
+        fi
+      fi
+    done
+  done
+  if [[ $changes -eq 0 ]]; then
+    echo "No changes needed."
+  fi
+}
+
+cmd_sync() {
+  local names
+  names=$(jq -r 'keys[]' "$CONFIG")
+  for name in $names; do
+    local url content_type events repos
+    url=$(jq -r --arg n "$name" '.[$n].url' "$CONFIG")
+    content_type=$(jq -r --arg n "$name" '.[$n].content_type // "json"' "$CONFIG")
+    events=$(jq -c --arg n "$name" '.[$n].events' "$CONFIG")
+    repos=$(jq -r --arg n "$name" '.[$n].repos[]' "$CONFIG")
+    for repo in $repos; do
+      local hook_id
+      hook_id=$(find_hook_id "$repo" "$url")
+      local payload
+      payload=$(jq -n \
+        --arg url "$url" \
+        --arg ct "$content_type" \
+        --argjson events "$events" \
+        '{config: {url: $url, content_type: $ct}, events: $events, active: true}')
+      if [[ -z "$hook_id" ]]; then
+        echo "CREATE: $repo ← $name"
+        gh-as tamakiii-doppelganger api "repos/$repo/hooks" --method POST --input - <<< "$payload" > /dev/null
+      else
+        local current_events
+        current_events=$(gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" 2>/dev/null | jq -c '.events | sort')
+        local desired_events
+        desired_events=$(echo "$events" | jq -c 'sort')
+        if [[ "$current_events" != "$desired_events" ]]; then
+          echo "UPDATE: $repo ← $name (events)"
+          gh-as tamakiii-doppelganger api "repos/$repo/hooks/$hook_id" --method PATCH --input - <<< "$payload" > /dev/null
+        else
+          echo "OK: $repo ← $name"
+        fi
+      fi
+    done
+  done
+}
+
+case "$COMMAND" in
+  sync)   cmd_sync "$@" ;;
+  status) cmd_status "$@" ;;
+  diff)   cmd_diff "$@" ;;
+  *)
+    echo "Unknown command: $COMMAND" >&2
+    echo "Usage: gh-webhooks <sync|status|diff>" >&2
+    exit 1
+    ;;
+esac
