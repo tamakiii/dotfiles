@@ -1,17 +1,14 @@
+.PHONY: help setup teardown
+.PHONY: install install-myfiles install-os 
+.PHONY: uninstall uninstall-os uninstall-myfiles
+.PHONY: check check-myfiles check-os
+
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
   OS := mac
 else
   OS := arch
 endif
-
-.PHONY: \
-	help \
-	setup teardown \
-	install uninstall \
-	install-myfiles uninstall-myfiles \
-	install-os uninstall-os \
-	check check-myfiles check-os
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
