@@ -1,11 +1,15 @@
 #!/bin/bash
-# tmux-observe-repl — pick a pane on the main tmux server and open a
-# tmux-main repl into it. Designed to run inside a tmux display-popup;
-# the popup closes (when the menu entry uses display-popup -E) as soon
-# as the repl exits via Ctrl-D.
+# tmux-observe-repl — open a tmux-main repl targeting a pane on the main server.
+# Designed to run inside a tmux display-popup so it has a TTY.
+#
+# If the calling pane is in view mode (title: "tmux-main view → <target> [READ-ONLY]"),
+# the target is extracted from the title automatically. Otherwise, an fzf picker
+# is shown to select a pane.
+#
+# Requires TMUX_CALLER_PANE to be set by the caller (via display-popup -e).
 
 set -euo pipefail
 
-target=$(tmux-main pick) || exit 1
+target=$(tmux display-message -p -t "${TMUX_CALLER_PANE}" '#{@view_target}')
 
 exec tmux-main repl "$target"

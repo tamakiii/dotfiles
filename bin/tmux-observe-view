@@ -1,15 +1,18 @@
 #!/bin/bash
 # tmux-observe-view — pick a pane on the main tmux server and open a
-# read-only view of it in a new window of the current tmux server
-# (typically the observe server). Designed to be invoked from a tmux
-# display-popup so fzf has a TTY.
+# read-only view of it in the calling pane of the observe server.
+# Designed to be invoked from a tmux display-popup so fzf has a TTY.
 #
-# After the popup picker exits, the popup closes (because the menu
-# entry uses display-popup -E), and the new window with the view
-# becomes visible in the observe server.
+# After picking, replaces the calling pane's process with
+# `tmux-main view --zoom <target>` via respawn-pane. The popup then
+# closes and the caller pane shows the view.
+#
+# Requires TMUX_CALLER_PANE to be set by the caller (via display-popup -e).
 
 set -euo pipefail
 
-target=$(tmux-main pick) || exit 1
+target=$(tmux-main pick) || { printf '\n[cancelled]\nPress Enter: '; read -r; exit 1; }
 
-exec tmux new-window -n "view:$target" "tmux-main view $(printf '%q' "$target")"
+tmux respawn-pane -k -t "${TMUX_CALLER_PANE}" \
+  "tmux-main view --zoom $(printf '%q' "$target")" \
+  || { printf '\n[respawn-pane failed]\nPress Enter: '; read -r; exit 1; }
