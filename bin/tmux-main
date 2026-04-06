@@ -124,6 +124,9 @@ case "$cmd" in
       echo "Usage: tmux-main view [session[:window[.pane]]]" >&2
       exit 1
     fi
+    if [[ -n "${TMUX:-}" ]]; then
+      tmux select-pane -T "tmux-main view → $target [READ-ONLY]" 2>/dev/null || true
+    fi
     view_target "$target"
     ;;
 
@@ -172,8 +175,12 @@ case "$cmd" in
     if [[ -n "${TMUX_MAIN_VIEW_PANE:-}" ]]; then
       trap 'tmux kill-pane -t "$TMUX_MAIN_VIEW_PANE" 2>/dev/null || true' EXIT
     fi
-    echo "tmux-main repl → $target  (Ctrl-D to exit; lines sent as text + Enter)"
-    while IFS= read -e -r -p "$target> " line; do
+    if [[ -n "${TMUX:-}" ]]; then
+      tmux select-pane -T "tmux-main repl → $target [TYPE HERE]" 2>/dev/null || true
+    fi
+    printf '\033[1;37;44m %s \033[0m\n' "tmux-main repl → $target"
+    printf '\033[1;37;44m %s \033[0m\n' "TYPE HERE — each line is sent as text + Enter   (Ctrl-D to exit)"
+    while IFS= read -r -p "$target> " line; do
       main send-keys -t "$target" -l "$line"
       main send-keys -t "$target" Enter
     done
@@ -193,10 +200,13 @@ case "$cmd" in
       exit 1
     fi
     view_pane=$(tmux display-message -p '#{pane_id}')
-    tmux split-window -v -l 30% \
+    repl_pane=$(tmux split-window -v -l 30% -P -F '#{pane_id}' \
       -e "TMUX_MAIN_VIEW_PANE=$view_pane" \
       -e "TMUX_MAIN_TARGET=$target" \
-      "$0 repl"
+      "$0 repl")
+    # Defensively put focus on the repl pane (split-window already does, but
+    # do it explicitly so the user lands on TYPE HERE).
+    tmux select-pane -t "$repl_pane"
     exec "$0" view "$target"
     ;;
 
