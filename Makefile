@@ -37,6 +37,8 @@ install: setup \
 	~/.local/bin/tmux-claude-send \
 	~/.local/bin/tmux-main \
 	~/.local/bin/tmux-observe \
+	~/.local/bin/tmux-observe-view \
+	~/.local/bin/tmux-observe-repl \
 	~/.local/bin/tmux-editor \
 	~/.local/bin/codium \
 	~/.local/bin/gh-app-token \
@@ -55,6 +57,8 @@ uninstall: uninstall-os uninstall-myfiles
 	rm -f ~/.local/bin/gh-app-token
 	rm -f ~/.local/bin/codium
 	rm -f ~/.local/bin/tmux-editor
+	rm -f ~/.local/bin/tmux-observe-repl
+	rm -f ~/.local/bin/tmux-observe-view
 	rm -f ~/.local/bin/tmux-observe
 	rm -f ~/.local/bin/tmux-main
 	rm -f ~/.local/bin/tmux-claude-send
@@ -92,7 +96,8 @@ LINKS := \
 	~/.local/bin/tmux-rename-sessions ~/.local/bin/tmux-claude-panes \
 	~/.local/bin/tmux-claude-status ~/.local/bin/tmux-claude-launch \
 	~/.local/bin/tmux-claude-send ~/.local/bin/tmux-main \
-	~/.local/bin/tmux-observe ~/.local/bin/tmux-editor \
+	~/.local/bin/tmux-observe ~/.local/bin/tmux-observe-view \
+	~/.local/bin/tmux-observe-repl ~/.local/bin/tmux-editor \
 	~/.local/bin/codium ~/.local/bin/gh-app-token ~/.local/bin/gh \
 	~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks
 
@@ -163,6 +168,12 @@ check-os:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-observe: | bin/tmux-observe
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-observe-view: | bin/tmux-observe-view
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/tmux-observe-repl: | bin/tmux-observe-repl
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-editor: | bin/tmux-editor

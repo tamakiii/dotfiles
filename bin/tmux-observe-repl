@@ -1,0 +1,11 @@
+#!/bin/bash
+# tmux-observe-repl — pick a pane on the main tmux server and open a
+# tmux-main repl into it. Designed to run inside a tmux display-popup;
+# the popup closes (when the menu entry uses display-popup -E) as soon
+# as the repl exits via Ctrl-D.
+
+set -euo pipefail
+
+target=$(tmux-main pick) || exit 1
+
+exec tmux-main repl "$target"

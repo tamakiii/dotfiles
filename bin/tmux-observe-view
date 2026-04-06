@@ -1,0 +1,15 @@
+#!/bin/bash
+# tmux-observe-view — pick a pane on the main tmux server and open a
+# read-only view of it in a new window of the current tmux server
+# (typically the observe server). Designed to be invoked from a tmux
+# display-popup so fzf has a TTY.
+#
+# After the popup picker exits, the popup closes (because the menu
+# entry uses display-popup -E), and the new window with the view
+# becomes visible in the observe server.
+
+set -euo pipefail
+
+target=$(tmux-main pick) || exit 1
+
+exec tmux new-window -n "view:$target" "tmux-main view $(printf '%q' "$target")"
