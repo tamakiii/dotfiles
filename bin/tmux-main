@@ -14,6 +14,9 @@
 #   pick                     fzf picker; prints the chosen target to stdout
 #   view [target]            attach as a read-only viewer (ignore-size).
 #                            target: session[:window[.pane]]; if omitted, runs pick.
+#                            If target is a specific pane, the window is
+#                            zoomed for the duration of the view (toggled
+#                            back on exit) so the viewer shows just that pane.
 #   view-stop                detach all read-only viewer clients on the main server
 #   send <target> <key>...   send tmux key(s) to target pane
 #   type <target> <text>     send literal text to target pane (no Enter)
@@ -31,6 +34,10 @@
 #   detach the viewer. Use `tmux-main control` (the repl auto-kills the
 #   viewer on Ctrl-D), or `tmux-main view-stop` from another pane, or set a
 #   different prefix on one of the servers.
+#
+#   Pane zoom in `view` is per-window state on the main server, shared
+#   with every other client on that session. Other clients of the same
+#   window will also see the zoom while the viewer is open.
 #
 # Examples:
 #   tmux-main sessions
@@ -127,6 +134,30 @@ case "$cmd" in
     if [[ -n "${TMUX:-}" ]]; then
       tmux select-pane -T "tmux-main view → $target [READ-ONLY]" 2>/dev/null || true
     fi
+
+    # If target names a specific pane and the window isn't already zoomed,
+    # zoom the target so the viewer shows just that pane. Track so we can
+    # unzoom on exit. Caveat: window_zoomed_flag and active-pane are per-
+    # window state shared with all other clients on the session — they will
+    # see the zoom too while the viewer is open.
+    zoom_target=""
+    if [[ "$target" == *.* ]]; then
+      if [[ "$(main display-message -p -t "$target" '#{window_zoomed_flag}' 2>/dev/null || echo 1)" == "0" ]]; then
+        if main resize-pane -Z -t "$target" 2>/dev/null; then
+          zoom_target=$target
+        fi
+      fi
+    fi
+    # Cleanup must run exactly once — resize-pane -Z is a toggle, so a
+    # second invocation would re-zoom. Clear the trap inside the handler.
+    unzoom_once() {
+      trap - EXIT INT TERM HUP
+      if [[ -n "${zoom_target:-}" ]]; then
+        main resize-pane -Z -t "$zoom_target" 2>/dev/null || true
+      fi
+    }
+    trap unzoom_once EXIT INT TERM HUP
+
     view_target "$target"
     ;;
 
