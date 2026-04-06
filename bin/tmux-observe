@@ -1,0 +1,30 @@
+#!/bin/bash
+# tmux-observe — launch or attach the observe (dashboard) tmux server
+#
+# A second tmux server (-L observe by default), separate from the main
+# tmux server, intended for observing and controlling panes on the main
+# server via tmux-main(1).
+#
+# Loads ~/.config/tmux/observe.conf via -f, which sources the main tmux
+# config and adds dashboard-specific bindings (e.g. prefix-a popup repl).
+#
+# Override the socket name with $TMUX_OBSERVE_SOCKET, the config path
+# with $TMUX_OBSERVE_CONF.
+#
+# Usage:
+#   tmux-observe              # attach if a session exists, else start one
+
+set -euo pipefail
+
+socket="${TMUX_OBSERVE_SOCKET:-observe}"
+config="${TMUX_OBSERVE_CONF:-$HOME/.config/tmux/observe.conf}"
+
+if [[ ! -r "$config" ]]; then
+  echo "tmux-observe: config not found: $config" >&2
+  exit 1
+fi
+
+# `-f` is honored only when the server starts. On subsequent attaches the
+# server already has the config in memory, so `-f` is harmless either way.
+env -u TMUX tmux -L "$socket" -f "$config" attach 2>/dev/null \
+  || exec env -u TMUX tmux -L "$socket" -f "$config" new-session

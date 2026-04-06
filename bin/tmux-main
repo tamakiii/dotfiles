@@ -12,19 +12,23 @@
 #   windows                  list all windows
 #   panes                    list all panes (target  cmd  title)
 #   pick                     fzf picker; prints the chosen target to stdout
-#   view [target]            attach as a read-only viewer (ignore-size).
+#   view [-z|--zoom] [target]
+#                            attach as a read-only viewer (ignore-size).
 #                            target: session[:window[.pane]]; if omitted, runs pick.
-#                            If target is a specific pane, the window is
-#                            zoomed for the duration of the view (toggled
-#                            back on exit) so the viewer shows just that pane.
+#                            With --zoom and a pane target, zoom the target
+#                            pane on the main server for the duration of the
+#                            view (toggled back on exit) so only that pane is
+#                            shown — intrusive (see Notes).
 #   view-stop                detach all read-only viewer clients on the main server
 #   send <target> <key>...   send tmux key(s) to target pane
 #   type <target> <text>     send literal text to target pane (no Enter)
 #   enter <target>           send Enter to target pane
 #   repl <target>            line-loop: each line is sent to target as text + Enter
-#   control [target]         split current dashboard pane: viewer above, repl below.
+#   control [-z|--zoom] [target]
+#                            split current dashboard pane: viewer above, repl below.
 #                            Repl Ctrl-D auto-kills the viewer pane.
 #                            target optional; if omitted, runs pick.
+#                            --zoom is forwarded to the inner view.
 #   <anything else>...       passthrough to `tmux` on the main socket
 #
 # Notes:
@@ -35,9 +39,11 @@
 #   viewer on Ctrl-D), or `tmux-main view-stop` from another pane, or set a
 #   different prefix on one of the servers.
 #
-#   Pane zoom in `view` is per-window state on the main server, shared
+#   `view --zoom` is opt-in because tmux's window_zoomed_flag (and the
+#   active-pane it implies) is per-window state on the main server, shared
 #   with every other client on that session. Other clients of the same
-#   window will also see the zoom while the viewer is open.
+#   window will also see the zoom while the viewer is open. Without --zoom,
+#   the viewer shows the whole multi-pane window (non-intrusive default).
 #
 # Examples:
 #   tmux-main sessions
@@ -123,25 +129,33 @@ case "$cmd" in
     ;;
 
   view)
+    want_zoom=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        -z|--zoom) want_zoom=1; shift ;;
+        --) shift; break ;;
+        -*) echo "tmux-main view: unknown flag: $1" >&2; exit 1 ;;
+        *) break ;;
+      esac
+    done
     if [[ $# -eq 0 ]]; then
       target=$("$0" pick) || exit 1
     elif [[ $# -eq 1 ]]; then
       target=$1
     else
-      echo "Usage: tmux-main view [session[:window[.pane]]]" >&2
+      echo "Usage: tmux-main view [-z|--zoom] [session[:window[.pane]]]" >&2
       exit 1
     fi
     if [[ -n "${TMUX:-}" ]]; then
       tmux select-pane -T "tmux-main view → $target [READ-ONLY]" 2>/dev/null || true
     fi
 
-    # If target names a specific pane and the window isn't already zoomed,
-    # zoom the target so the viewer shows just that pane. Track so we can
-    # unzoom on exit. Caveat: window_zoomed_flag and active-pane are per-
-    # window state shared with all other clients on the session — they will
-    # see the zoom too while the viewer is open.
+    # Opt-in zoom: only when --zoom was passed and target names a specific
+    # pane. We toggle the main server's zoom on attach and toggle it back
+    # on exit. Caveat: window_zoomed_flag and active-pane are per-window
+    # state shared with all clients on the session.
     zoom_target=""
-    if [[ "$target" == *.* ]]; then
+    if [[ -n "$want_zoom" && "$target" == *.* ]]; then
       if [[ "$(main display-message -p -t "$target" '#{window_zoomed_flag}' 2>/dev/null || echo 1)" == "0" ]]; then
         if main resize-pane -Z -t "$target" 2>/dev/null; then
           zoom_target=$target
@@ -222,12 +236,21 @@ case "$cmd" in
       echo "tmux-main control must be run inside a tmux session" >&2
       exit 1
     fi
+    zoom_arg=()
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        -z|--zoom) zoom_arg=(--zoom); shift ;;
+        --) shift; break ;;
+        -*) echo "tmux-main control: unknown flag: $1" >&2; exit 1 ;;
+        *) break ;;
+      esac
+    done
     if [[ $# -eq 0 ]]; then
       target=$("$0" pick) || exit 1
     elif [[ $# -eq 1 ]]; then
       target=$1
     else
-      echo "Usage: tmux-main control [target]" >&2
+      echo "Usage: tmux-main control [-z|--zoom] [target]" >&2
       exit 1
     fi
     view_pane=$(tmux display-message -p '#{pane_id}')
@@ -238,7 +261,7 @@ case "$cmd" in
     # Defensively put focus on the repl pane (split-window already does, but
     # do it explicitly so the user lands on TYPE HERE).
     tmux select-pane -t "$repl_pane"
-    exec "$0" view "$target"
+    exec "$0" view ${zoom_arg[@]+"${zoom_arg[@]}"} "$target"
     ;;
 
   *)
