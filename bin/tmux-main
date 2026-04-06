@@ -11,19 +11,35 @@
 #   sessions                 list sessions on the main server
 #   windows                  list all windows
 #   panes                    list all panes (target  cmd  title)
-#   view <target>            attach as a read-only viewer (ignore-size)
-#                            target: session[:window[.pane]]
+#   pick                     fzf picker; prints the chosen target to stdout
+#   view [target]            attach as a read-only viewer (ignore-size).
+#                            target: session[:window[.pane]]; if omitted, runs pick.
+#   view-stop                detach all read-only viewer clients on the main server
 #   send <target> <key>...   send tmux key(s) to target pane
 #   type <target> <text>     send literal text to target pane (no Enter)
 #   enter <target>           send Enter to target pane
+#   repl <target>            line-loop: each line is sent to target as text + Enter
+#   control [target]         split current dashboard pane: viewer above, repl below.
+#                            Repl Ctrl-D auto-kills the viewer pane.
+#                            target optional; if omitted, runs pick.
 #   <anything else>...       passthrough to `tmux` on the main socket
+#
+# Notes:
+#   The viewer is a tmux client on the main server running inside a dashboard
+#   pane. If both servers use the same prefix (e.g. C-b), the dashboard
+#   intercepts the prefix before the inner client sees it, so prefix-d won't
+#   detach the viewer. Use `tmux-main control` (the repl auto-kills the
+#   viewer on Ctrl-D), or `tmux-main view-stop` from another pane, or set a
+#   different prefix on one of the servers.
 #
 # Examples:
 #   tmux-main sessions
+#   tmux-main control                                  # pick → view + repl
 #   tmux-main view openclaw-workspace:1.0
+#   tmux-main view "$(tmux-main pick)"
 #   tmux-main type openclaw-workspace:1.0 "ls -la"
-#   tmux-main enter openclaw-workspace:1.0
 #   tmux-main send openclaw-workspace:1.0 C-c
+#   tmux-main view-stop                                # detach all viewers
 #   tmux-main capture-pane -p -t openclaw-workspace:1.0
 #
 # Override the target socket with TMUX_MAIN_SOCKET=other tmux-main ...
@@ -39,6 +55,24 @@ main() {
 usage() {
   sed -n '2,/^$/p' "$0" | sed 's/^#\s\?//'
   exit "${1:-0}"
+}
+
+view_target() {
+  local target=$1 session window
+  session=${target%%:*}
+  if [[ "$target" == *.* ]]; then
+    window=${target#*:}
+    window=${window%%.*}
+    main attach-session -f read-only,ignore-size -t "$session" \; \
+      select-window -t "$session:$window" \; \
+      select-pane -t "$target"
+  elif [[ "$target" == *:* ]]; then
+    window=${target#*:}
+    main attach-session -f read-only,ignore-size -t "$session" \; \
+      select-window -t "$session:$window"
+  else
+    main attach-session -f read-only,ignore-size -t "$session"
+  fi
 }
 
 if [[ $# -eq 0 ]]; then
@@ -65,26 +99,40 @@ case "$cmd" in
     main list-panes -a -F '#S:#I.#P #{pane_current_command} #{pane_title}' "$@"
     ;;
 
+  pick)
+    if ! command -v fzf >/dev/null; then
+      echo "fzf not found in PATH" >&2
+      exit 127
+    fi
+    selection=$(
+      main list-panes -a -F '#{session_name}:#{window_index}.#{pane_index}	#{pane_current_command}	#{window_name}	#{pane_title}' \
+        | fzf --delimiter=$'\t' --with-nth=1,2,3,4 \
+              --preview="env -u TMUX tmux -L $socket capture-pane -p -e -J -t {1}" \
+              --preview-window=right:60%:wrap \
+              --header='select a pane on the main server'
+    ) || exit 1
+    [[ -z "$selection" ]] && exit 1
+    printf '%s\n' "${selection%%	*}"
+    ;;
+
   view)
-    if [[ $# -ne 1 ]]; then
-      echo "Usage: tmux-main view <session[:window[.pane]]>" >&2
+    if [[ $# -eq 0 ]]; then
+      target=$("$0" pick) || exit 1
+    elif [[ $# -eq 1 ]]; then
+      target=$1
+    else
+      echo "Usage: tmux-main view [session[:window[.pane]]]" >&2
       exit 1
     fi
-    target=$1
-    session=${target%%:*}
-    if [[ "$target" == *.* ]]; then
-      window=${target#*:}
-      window=${window%%.*}
-      main attach-session -f read-only,ignore-size -t "$session" \; \
-        select-window -t "$session:$window" \; \
-        select-pane -t "$target"
-    elif [[ "$target" == *:* ]]; then
-      window=${target#*:}
-      main attach-session -f read-only,ignore-size -t "$session" \; \
-        select-window -t "$session:$window"
-    else
-      main attach-session -f read-only,ignore-size -t "$session"
-    fi
+    view_target "$target"
+    ;;
+
+  view-stop)
+    while read -r tty ro; do
+      if [[ "$ro" == "1" ]]; then
+        main detach-client -t "$tty"
+      fi
+    done < <(main list-clients -F '#{client_tty} #{client_readonly}' 2>/dev/null)
     ;;
 
   send)
@@ -113,6 +161,43 @@ case "$cmd" in
       exit 1
     fi
     main send-keys -t "$1" Enter
+    ;;
+
+  repl)
+    target="${1:-${TMUX_MAIN_TARGET:-}}"
+    if [[ -z "$target" ]]; then
+      echo "Usage: tmux-main repl <target>" >&2
+      exit 1
+    fi
+    if [[ -n "${TMUX_MAIN_VIEW_PANE:-}" ]]; then
+      trap 'tmux kill-pane -t "$TMUX_MAIN_VIEW_PANE" 2>/dev/null || true' EXIT
+    fi
+    echo "tmux-main repl → $target  (Ctrl-D to exit; lines sent as text + Enter)"
+    while IFS= read -e -r -p "$target> " line; do
+      main send-keys -t "$target" -l "$line"
+      main send-keys -t "$target" Enter
+    done
+    ;;
+
+  control)
+    if [[ -z "${TMUX:-}" ]]; then
+      echo "tmux-main control must be run inside a tmux session" >&2
+      exit 1
+    fi
+    if [[ $# -eq 0 ]]; then
+      target=$("$0" pick) || exit 1
+    elif [[ $# -eq 1 ]]; then
+      target=$1
+    else
+      echo "Usage: tmux-main control [target]" >&2
+      exit 1
+    fi
+    view_pane=$(tmux display-message -p '#{pane_id}')
+    tmux split-window -v -l 30% \
+      -e "TMUX_MAIN_VIEW_PANE=$view_pane" \
+      -e "TMUX_MAIN_TARGET=$target" \
+      "$0 repl"
+    exec "$0" view "$target"
     ;;
 
   *)
