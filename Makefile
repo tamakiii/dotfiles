@@ -42,10 +42,12 @@ install: setup \
 	~/.local/bin/gh-as \
 	~/.local/bin/gh-apps \
 	~/.local/bin/gh-webhooks \
+	~/.local/bin/git-repo-slug \
 	install-myfiles \
 	install-os
 
 uninstall: uninstall-os uninstall-myfiles
+	rm -f ~/.local/bin/git-repo-slug
 	rm -f ~/.local/bin/gh-webhooks
 	rm -f ~/.local/bin/gh-apps
 	rm -f ~/.local/bin/gh-as
@@ -89,7 +91,8 @@ LINKS := \
 	~/.local/bin/tmux-claude-status ~/.local/bin/tmux-claude-launch \
 	~/.local/bin/tmux-claude-send ~/.local/bin/tmux-editor \
 	~/.local/bin/codium ~/.local/bin/gh-app-token ~/.local/bin/gh \
-	~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks
+	~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks \
+	~/.local/bin/git-repo-slug
 
 check: check-myfiles check-os
 	@for link in $(LINKS); do \
@@ -173,4 +176,7 @@ check-os:
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/gh-webhooks: | bin/gh-webhooks
+	ln -sfnv $(abspath $|) $@
+
+~/.local/bin/git-repo-slug: | bin/git-repo-slug
 	ln -sfnv $(abspath $|) $@

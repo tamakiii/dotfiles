@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Extract owner/repo slug from a GitHub URL on stdin.
+#
+# Usage:
+#   git remote get-url origin | git-repo-slug
+
+read -r url
+url="${url#*github.com:}"
+url="${url#*github.com/}"
+url="${url%.git}"
+echo "$url"
