@@ -10,7 +10,7 @@ set -euo pipefail
 #
 # Config: $MYFILES/github/apps/<app-name>.json
 
-MYFILES="${HOME}/.dotfiles/.local/src/tamakiii/myfiles"
+MYFILES="${HOME}/.myfiles"
 APPS_DIR="${MYFILES}/github/apps"
 
 if [[ ! -d "$APPS_DIR" ]]; then
