@@ -1,0 +1,121 @@
+#!/bin/bash
+# tmux-main — operate on the main tmux server from outside (e.g. a dashboard server)
+#
+# Useful when you're inside one tmux server (e.g. tmux -L dashboard) and want
+# to observe or control panes on another tmux server (e.g. -L default).
+#
+# Unsets TMUX so the nested-tmux check is bypassed, and targets the socket
+# named by $TMUX_MAIN_SOCKET (default: "default").
+#
+# Subcommands:
+#   sessions                 list sessions on the main server
+#   windows                  list all windows
+#   panes                    list all panes (target  cmd  title)
+#   view <target>            attach as a read-only viewer (ignore-size)
+#                            target: session[:window[.pane]]
+#   send <target> <key>...   send tmux key(s) to target pane
+#   type <target> <text>     send literal text to target pane (no Enter)
+#   enter <target>           send Enter to target pane
+#   <anything else>...       passthrough to `tmux` on the main socket
+#
+# Examples:
+#   tmux-main sessions
+#   tmux-main view openclaw-workspace:1.0
+#   tmux-main type openclaw-workspace:1.0 "ls -la"
+#   tmux-main enter openclaw-workspace:1.0
+#   tmux-main send openclaw-workspace:1.0 C-c
+#   tmux-main capture-pane -p -t openclaw-workspace:1.0
+#
+# Override the target socket with TMUX_MAIN_SOCKET=other tmux-main ...
+
+set -euo pipefail
+
+socket=${TMUX_MAIN_SOCKET:-default}
+
+main() {
+  env -u TMUX tmux -L "$socket" "$@"
+}
+
+usage() {
+  sed -n '2,/^$/p' "$0" | sed 's/^#\s\?//'
+  exit "${1:-0}"
+}
+
+if [[ $# -eq 0 ]]; then
+  usage 1
+fi
+
+cmd=$1
+shift
+
+case "$cmd" in
+  -h|--help|help)
+    usage 0
+    ;;
+
+  sessions)
+    main list-sessions "$@"
+    ;;
+
+  windows)
+    main list-windows -a "$@"
+    ;;
+
+  panes)
+    main list-panes -a -F '#S:#I.#P #{pane_current_command} #{pane_title}' "$@"
+    ;;
+
+  view)
+    if [[ $# -ne 1 ]]; then
+      echo "Usage: tmux-main view <session[:window[.pane]]>" >&2
+      exit 1
+    fi
+    target=$1
+    session=${target%%:*}
+    if [[ "$target" == *.* ]]; then
+      window=${target#*:}
+      window=${window%%.*}
+      main attach-session -f read-only,ignore-size -t "$session" \; \
+        select-window -t "$session:$window" \; \
+        select-pane -t "$target"
+    elif [[ "$target" == *:* ]]; then
+      window=${target#*:}
+      main attach-session -f read-only,ignore-size -t "$session" \; \
+        select-window -t "$session:$window"
+    else
+      main attach-session -f read-only,ignore-size -t "$session"
+    fi
+    ;;
+
+  send)
+    if [[ $# -lt 2 ]]; then
+      echo "Usage: tmux-main send <target> <key>..." >&2
+      exit 1
+    fi
+    target=$1
+    shift
+    main send-keys -t "$target" "$@"
+    ;;
+
+  type)
+    if [[ $# -lt 2 ]]; then
+      echo "Usage: tmux-main type <target> <text>" >&2
+      exit 1
+    fi
+    target=$1
+    shift
+    main send-keys -t "$target" -l "$*"
+    ;;
+
+  enter)
+    if [[ $# -ne 1 ]]; then
+      echo "Usage: tmux-main enter <target>" >&2
+      exit 1
+    fi
+    main send-keys -t "$1" Enter
+    ;;
+
+  *)
+    main "$cmd" "$@"
+    ;;
+esac
