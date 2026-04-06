@@ -5,13 +5,24 @@ else
   OS := arch
 endif
 
-.PHONY: help install uninstall check
+.PHONY: \
+	help \
+	setup teardown \
+	install uninstall \
+	install-myfiles uninstall-myfiles \
+	install-os uninstall-os \
+	check check-myfiles check-os
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
-install: \
-	.local/src/tamakiii/myfiles \
+setup: \
+	~/.myfiles
+
+teardown:
+	rm -rf ~/.myfiles
+
+install: setup \
 	~/.zsh \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
@@ -33,13 +44,11 @@ install: \
 	~/.local/bin/gh \
 	~/.local/bin/gh-as \
 	~/.local/bin/gh-apps \
-	~/.local/bin/gh-webhooks
-	$(MAKE) -C .local/src/tamakiii/myfiles install
-	$(MAKE) -C os/$(OS) install
+	~/.local/bin/gh-webhooks \
+	install-myfiles \
+	install-os
 
-uninstall:
-	$(MAKE) -C os/$(OS) uninstall
-	$(MAKE) -C .local/src/tamakiii/myfiles uninstall
+uninstall: uninstall-os uninstall-myfiles
 	rm -f ~/.local/bin/gh-webhooks
 	rm -f ~/.local/bin/gh-apps
 	rm -f ~/.local/bin/gh-as
@@ -63,28 +72,41 @@ uninstall:
 	rm -rf ~/.zsh/antigen.zsh
 	rm -rf ~/.zsh
 
-check:
-	@err=0; \
-	for link in \
-		~/.zshrc ~/.config/tmux ~/.config/helix ~/.config/ghostty/themes \
-		~/.config/gitmux ~/.config/git \
-		~/.local/bin/tmux-window-name ~/.local/bin/tmux-pane-label \
-		~/.local/bin/tmux-rename-sessions ~/.local/bin/tmux-claude-panes \
-		~/.local/bin/tmux-claude-status ~/.local/bin/tmux-claude-launch \
-		~/.local/bin/tmux-claude-send ~/.local/bin/tmux-editor \
-		~/.local/bin/codium ~/.local/bin/gh-app-token ~/.local/bin/gh \
-		~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks \
-	; do \
-		if [ ! -e "$$link" ]; then \
-			echo "BROKEN: $$link"; err=1; \
-		fi; \
-	done; \
-	$(MAKE) -s -C .local/src/tamakiii/myfiles check || err=1; \
-	$(MAKE) -s -C os/$(OS) check || err=1; \
-	if [ $$err -eq 0 ]; then echo "OK: all symlinks valid"; fi; \
-	exit $$err
+install-myfiles:
+	$(MAKE) -C ~/.myfiles install
 
-.local/src/tamakiii/myfiles:
+uninstall-myfiles:
+	$(MAKE) -C ~/.myfiles uninstall
+
+install-os:
+	$(MAKE) -C os/$(OS) install
+
+uninstall-os:
+	$(MAKE) -C os/$(OS) uninstall
+
+LINKS := \
+	~/.zshrc ~/.config/tmux ~/.config/helix ~/.config/ghostty/themes \
+	~/.config/gitmux ~/.config/git \
+	~/.local/bin/tmux-window-name ~/.local/bin/tmux-pane-label \
+	~/.local/bin/tmux-rename-sessions ~/.local/bin/tmux-claude-panes \
+	~/.local/bin/tmux-claude-status ~/.local/bin/tmux-claude-launch \
+	~/.local/bin/tmux-claude-send ~/.local/bin/tmux-editor \
+	~/.local/bin/codium ~/.local/bin/gh-app-token ~/.local/bin/gh \
+	~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks
+
+check: check-myfiles check-os
+	@for link in $(LINKS); do \
+		test -e "$$link" || { echo "BROKEN: $$link"; exit 1; }; \
+	done; \
+	echo "OK: all symlinks valid"
+
+check-myfiles:
+	$(MAKE) -s -C ~/.myfiles check
+
+check-os:
+	$(MAKE) -s -C os/$(OS) check
+
+~/.myfiles:
 	git clone git@github.com:tamakiii/myfiles.git $@
 
 ~/.zsh:

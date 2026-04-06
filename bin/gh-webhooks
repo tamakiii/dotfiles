@@ -10,7 +10,7 @@ set -euo pipefail
 #
 # Config: $MYFILES/github/webhooks.json
 
-MYFILES="${HOME}/.dotfiles/.local/src/tamakiii/myfiles"
+MYFILES="${HOME}/.myfiles"
 CONFIG="${MYFILES}/github/webhooks.json"
 
 if [[ ! -f "$CONFIG" ]]; then
