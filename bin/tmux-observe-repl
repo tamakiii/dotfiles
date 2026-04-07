@@ -2,9 +2,10 @@
 # tmux-observe-repl — open a tmux-main repl targeting a pane on the main server.
 # Designed to run inside a tmux display-popup so it has a TTY.
 #
-# If the calling pane is in view mode (title: "tmux-main view → <target> [READ-ONLY]"),
-# the target is extracted from the title automatically. Otherwise, an fzf picker
-# is shown to select a pane.
+# Reads the target from the calling pane's @view_target user-option, which
+# `tmux-main view` sets when it takes over a pane. If unset, this script
+# errors out — the caller is expected to check @view_target first (see
+# observe.conf prefix-a menu).
 #
 # Requires TMUX_CALLER_PANE to be set by the caller (via display-popup -e).
 

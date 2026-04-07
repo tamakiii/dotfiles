@@ -157,16 +157,9 @@ case "$cmd" in
     # state shared with all clients on the session.
     zoom_target=""
     if [[ -n "$want_zoom" && "$target" == *.* ]]; then
-      zoomed_flag=$(main display-message -p -t "$target" '#{window_zoomed_flag}' 2>&1) \
-        || { echo "tmux-main: display-message failed: $zoomed_flag" >&2; zoomed_flag=1; }
-      if [[ "$zoomed_flag" == "0" ]]; then
-        if main resize-pane -Z -t "$target"; then
-          zoom_target=$target
-        else
-          echo "tmux-main: resize-pane -Z failed for $target" >&2
-        fi
-      else
-        echo "tmux-main: skipping zoom (window_zoomed_flag=$zoomed_flag)" >&2
+      zoomed_flag=$(main display-message -p -t "$target" '#{window_zoomed_flag}' 2>/dev/null || echo 1)
+      if [[ "$zoomed_flag" == "0" ]] && main resize-pane -Z -t "$target" 2>/dev/null; then
+        zoom_target=$target
       fi
     fi
     # Cleanup must run exactly once — resize-pane -Z is a toggle, so a
