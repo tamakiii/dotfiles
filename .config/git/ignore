@@ -2,5 +2,3 @@
 /.codex
 nohup.out
 *.local.json
-*.local
-*.local/
