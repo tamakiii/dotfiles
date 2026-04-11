@@ -1,0 +1,7 @@
+# AUR packages for Arch Linux.
+# Installed via `make -C os/arch install-packages-aur` (runs paru).
+#
+# Format: one package per line. Blank lines and '#' comments are ignored.
+
+# code counting (complement to tokei)
+scc

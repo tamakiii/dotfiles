@@ -1,0 +1,23 @@
+# Optional Homebrew bundle for macOS.
+# NOT installed by default. Run with:
+#
+#   brew bundle --file=os/mac/Brewfile.opt
+
+# editors / ides
+cask "visual-studio-code"
+brew "helix"
+
+# terminals
+cask "ghostty"
+
+# browsers
+cask "firefox"
+cask "google-chrome"
+
+# apps
+cask "obsidian"
+cask "discord"
+cask "slack"
+
+# mesh / remote
+cask "tailscale"

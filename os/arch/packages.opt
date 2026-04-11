@@ -1,0 +1,67 @@
+# Optional packages for Arch Linux.
+# NOT installed by default. To install a subset:
+#
+#   sudo pacman -S --needed $(grep -vE '^\s*(#|$)' os/arch/packages.opt)
+#
+# Grouped by concern so you can copy individual sections.
+
+# --- nvidia gpu stack ---
+nvidia-open
+nvidia-utils
+lib32-nvidia-utils
+nvidia-settings
+nvidia-container-toolkit
+cudnn
+
+# --- llm runtime ---
+ollama-cuda
+# lmstudio               # AUR only; see packages.aur if you adopt it
+# llama-server            # built from llama.cpp source under ~/.local
+
+# --- observability stack ---
+prometheus
+prometheus-node-exporter
+grafana
+loki
+grafana-alloy
+
+# --- desktop (hyprland) ---
+hyprland
+hyprlock
+hyprpaper
+waybar
+rofi
+mako
+wl-clipboard
+grim
+slurp
+cliphist
+
+# --- editors / ides ---
+helix
+visual-studio-code-bin
+vim
+
+# --- terminals ---
+ghostty
+kitty
+
+# --- browsers ---
+firefox
+chromium
+
+# --- apps ---
+obsidian
+discord
+mpv
+obs-studio
+
+# --- mesh / remote ---
+tailscale
+openssh
+
+# --- gaming ---
+steam
+gamemode
+gamescope
+mangohud

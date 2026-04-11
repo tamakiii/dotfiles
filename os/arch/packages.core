@@ -1,0 +1,107 @@
+# Core packages for Arch Linux.
+# Installed via `make -C os/arch install-packages-core` (runs pacman).
+#
+# See docs/environment/README.md in tamakiii/myfiles for rationale and the
+# distinction between built-in Claude Code tools and shell-invoked ones.
+#
+# Format: one package per line. Blank lines and '#' comments are ignored.
+
+# version control + GitHub
+git
+github-cli
+
+# build
+base-devel
+cmake
+just
+
+# shell
+zsh
+tmux
+
+# search / nav / inspection
+ripgrep
+fd
+fzf
+bat
+eza
+zoxide
+tree
+tealdeer
+
+# json / yaml / http
+jq
+go-yq
+curl
+wget
+
+# git review
+git-delta
+lazygit
+tig
+difftastic
+
+# shell quality of life
+direnv
+
+# python
+python
+python-pip
+uv
+python-pipx
+
+# node
+nodejs-lts-krypton
+npm
+pnpm
+bun
+
+# rust / go / deno
+rustup
+go
+deno
+
+# containers
+docker
+docker-compose
+docker-buildx
+podman
+
+# file ops / archives
+rsync
+unzip
+zip
+
+# text / diff
+less
+diffutils
+
+# observability
+htop
+btop
+nvtop
+mission-center
+
+# benchmarking / timing
+hyperfine
+
+# code counting
+tokei
+
+# file watching
+entr
+watchexec
+
+# structural search
+ast-grep
+
+# disk / process inspection
+dust
+duf
+procs
+
+# sync
+rclone
+
+# db client
+sqlite

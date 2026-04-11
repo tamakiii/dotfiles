@@ -1,0 +1,84 @@
+# Core Homebrew bundle for macOS.
+# Installed via `make -C os/mac install-packages` (runs `brew bundle`).
+#
+# See docs/environment/README.md in tamakiii/myfiles for rationale.
+
+# version control + GitHub
+brew "git"
+brew "gh"
+
+# build
+brew "make"
+brew "cmake"
+brew "just"
+
+# shell
+brew "tmux"
+
+# search / nav / inspection
+brew "ripgrep"
+brew "fd"
+brew "fzf"
+brew "bat"
+brew "eza"
+brew "zoxide"
+brew "tree"
+brew "tealdeer"
+
+# json / yaml / http
+brew "jq"
+brew "yq"
+brew "curl"
+brew "wget"
+
+# git review
+brew "git-delta"
+brew "lazygit"
+brew "tig"
+brew "difftastic"
+
+# shell quality of life
+brew "direnv"
+
+# python
+brew "python@3.12"
+brew "uv"
+brew "pipx"
+
+# node
+brew "node"
+brew "pnpm"
+brew "bun"
+
+# rust / go / deno
+brew "rustup"
+brew "go"
+brew "deno"
+
+# containers
+brew "podman"
+cask "docker"
+
+# file ops
+brew "rsync"
+
+# observability
+brew "htop"
+brew "btop"
+
+# benchmarking / timing
+brew "hyperfine"
+
+# code counting
+brew "tokei"
+
+# file watching
+brew "entr"
+brew "watchexec"
+
+# structural search
+brew "ast-grep"
+
+# fonts
+tap "homebrew/cask-fonts"
+cask "font-jetbrains-mono-nerd-font"

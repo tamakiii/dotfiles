@@ -1,7 +1,9 @@
 .PHONY: help setup teardown
-.PHONY: install install-myfiles install-os 
+.PHONY: install install-myfiles install-os
 .PHONY: uninstall uninstall-os uninstall-myfiles
 .PHONY: check check-myfiles check-os
+.PHONY: install-packages install-packages-os
+.PHONY: check-packages check-packages-os
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -78,6 +80,16 @@ install-os:
 
 uninstall-os:
 	$(MAKE) -C os/$(OS) uninstall
+
+install-packages: install-packages-os
+
+install-packages-os:
+	$(MAKE) -C os/$(OS) install-packages
+
+check-packages: check-packages-os
+
+check-packages-os:
+	$(MAKE) -s -C os/$(OS) check-packages
 
 LINKS := \
 	~/.zshrc ~/.config/tmux ~/.config/helix ~/.config/ghostty/themes \

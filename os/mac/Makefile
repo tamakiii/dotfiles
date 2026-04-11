@@ -1,4 +1,5 @@
 .PHONY: help install uninstall check
+.PHONY: install-packages check-packages
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -38,3 +39,9 @@ check:
 
 ~/.local/bin/gw: | bin/gw
 	ln -sfnv $(abspath $|) $@
+
+install-packages: Brewfile
+	brew bundle --file=$<
+
+check-packages: Brewfile
+	brew bundle check --file=$<
