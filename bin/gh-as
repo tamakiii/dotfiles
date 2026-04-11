@@ -39,10 +39,8 @@ app_config=$(jq -e --arg name "$APP_NAME" '.apps[$name] // empty' "$CONFIG" 2>/d
   exit 1
 }
 
+auth_type=$(echo "$app_config" | jq -r '.type // "app"')
 backend=$(echo "$app_config" | jq -r '.backend')
-app_id_ref=$(echo "$app_config" | jq -r '."app-id"')
-installation_id_ref=$(echo "$app_config" | jq -r '."installation-id"')
-private_key_ref=$(echo "$app_config" | jq -r '."private-key"')
 
 # Fetch secrets based on backend
 fetch_secret() {
@@ -69,13 +67,27 @@ fetch_secret() {
   esac
 }
 
-app_id=$(fetch_secret "$app_id_ref")
-installation_id=$(fetch_secret "$installation_id_ref")
-
-export GH_TOKEN="$("${HOME}/.local/bin/gh-app-token" \
-  "$app_id" \
-  "$installation_id" \
-  <(fetch_secret "$private_key_ref"))"
+case "$auth_type" in
+  pat)
+    token_ref=$(echo "$app_config" | jq -r '.token')
+    export GH_TOKEN="$(fetch_secret "$token_ref")"
+    ;;
+  app)
+    app_id_ref=$(echo "$app_config" | jq -r '."app-id"')
+    installation_id_ref=$(echo "$app_config" | jq -r '."installation-id"')
+    private_key_ref=$(echo "$app_config" | jq -r '."private-key"')
+    app_id=$(fetch_secret "$app_id_ref")
+    installation_id=$(fetch_secret "$installation_id_ref")
+    export GH_TOKEN="$("${HOME}/.local/bin/gh-app-token" \
+      "$app_id" \
+      "$installation_id" \
+      <(fetch_secret "$private_key_ref"))"
+    ;;
+  *)
+    echo "gh-as: unsupported auth type: $auth_type" >&2
+    exit 1
+    ;;
+esac
 
 # Find the real gh binary, excluding wrappers
 SELF_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
