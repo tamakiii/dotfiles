@@ -24,7 +24,6 @@ install: setup \
 	~/.zsh/antigen.zsh \
 	~/.zshrc \
 	~/.config/tmux \
-	~/.config/helix \
 	~/.config/ghostty/themes \
 	~/.config/gitmux \
 	~/.config/git \
@@ -61,7 +60,6 @@ uninstall: uninstall-os uninstall-myfiles
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty/themes
-	rm -rf ~/.config/helix
 	rm -rf ~/.config/tmux
 	rm -rf ~/.zshrc
 	rm -rf ~/.zsh/antigen.zsh
@@ -80,7 +78,7 @@ uninstall-os:
 	$(MAKE) -C os/$(OS) uninstall
 
 LINKS := \
-	~/.zshrc ~/.config/tmux ~/.config/helix ~/.config/ghostty/themes \
+	~/.zshrc ~/.config/tmux ~/.config/ghostty/themes \
 	~/.config/gitmux ~/.config/git \
 	~/.local/bin/tmux-window-name ~/.local/bin/tmux-pane-label \
 	~/.local/bin/tmux-rename-sessions ~/.local/bin/tmux-claude-panes \
@@ -114,9 +112,6 @@ check-os:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/tmux: | .config/tmux
-	ln -sfnv $(abspath $|) $@
-
-~/.config/helix: | .config/helix
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/ghostty:
