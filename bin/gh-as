@@ -1,30 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run gh CLI authenticated as a GitHub App.
+# Run gh CLI authenticated as a specific identity.
 #
 # Usage:
-#   gh-as <app-name> [gh args...]
+#   gh-as <identity> [gh args...]
 #
-# Reads app credentials from ~/.config/gh-as/config.json.
+# Reads identity credentials from ~/.config/gh-as/config.json.
+# Supports auth types: app (GitHub App), pat (personal access token),
+# passthrough (uses the default gh auth login identity).
 #
 # Example:
 #   gh-as tamakiii-claude pr review 2 --repo tamakiii/sandbox-bevy --approve
 #   gh-as tamakiii-doppelganger pr create --title "..."
+#   gh-as tamakiii issue list --repo tamakiii/meta
 
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/gh-as/config.json"
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: gh-as <app-name> [gh args...]" >&2
+  echo "Usage: gh-as <identity> [gh args...]" >&2
   echo "" >&2
   if [[ -f "$CONFIG" ]]; then
-    echo "Available apps:" >&2
+    echo "Available identities:" >&2
     jq -r '.apps | keys[]' "$CONFIG" | sed 's/^/  /' >&2
   fi
   exit 1
 fi
 
-APP_NAME="$1"
+IDENTITY="$1"
 shift
 
 if [[ ! -f "$CONFIG" ]]; then
@@ -32,9 +35,9 @@ if [[ ! -f "$CONFIG" ]]; then
   exit 1
 fi
 
-app_config=$(jq -e --arg name "$APP_NAME" '.apps[$name] // empty' "$CONFIG" 2>/dev/null) || {
-  echo "gh-as: unknown app: $APP_NAME" >&2
-  echo "Available apps:" >&2
+app_config=$(jq -e --arg name "$IDENTITY" '.apps[$name] // empty' "$CONFIG" 2>/dev/null) || {
+  echo "gh-as: unknown identity: $IDENTITY" >&2
+  echo "Available identities:" >&2
   jq -r '.apps | keys[]' "$CONFIG" | sed 's/^/  /' >&2
   exit 1
 }
@@ -68,6 +71,8 @@ fetch_secret() {
 }
 
 case "$auth_type" in
+  passthrough)
+    ;;
   pat)
     token_ref=$(echo "$app_config" | jq -r '.token')
     export GH_TOKEN="$(fetch_secret "$token_ref")"
