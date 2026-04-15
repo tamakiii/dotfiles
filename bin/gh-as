@@ -98,8 +98,17 @@ esac
 SELF_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 for p in $(type -ap gh); do
   real="$(readlink -f "$p")"
-  # Skip if it's in our bin dir (the gh wrapper) or is gh-as itself
+  # Skip the gh wrapper that lives alongside gh-as
   [[ "$(dirname "$real")" == "$SELF_DIR" ]] && continue
+  # Skip other shell-script wrappers that chain back into gh-as
+  # (e.g. ~/.myfiles/.claude/bin/gh → `exec gh-as tamakiii-claude "$@"`).
+  # Without this, the PATH walk finds a wrapper before the real gh and
+  # re-exec loops infinitely.
+  if [[ -f "$real" ]] \
+     && head -c 2 "$real" 2>/dev/null | grep -q '^#!' \
+     && head -n 5 "$real" 2>/dev/null | grep -q 'gh-as'; then
+    continue
+  fi
   exec "$p" "$@"
 done
 echo "gh: not found" >&2
