@@ -22,6 +22,7 @@ teardown:
 install: setup \
 	~/.zsh \
 	~/.zsh/antigen.zsh \
+	~/.zshenv \
 	~/.zshrc \
 	~/.config/tmux \
 	~/.config/ghostty/themes \
@@ -62,6 +63,7 @@ uninstall: uninstall-os uninstall-myfiles
 	rm -rf ~/.config/ghostty/themes
 	rm -rf ~/.config/tmux
 	rm -rf ~/.zshrc
+	rm -rf ~/.zshenv
 	rm -rf ~/.zsh/antigen.zsh
 	rm -rf ~/.zsh
 
@@ -78,7 +80,7 @@ uninstall-os:
 	$(MAKE) -C os/$(OS) uninstall
 
 LINKS := \
-	~/.zshrc ~/.config/tmux ~/.config/ghostty/themes \
+	~/.zshenv ~/.zshrc ~/.config/tmux ~/.config/ghostty/themes \
 	~/.config/gitmux ~/.config/git \
 	~/.local/bin/tmux-window-name ~/.local/bin/tmux-pane-label \
 	~/.local/bin/tmux-rename-sessions ~/.local/bin/tmux-claude-panes \
@@ -107,6 +109,9 @@ check-os:
 
 ~/.zsh/antigen.zsh:
 	curl -fL https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > $@
+
+~/.zshenv: | .zshenv
+	ln -sfnv $(abspath $|) $@
 
 ~/.zshrc: | .zshrc
 	ln -sfnv $(abspath $|) $@
