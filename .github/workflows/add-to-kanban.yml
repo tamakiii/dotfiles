@@ -12,13 +12,66 @@ permissions:
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_URL: ${{ vars.KANBAN_PROJECT_URL || 'https://github.com/users/tamakiii/projects/5' }}
     steps:
       # No floating v1 tag exists; pin to the latest specific release.
       - uses: actions/add-to-project@v1.0.2
         id: add
         with:
-          project-url: ${{ vars.KANBAN_PROJECT_URL || 'https://github.com/users/tamakiii/projects/5' }}
+          project-url: ${{ env.PROJECT_URL }}
           github-token: ${{ secrets.PROJECTS_TOKEN }}
+
+      # Resolve project node ID, number, and Status field / "In Progress"
+      # option IDs at runtime from PROJECT_URL, so the flip steps below (and
+      # the linked-issue lookup) don't hardcode anything beyond the URL.
+      - name: Resolve project IDs
+        id: resolve
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ "$PROJECT_URL" =~ /(users|orgs)/([^/]+)/projects/([0-9]+) ]]; then
+            owner_type="${BASH_REMATCH[1]}"
+            owner="${BASH_REMATCH[2]}"
+            number="${BASH_REMATCH[3]}"
+          else
+            echo "Unrecognized PROJECT_URL: $PROJECT_URL" >&2
+            exit 1
+          fi
+          if [ "$owner_type" = "users" ]; then
+            root="user"
+          else
+            root="organization"
+          fi
+          data=$(gh api graphql -f query="
+            query {
+              $root(login: \"$owner\") {
+                projectV2(number: $number) {
+                  id
+                  field(name: \"Status\") {
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      options { id name }
+                    }
+                  }
+                }
+              }
+            }")
+          project_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.id")
+          status_field_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.id")
+          in_progress_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"In Progress\") | .id")
+          [ "$project_id" != "null" ] && [ -n "$project_id" ] || { echo "project not found at $PROJECT_URL" >&2; exit 1; }
+          [ "$status_field_id" != "null" ] && [ -n "$status_field_id" ] || { echo "Status field not found on project" >&2; exit 1; }
+          [ -n "$in_progress_id" ] || { echo "In Progress option not found on Status field" >&2; exit 1; }
+          {
+            echo "owner=$owner"
+            echo "number=$number"
+            echo "project_id=$project_id"
+            echo "status_field_id=$status_field_id"
+            echo "in_progress_id=$in_progress_id"
+          } >>"$GITHUB_OUTPUT"
 
       # Issues default to Todo via the project's "Item added to project"
       # workflow. PRs are different — an open PR is already in progress
@@ -28,12 +81,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           ITEM_ID: ${{ steps.add.outputs.itemId }}
+          PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
+          STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
+          IN_PROGRESS_ID: ${{ steps.resolve.outputs.in_progress_id }}
         run: |
           gh project item-edit \
             --id "$ITEM_ID" \
-            --project-id PVT_kwHOAAQIhc4BUN0d \
-            --field-id PVTSSF_lAHOAAQIhc4BUN0dzhBXgUA \
-            --single-select-option-id 47fc9ee4
+            --project-id "$PROJECT_ID" \
+            --field-id "$STATUS_FIELD_ID" \
+            --single-select-option-id "$IN_PROGRESS_ID"
 
       # Mid-conversation, an opened PR signals work has begun on the issues
       # it references. Flip those issues' Status to In Progress so the board
@@ -45,6 +101,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           PR_BODY: ${{ github.event.pull_request.body }}
+          PROJECT_NUMBER: ${{ steps.resolve.outputs.number }}
+          PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
+          STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
+          IN_PROGRESS_ID: ${{ steps.resolve.outputs.in_progress_id }}
         run: |
           set -euo pipefail
           refs=$(printf '%s\n' "${PR_BODY:-}" | grep -oE 'tamakiii/meta#[0-9]+' | sort -u || true)
@@ -70,15 +130,15 @@ jobs:
                     }
                   }
                 }
-              }" --jq '.data.repository.issueOrPullRequest | select(.__typename == "Issue") | .projectItems.nodes[] | select(.project.number == 5) | .id' 2>/dev/null | head -1 || true)
+              }" --jq ".data.repository.issueOrPullRequest | select(.__typename == \"Issue\") | .projectItems.nodes[] | select(.project.number == $PROJECT_NUMBER) | .id" 2>/dev/null | head -1 || true)
             if [ -z "$item_id" ]; then
-              echo "  not an issue on Kanban #5 (skipped)"
+              echo "  not an issue on Kanban #$PROJECT_NUMBER (skipped)"
               continue
             fi
             echo "  flipping $item_id to In Progress"
             gh project item-edit \
               --id "$item_id" \
-              --project-id PVT_kwHOAAQIhc4BUN0d \
-              --field-id PVTSSF_lAHOAAQIhc4BUN0dzhBXgUA \
-              --single-select-option-id 47fc9ee4
+              --project-id "$PROJECT_ID" \
+              --field-id "$STATUS_FIELD_ID" \
+              --single-select-option-id "$IN_PROGRESS_ID"
           done
