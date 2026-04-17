@@ -4,6 +4,7 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
+	~/.zshenv \
 	~/.zprofile \
 	~/.config/ghostty/config \
 	~/.config/hypr \
@@ -16,11 +17,12 @@ uninstall:
 	rm -rf ~/.config/hypr
 	rm -f ~/.config/ghostty/config
 	rm -rf ~/.zprofile
+	rm -rf ~/.zshenv
 
 check:
 	@err=0; \
 	for link in \
-		~/.zprofile ~/.config/ghostty/config ~/.config/hypr \
+		~/.zshenv ~/.zprofile ~/.config/ghostty/config ~/.config/hypr \
 		~/.local/bin/pbcopy ~/.local/bin/pbpaste \
 	; do \
 		if [ ! -e "$$link" ]; then \
@@ -28,6 +30,9 @@ check:
 		fi; \
 	done; \
 	exit $$err
+
+~/.zshenv: | .zshenv
+	ln -sfnv $(abspath $|) $@
 
 ~/.zprofile: | .zprofile
 	ln -sfnv $(abspath $|) $@

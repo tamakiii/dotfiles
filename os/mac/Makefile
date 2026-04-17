@@ -4,6 +4,7 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 install: \
+	~/.zshenv \
 	~/.zprofile \
 	~/.config/ghostty/config \
 	~/.local/bin/github-mcp-headers \
@@ -14,11 +15,12 @@ uninstall:
 	rm -rf ~/.local/bin/github-mcp-headers
 	rm -f ~/.config/ghostty/config
 	rm -rf ~/.zprofile
+	rm -rf ~/.zshenv
 
 check:
 	@err=0; \
 	for link in \
-		~/.zprofile ~/.config/ghostty/config \
+		~/.zshenv ~/.zprofile ~/.config/ghostty/config \
 		~/.local/bin/github-mcp-headers ~/.local/bin/gw \
 	; do \
 		if [ ! -e "$$link" ]; then \
@@ -26,6 +28,9 @@ check:
 		fi; \
 	done; \
 	exit $$err
+
+~/.zshenv: | .zshenv
+	ln -sfnv $(abspath $|) $@
 
 ~/.zprofile: | .zprofile
 	ln -sfnv $(abspath $|) $@
