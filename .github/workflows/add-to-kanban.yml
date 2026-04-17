@@ -17,7 +17,7 @@ jobs:
       - uses: actions/add-to-project@v1.0.2
         id: add
         with:
-          project-url: https://github.com/users/tamakiii/projects/5
+          project-url: ${{ vars.KANBAN_PROJECT_URL || 'https://github.com/users/tamakiii/projects/5' }}
           github-token: ${{ secrets.PROJECTS_TOKEN }}
 
       # Issues default to Todo via the project's "Item added to project"
