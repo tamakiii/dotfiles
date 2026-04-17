@@ -15,6 +15,22 @@ jobs:
     steps:
       # No floating v1 tag exists; pin to the latest specific release.
       - uses: actions/add-to-project@v1.0.2
+        id: add
         with:
           project-url: https://github.com/users/tamakiii/projects/5
           github-token: ${{ secrets.PROJECTS_TOKEN }}
+
+      # Issues default to Todo via the project's "Item added to project"
+      # workflow. PRs are different — an open PR is already in progress
+      # (waiting on review), so flip its Status accordingly.
+      - name: Set PR status to In Progress
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ITEM_ID: ${{ steps.add.outputs.itemId }}
+        run: |
+          gh project item-edit \
+            --id "$ITEM_ID" \
+            --project-id PVT_kwHOAAQIhc4BUN0d \
+            --field-id PVTSSF_lAHOAAQIhc4BUN0dzhBXgUA \
+            --single-select-option-id 47fc9ee4
