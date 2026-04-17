@@ -34,3 +34,51 @@ jobs:
             --project-id PVT_kwHOAAQIhc4BUN0d \
             --field-id PVTSSF_lAHOAAQIhc4BUN0dzhBXgUA \
             --single-select-option-id 47fc9ee4
+
+      # Mid-conversation, an opened PR signals work has begun on the issues
+      # it references. Flip those issues' Status to In Progress so the board
+      # reflects active work, not a stale Todo. Per the issue-first
+      # convention, all tracked issues live on tamakiii/meta — only those
+      # refs are scanned.
+      - name: Move linked issues to In Progress
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          refs=$(printf '%s\n' "${PR_BODY:-}" | grep -oE 'tamakiii/meta#[0-9]+' | sort -u || true)
+          if [ -z "$refs" ]; then
+            echo "No tamakiii/meta#N references in PR body; nothing to flip."
+            exit 0
+          fi
+          for ref in $refs; do
+            n="${ref##*#}"
+            echo "Looking up project item for tamakiii/meta#$n"
+            # issueOrPullRequest returns null typename for PR refs (which we
+            # ignore — only issues belong on the Kanban board's Todo column).
+            # Errors are swallowed so a single bad ref can't fail the job.
+            item_id=$(gh api graphql -f query="
+              {
+                repository(owner: \"tamakiii\", name: \"meta\") {
+                  issueOrPullRequest(number: $n) {
+                    __typename
+                    ... on Issue {
+                      projectItems(first: 20) {
+                        nodes { id project { number } }
+                      }
+                    }
+                  }
+                }
+              }" --jq '.data.repository.issueOrPullRequest | select(.__typename == "Issue") | .projectItems.nodes[] | select(.project.number == 5) | .id' 2>/dev/null | head -1 || true)
+            if [ -z "$item_id" ]; then
+              echo "  not an issue on Kanban #5 (skipped)"
+              continue
+            fi
+            echo "  flipping $item_id to In Progress"
+            gh project item-edit \
+              --id "$item_id" \
+              --project-id PVT_kwHOAAQIhc4BUN0d \
+              --field-id PVTSSF_lAHOAAQIhc4BUN0dzhBXgUA \
+              --single-select-option-id 47fc9ee4
+          done
