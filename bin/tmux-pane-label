@@ -1,18 +1,46 @@
 #!/bin/bash
-# Output a label for a tmux pane based on its running process
-# Usage: tmux-pane-label <pane_pid> <pane_current_command>
+# Output a formatted label for a tmux pane border based on its running process.
+# Usage: tmux-pane-label <pane_pid> <pane_current_command> [pane_current_path]
 
 pid="${1:-}"
 cmd="${2:-}"
+path="${3:-}"
+
+fmt() {
+  # $1 = colour number, $2 = label text
+  printf ' #[fg=colour%s]%s#[default] \n' "$1" "$2"
+}
+
+claude_worktree_label() {
+  local p="$1" rel org repo wt top
+  [ -z "$p" ] && return
+
+  case "$p" in
+    "$HOME/.dotfiles"|"$HOME/.dotfiles"/*) echo "dotfiles"; return ;;
+    "$HOME/.myfiles"|"$HOME/.myfiles"/*)   echo "myfiles";  return ;;
+    "$HOME/Git/"*)
+      rel="${p#"$HOME/Git/"}"
+      IFS='/' read -r org repo wt _ <<<"$rel"
+      if [ -n "$repo" ] && [ -n "$wt" ]; then
+        echo "$repo/$wt"
+        return
+      fi
+      ;;
+  esac
+
+  if top=$(cd "$p" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null); then
+    basename "$top"
+  fi
+}
 
 case "$cmd" in
-  claude) echo "claude" ;;
-  node)
-    if pgrep -P "$pid" -f codex >/dev/null 2>&1; then
-      echo "codex"
-    else
-      echo "$cmd"
-    fi
+  claude)
+    label=$(claude_worktree_label "$path")
+    fmt 208 "＊${label:-Claude}"
     ;;
-  *) echo "$cmd" ;;
+  node)
+    pgrep -P "$pid" -f codex >/dev/null 2>&1 && fmt 63 "Codex"
+    ;;
+  codex) fmt 63 "Codex" ;;
+  helix) fmt 141 "Helix" ;;
 esac
