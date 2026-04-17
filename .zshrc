@@ -5,6 +5,11 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen apply
 
 umask 002
+
+# Default GitHub Projects v2 board (Kanban #5) for the gh-project CLI and
+# related skills (pull-request-create, kanban-sweep). See tamakiii/meta#300.
+export GH_PROJECT_DEFAULT=5
+
 bindkey -v
 bindkey -e
 HISTFILE=~/.zsh_history
