@@ -107,12 +107,27 @@ jobs:
           PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
           STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
           IN_PROGRESS_ID: ${{ steps.resolve.outputs.in_progress_id }}
+          SPRINT_FIELD_ID: ${{ steps.resolve.outputs.sprint_field_id }}
+          CURRENT_ITERATION_ID: ${{ steps.resolve.outputs.current_iteration_id }}
         run: |
+          set -euo pipefail
           gh project item-edit \
             --id "$ITEM_ID" \
             --project-id "$PROJECT_ID" \
             --field-id "$STATUS_FIELD_ID" \
             --single-select-option-id "$IN_PROGRESS_ID"
+          # Mark active-iteration commitment: PR opened during Sprint N means
+          # work is in flight this sprint, so set Sprint=current (per
+          # tamakiii/meta#250 / tamakiii/meta#389 rule a). Overwrites any prior
+          # Sprint value — the PR-open signal is fresher than whatever the
+          # item's old commitment was. Between-sprints state = no-op.
+          if [ -n "$CURRENT_ITERATION_ID" ]; then
+            echo "Setting Sprint to current iteration $CURRENT_ITERATION_ID"
+            gh api graphql -f query='mutation($project: ID!, $item: ID!, $field: ID!, $iter: String!) { updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { iterationId: $iter } }) { clientMutationId } }' \
+              -F project="$PROJECT_ID" -F item="$ITEM_ID" -F field="$SPRINT_FIELD_ID" -F iter="$CURRENT_ITERATION_ID" >/dev/null
+          else
+            echo "No current iteration (between sprints); leaving Sprint unset."
+          fi
 
       # Mid-conversation, an opened PR signals work has begun on the issues
       # it references. Flip those issues' Status to In Progress so the board
@@ -128,6 +143,8 @@ jobs:
           PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
           STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
           IN_PROGRESS_ID: ${{ steps.resolve.outputs.in_progress_id }}
+          SPRINT_FIELD_ID: ${{ steps.resolve.outputs.sprint_field_id }}
+          CURRENT_ITERATION_ID: ${{ steps.resolve.outputs.current_iteration_id }}
         run: |
           set -euo pipefail
           refs=$(printf '%s\n' "${PR_BODY:-}" | grep -oE 'tamakiii/meta#[0-9]+' | sort -u || true)
@@ -168,6 +185,11 @@ jobs:
               --project-id "$PROJECT_ID" \
               --field-id "$STATUS_FIELD_ID" \
               --single-select-option-id "$IN_PROGRESS_ID"
+            if [ -n "$CURRENT_ITERATION_ID" ]; then
+              echo "  setting Sprint to $CURRENT_ITERATION_ID"
+              gh api graphql -f query='mutation($project: ID!, $item: ID!, $field: ID!, $iter: String!) { updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { iterationId: $iter } }) { clientMutationId } }' \
+                -F project="$PROJECT_ID" -F item="$item_id" -F field="$SPRINT_FIELD_ID" -F iter="$CURRENT_ITERATION_ID" >/dev/null
+            fi
           done
 
       # Closed items should land on Done. The built-in "Item closed" and
