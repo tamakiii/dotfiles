@@ -56,6 +56,14 @@ jobs:
                       options { id name }
                     }
                   }
+                  sprint: field(name: \"Sprint\") {
+                    ... on ProjectV2IterationField {
+                      id
+                      configuration {
+                        iterations { id title startDate duration }
+                      }
+                    }
+                  }
                 }
               }
             }")
@@ -63,10 +71,20 @@ jobs:
           status_field_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.id")
           in_progress_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"In Progress\") | .id")
           done_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"Done\") | .id")
+          sprint_field_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.sprint.id")
+          # Current iteration: the one whose [startDate, startDate+duration) window contains today.
+          # Empty output when between sprints — the close step treats this as a no-op.
+          today=$(date -u +%Y-%m-%d)
+          current_iteration_id=$(printf '%s' "$data" | jq -r --arg today "$today" "
+            .data.$root.projectV2.sprint.configuration.iterations[]
+            | select(.startDate <= \$today
+                and (\$today < (((.startDate | strptime(\"%Y-%m-%d\") | mktime) + (.duration * 86400)) | strftime(\"%Y-%m-%d\"))))
+            | .id" | head -1)
           [ "$project_id" != "null" ] && [ -n "$project_id" ] || { echo "project not found at $PROJECT_URL" >&2; exit 1; }
           [ "$status_field_id" != "null" ] && [ -n "$status_field_id" ] || { echo "Status field not found on project" >&2; exit 1; }
           [ -n "$in_progress_id" ] || { echo "In Progress option not found on Status field" >&2; exit 1; }
           [ -n "$done_id" ] || { echo "Done option not found on Status field" >&2; exit 1; }
+          [ "$sprint_field_id" != "null" ] && [ -n "$sprint_field_id" ] || { echo "Sprint field not found on project" >&2; exit 1; }
           {
             echo "owner=$owner"
             echo "number=$number"
@@ -74,6 +92,8 @@ jobs:
             echo "status_field_id=$status_field_id"
             echo "in_progress_id=$in_progress_id"
             echo "done_id=$done_id"
+            echo "sprint_field_id=$sprint_field_id"
+            echo "current_iteration_id=$current_iteration_id"
           } >>"$GITHUB_OUTPUT"
 
       # Issues default to Todo via the project's "Item added to project"
@@ -165,9 +185,24 @@ jobs:
           PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
           STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
           DONE_ID: ${{ steps.resolve.outputs.done_id }}
+          SPRINT_FIELD_ID: ${{ steps.resolve.outputs.sprint_field_id }}
+          CURRENT_ITERATION_ID: ${{ steps.resolve.outputs.current_iteration_id }}
         run: |
+          set -euo pipefail
           gh project item-edit \
             --id "$ITEM_ID" \
             --project-id "$PROJECT_ID" \
             --field-id "$STATUS_FIELD_ID" \
             --single-select-option-id "$DONE_ID"
+          # Back-fill Sprint to the iteration in which this item shipped, so the
+          # retrospective sees a truthful denominator (tamakiii/meta#358 /
+          # tamakiii/meta#389 rule b). Overwrites any pre-existing Sprint value —
+          # "Sprint" means "iteration in which shipped", not "which iteration
+          # originally committed it". Between-sprints state = no-op.
+          if [ -n "$CURRENT_ITERATION_ID" ]; then
+            echo "Back-filling Sprint to current iteration $CURRENT_ITERATION_ID"
+            gh api graphql -f query='mutation($project: ID!, $item: ID!, $field: ID!, $iter: String!) { updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { iterationId: $iter } }) { clientMutationId } }' \
+              -F project="$PROJECT_ID" -F item="$ITEM_ID" -F field="$SPRINT_FIELD_ID" -F iter="$CURRENT_ITERATION_ID" >/dev/null
+          else
+            echo "No current iteration (between sprints); leaving Sprint unset."
+          fi
