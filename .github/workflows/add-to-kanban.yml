@@ -120,20 +120,24 @@ jobs:
             echo "Looking up project item for tamakiii/meta#$n"
             # issueOrPullRequest returns null typename for PR refs (which we
             # ignore — only issues belong on the Kanban board's Todo column).
-            # Errors are swallowed so a single bad ref can't fail the job.
+            # CLOSED issues are also skipped — a PR body citing an
+            # already-closed issue for context shouldn't flip it back to
+            # In Progress (tamakiii/meta#434). Errors are swallowed so a
+            # single bad ref can't fail the job.
             item_id=$(gh api graphql -f query="
               {
                 repository(owner: \"tamakiii\", name: \"meta\") {
                   issueOrPullRequest(number: $n) {
                     __typename
                     ... on Issue {
+                      state
                       projectItems(first: 20) {
                         nodes { id project { number } }
                       }
                     }
                   }
                 }
-              }" --jq ".data.repository.issueOrPullRequest | select(.__typename == \"Issue\") | .projectItems.nodes[] | select(.project.number == $PROJECT_NUMBER) | .id" 2>/dev/null | head -1 || true)
+              }" --jq ".data.repository.issueOrPullRequest | select(.__typename == \"Issue\" and .state == \"OPEN\") | .projectItems.nodes[] | select(.project.number == $PROJECT_NUMBER) | .id" 2>/dev/null | head -1 || true)
             if [ -z "$item_id" ]; then
               echo "  not an issue on Kanban #$PROJECT_NUMBER (skipped)"
               continue
