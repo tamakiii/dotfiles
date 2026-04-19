@@ -1,5 +1,21 @@
 name: Add to Kanban
 
+# Token-shim variant: tamakiii/dotfiles is public, so GitHub's built-in
+# "Accessible from repositories owned by the user" setting on the private
+# tamakiii/meta doesn't apply (access is only granted to private callers).
+# To still consume the central composite action, check the action out via
+# actions/checkout with a fine-grained PAT scoped to Contents:Read on
+# tamakiii/meta only, then reference it locally.
+#
+# Required secret on this repo: META_READ_PAT — a fine-grained PAT issued
+# by tamakiii, resource owner 'tamakiii', repository access limited to
+# 'tamakiii/meta', permissions Contents:Read-only (nothing else). Rotate
+# within the PAT's 1-year lifetime.
+#
+# The 4 private siblings (claudius, home, myfiles, openclaw-workspace) use
+# the simpler shim form without checkout/token. See tamakiii/meta#458 for
+# the rollout history.
+
 on:
   issues:
     types: [opened, reopened, transferred, closed]
@@ -12,219 +28,17 @@ permissions:
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
-    env:
-      PROJECT_URL: ${{ vars.KANBAN_PROJECT_URL || 'https://github.com/users/tamakiii/projects/5' }}
     steps:
-      # No floating v1 tag exists; pin to the latest specific release.
-      - uses: actions/add-to-project@v1.0.2
-        id: add
+      - name: Check out meta's add-to-kanban action
+        uses: actions/checkout@v5
         with:
-          project-url: ${{ env.PROJECT_URL }}
-          github-token: ${{ secrets.PROJECTS_TOKEN }}
-
-      # Resolve project node ID, number, and Status field / In Progress /
-      # Done option IDs at runtime from PROJECT_URL, so the flip steps below
-      # (and the linked-issue lookup) don't hardcode anything beyond the URL.
-      # Runs on every event — close steps also depend on the resolved IDs.
-      - name: Resolve project IDs
-        id: resolve
-        env:
-          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [[ "$PROJECT_URL" =~ /(users|orgs)/([^/]+)/projects/([0-9]+) ]]; then
-            owner_type="${BASH_REMATCH[1]}"
-            owner="${BASH_REMATCH[2]}"
-            number="${BASH_REMATCH[3]}"
-          else
-            echo "Unrecognized PROJECT_URL: $PROJECT_URL" >&2
-            exit 1
-          fi
-          if [ "$owner_type" = "users" ]; then
-            root="user"
-          else
-            root="organization"
-          fi
-          data=$(gh api graphql -f query="
-            query {
-              $root(login: \"$owner\") {
-                projectV2(number: $number) {
-                  id
-                  field(name: \"Status\") {
-                    ... on ProjectV2SingleSelectField {
-                      id
-                      options { id name }
-                    }
-                  }
-                  sprint: field(name: \"Sprint\") {
-                    ... on ProjectV2IterationField {
-                      id
-                      configuration {
-                        iterations { id title startDate duration }
-                      }
-                    }
-                  }
-                }
-              }
-            }")
-          project_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.id")
-          status_field_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.id")
-          in_progress_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"In Progress\") | .id")
-          done_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"Done\") | .id")
-          sprint_field_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.sprint.id")
-          # Current iteration: the one whose [startDate, startDate+duration) window contains today.
-          # Empty output when between sprints — the close step treats this as a no-op.
-          today=$(date -u +%Y-%m-%d)
-          current_iteration_id=$(printf '%s' "$data" | jq -r --arg today "$today" "
-            .data.$root.projectV2.sprint.configuration.iterations[]
-            | select(.startDate <= \$today
-                and (\$today < (((.startDate | strptime(\"%Y-%m-%d\") | mktime) + (.duration * 86400)) | strftime(\"%Y-%m-%d\"))))
-            | .id" | head -1)
-          [ "$project_id" != "null" ] && [ -n "$project_id" ] || { echo "project not found at $PROJECT_URL" >&2; exit 1; }
-          [ "$status_field_id" != "null" ] && [ -n "$status_field_id" ] || { echo "Status field not found on project" >&2; exit 1; }
-          [ -n "$in_progress_id" ] || { echo "In Progress option not found on Status field" >&2; exit 1; }
-          [ -n "$done_id" ] || { echo "Done option not found on Status field" >&2; exit 1; }
-          [ "$sprint_field_id" != "null" ] && [ -n "$sprint_field_id" ] || { echo "Sprint field not found on project" >&2; exit 1; }
-          {
-            echo "owner=$owner"
-            echo "number=$number"
-            echo "project_id=$project_id"
-            echo "status_field_id=$status_field_id"
-            echo "in_progress_id=$in_progress_id"
-            echo "done_id=$done_id"
-            echo "sprint_field_id=$sprint_field_id"
-            echo "current_iteration_id=$current_iteration_id"
-          } >>"$GITHUB_OUTPUT"
-
-      # Issues default to Todo via the project's "Item added to project"
-      # workflow. PRs are different — an open PR is already in progress
-      # (waiting on review), so flip its Status accordingly.
-      - name: Set PR status to In Progress
-        if: github.event_name == 'pull_request' && github.event.action != 'closed'
-        env:
-          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
-          ITEM_ID: ${{ steps.add.outputs.itemId }}
-          PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
-          STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
-          IN_PROGRESS_ID: ${{ steps.resolve.outputs.in_progress_id }}
-          SPRINT_FIELD_ID: ${{ steps.resolve.outputs.sprint_field_id }}
-          CURRENT_ITERATION_ID: ${{ steps.resolve.outputs.current_iteration_id }}
-        run: |
-          set -euo pipefail
-          gh project item-edit \
-            --id "$ITEM_ID" \
-            --project-id "$PROJECT_ID" \
-            --field-id "$STATUS_FIELD_ID" \
-            --single-select-option-id "$IN_PROGRESS_ID"
-          # Mark active-iteration commitment: PR opened during Sprint N means
-          # work is in flight this sprint, so set Sprint=current (per
-          # tamakiii/meta#250 / tamakiii/meta#389 rule a). Overwrites any prior
-          # Sprint value — the PR-open signal is fresher than whatever the
-          # item's old commitment was. Between-sprints state = no-op.
-          if [ -n "$CURRENT_ITERATION_ID" ]; then
-            echo "Setting Sprint to current iteration $CURRENT_ITERATION_ID"
-            gh api graphql -f query='mutation($project: ID!, $item: ID!, $field: ID!, $iter: String!) { updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { iterationId: $iter } }) { clientMutationId } }' \
-              -F project="$PROJECT_ID" -F item="$ITEM_ID" -F field="$SPRINT_FIELD_ID" -F iter="$CURRENT_ITERATION_ID" >/dev/null
-          else
-            echo "No current iteration (between sprints); leaving Sprint unset."
-          fi
-
-      # Mid-conversation, an opened PR signals work has begun on the issues
-      # it references. Flip those issues' Status to In Progress so the board
-      # reflects active work, not a stale Todo. Per the issue-first
-      # convention, all tracked issues live on tamakiii/meta — only those
-      # refs are scanned.
-      - name: Move linked issues to In Progress
-        if: github.event_name == 'pull_request' && github.event.action != 'closed'
-        env:
-          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PROJECT_NUMBER: ${{ steps.resolve.outputs.number }}
-          PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
-          STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
-          IN_PROGRESS_ID: ${{ steps.resolve.outputs.in_progress_id }}
-          SPRINT_FIELD_ID: ${{ steps.resolve.outputs.sprint_field_id }}
-          CURRENT_ITERATION_ID: ${{ steps.resolve.outputs.current_iteration_id }}
-        run: |
-          set -euo pipefail
-          refs=$(printf '%s\n' "${PR_BODY:-}" | grep -oE 'tamakiii/meta#[0-9]+' | sort -u || true)
-          if [ -z "$refs" ]; then
-            echo "No tamakiii/meta#N references in PR body; nothing to flip."
-            exit 0
-          fi
-          for ref in $refs; do
-            n="${ref##*#}"
-            echo "Looking up project item for tamakiii/meta#$n"
-            # issueOrPullRequest returns null typename for PR refs (which we
-            # ignore — only issues belong on the Kanban board's Todo column).
-            # CLOSED issues are also skipped — a PR body citing an
-            # already-closed issue for context shouldn't flip it back to
-            # In Progress (tamakiii/meta#434). Errors are swallowed so a
-            # single bad ref can't fail the job.
-            item_id=$(gh api graphql -f query="
-              {
-                repository(owner: \"tamakiii\", name: \"meta\") {
-                  issueOrPullRequest(number: $n) {
-                    __typename
-                    ... on Issue {
-                      state
-                      projectItems(first: 20) {
-                        nodes { id project { number } }
-                      }
-                    }
-                  }
-                }
-              }" --jq ".data.repository.issueOrPullRequest | select(.__typename == \"Issue\" and .state == \"OPEN\") | .projectItems.nodes[] | select(.project.number == $PROJECT_NUMBER) | .id" 2>/dev/null | head -1 || true)
-            if [ -z "$item_id" ]; then
-              echo "  not an issue on Kanban #$PROJECT_NUMBER (skipped)"
-              continue
-            fi
-            echo "  flipping $item_id to In Progress"
-            gh project item-edit \
-              --id "$item_id" \
-              --project-id "$PROJECT_ID" \
-              --field-id "$STATUS_FIELD_ID" \
-              --single-select-option-id "$IN_PROGRESS_ID"
-            if [ -n "$CURRENT_ITERATION_ID" ]; then
-              echo "  setting Sprint to $CURRENT_ITERATION_ID"
-              gh api graphql -f query='mutation($project: ID!, $item: ID!, $field: ID!, $iter: String!) { updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { iterationId: $iter } }) { clientMutationId } }' \
-                -F project="$PROJECT_ID" -F item="$item_id" -F field="$SPRINT_FIELD_ID" -F iter="$CURRENT_ITERATION_ID" >/dev/null
-            fi
-          done
-
-      # Closed items should land on Done. The built-in "Item closed" and
-      # "Pull request merged" project workflows were expected to cover this
-      # (see tamakiii/meta#229), but manually-closed issues have been
-      # slipping through (tamakiii/meta#421). Handle it explicitly here so
-      # the transition is deterministic regardless of the built-in state.
-      # Unmerged PR closes are left alone — there's no "Cancelled" column,
-      # and flipping them to Done would be a lie.
-      - name: Move closed item to Done
-        if: github.event.action == 'closed' && (github.event_name == 'issues' || github.event.pull_request.merged == true)
-        env:
-          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
-          ITEM_ID: ${{ steps.add.outputs.itemId }}
-          PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
-          STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
-          DONE_ID: ${{ steps.resolve.outputs.done_id }}
-          SPRINT_FIELD_ID: ${{ steps.resolve.outputs.sprint_field_id }}
-          CURRENT_ITERATION_ID: ${{ steps.resolve.outputs.current_iteration_id }}
-        run: |
-          set -euo pipefail
-          gh project item-edit \
-            --id "$ITEM_ID" \
-            --project-id "$PROJECT_ID" \
-            --field-id "$STATUS_FIELD_ID" \
-            --single-select-option-id "$DONE_ID"
-          # Back-fill Sprint to the iteration in which this item shipped, so the
-          # retrospective sees a truthful denominator (tamakiii/meta#358 /
-          # tamakiii/meta#389 rule b). Overwrites any pre-existing Sprint value —
-          # "Sprint" means "iteration in which shipped", not "which iteration
-          # originally committed it". Between-sprints state = no-op.
-          if [ -n "$CURRENT_ITERATION_ID" ]; then
-            echo "Back-filling Sprint to current iteration $CURRENT_ITERATION_ID"
-            gh api graphql -f query='mutation($project: ID!, $item: ID!, $field: ID!, $iter: String!) { updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { iterationId: $iter } }) { clientMutationId } }' \
-              -F project="$PROJECT_ID" -F item="$ITEM_ID" -F field="$SPRINT_FIELD_ID" -F iter="$CURRENT_ITERATION_ID" >/dev/null
-          else
-            echo "No current iteration (between sprints); leaving Sprint unset."
-          fi
+          repository: tamakiii/meta
+          ref: main
+          token: ${{ secrets.META_READ_PAT }}
+          path: .meta-action
+          sparse-checkout: .github/actions/add-to-kanban
+          sparse-checkout-cone-mode: false
+      - uses: ./.meta-action/.github/actions/add-to-kanban
+        with:
+          projects-token: ${{ secrets.PROJECTS_TOKEN }}
+          project-url: ${{ vars.KANBAN_PROJECT_URL || 'https://github.com/users/tamakiii/projects/5' }}
