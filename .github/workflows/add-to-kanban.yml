@@ -2,9 +2,9 @@ name: Add to Kanban
 
 on:
   issues:
-    types: [opened, reopened, transferred]
+    types: [opened, reopened, transferred, closed]
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, closed]
 
 permissions:
   contents: read
@@ -22,12 +22,12 @@ jobs:
           project-url: ${{ env.PROJECT_URL }}
           github-token: ${{ secrets.PROJECTS_TOKEN }}
 
-      # Resolve project node ID, number, and Status field / "In Progress"
-      # option IDs at runtime from PROJECT_URL, so the flip steps below (and
-      # the linked-issue lookup) don't hardcode anything beyond the URL.
+      # Resolve project node ID, number, and Status field / In Progress /
+      # Done option IDs at runtime from PROJECT_URL, so the flip steps below
+      # (and the linked-issue lookup) don't hardcode anything beyond the URL.
+      # Runs on every event — close steps also depend on the resolved IDs.
       - name: Resolve project IDs
         id: resolve
-        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
         run: |
@@ -62,22 +62,25 @@ jobs:
           project_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.id")
           status_field_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.id")
           in_progress_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"In Progress\") | .id")
+          done_id=$(printf '%s' "$data" | jq -r ".data.$root.projectV2.field.options[] | select(.name == \"Done\") | .id")
           [ "$project_id" != "null" ] && [ -n "$project_id" ] || { echo "project not found at $PROJECT_URL" >&2; exit 1; }
           [ "$status_field_id" != "null" ] && [ -n "$status_field_id" ] || { echo "Status field not found on project" >&2; exit 1; }
           [ -n "$in_progress_id" ] || { echo "In Progress option not found on Status field" >&2; exit 1; }
+          [ -n "$done_id" ] || { echo "Done option not found on Status field" >&2; exit 1; }
           {
             echo "owner=$owner"
             echo "number=$number"
             echo "project_id=$project_id"
             echo "status_field_id=$status_field_id"
             echo "in_progress_id=$in_progress_id"
+            echo "done_id=$done_id"
           } >>"$GITHUB_OUTPUT"
 
       # Issues default to Todo via the project's "Item added to project"
       # workflow. PRs are different — an open PR is already in progress
       # (waiting on review), so flip its Status accordingly.
       - name: Set PR status to In Progress
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           ITEM_ID: ${{ steps.add.outputs.itemId }}
@@ -97,7 +100,7 @@ jobs:
       # convention, all tracked issues live on tamakiii/meta — only those
       # refs are scanned.
       - name: Move linked issues to In Progress
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           PR_BODY: ${{ github.event.pull_request.body }}
@@ -142,3 +145,25 @@ jobs:
               --field-id "$STATUS_FIELD_ID" \
               --single-select-option-id "$IN_PROGRESS_ID"
           done
+
+      # Closed items should land on Done. The built-in "Item closed" and
+      # "Pull request merged" project workflows were expected to cover this
+      # (see tamakiii/meta#229), but manually-closed issues have been
+      # slipping through (tamakiii/meta#421). Handle it explicitly here so
+      # the transition is deterministic regardless of the built-in state.
+      # Unmerged PR closes are left alone — there's no "Cancelled" column,
+      # and flipping them to Done would be a lie.
+      - name: Move closed item to Done
+        if: github.event.action == 'closed' && (github.event_name == 'issues' || github.event.pull_request.merged == true)
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ITEM_ID: ${{ steps.add.outputs.itemId }}
+          PROJECT_ID: ${{ steps.resolve.outputs.project_id }}
+          STATUS_FIELD_ID: ${{ steps.resolve.outputs.status_field_id }}
+          DONE_ID: ${{ steps.resolve.outputs.done_id }}
+        run: |
+          gh project item-edit \
+            --id "$ITEM_ID" \
+            --project-id "$PROJECT_ID" \
+            --field-id "$STATUS_FIELD_ID" \
+            --single-select-option-id "$DONE_ID"
