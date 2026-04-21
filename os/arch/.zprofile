@@ -30,6 +30,9 @@ paths=(
     "$HOME/.cargo/bin"
     "$HOME/.npm-global/bin"
 
+    # home-manager user profile (glab and other Nix-managed tools)
+    "$HOME/.nix-profile/bin"
+
     # System-wide binaries
     "/usr/local/bin"
     "/usr/bin"
