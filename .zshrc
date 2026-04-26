@@ -39,3 +39,7 @@ function fzf-history() {
 
 zle -N fzf-history
 bindkey '^r' fzf-history
+
+# Wrap `claude` with frequently-used --add-dir paths. Defined in the private
+# half of the dotfiles tree (tamakiii/myfiles). Origin: tamakiii/meta#276.
+[[ -f ~/.myfiles/shell/claude.zsh ]] && source ~/.myfiles/shell/claude.zsh
