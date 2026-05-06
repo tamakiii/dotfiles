@@ -1,0 +1,20 @@
+[core]
+	editor = hx
+
+[push]
+	default = nothing
+
+[pager]
+	diff = delta
+	show = delta
+	log  = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	file-style = raw
+	hunk-header-style = raw
+	file-decoration-style = none
+	hunk-header-decoration-style = none
+	syntax-theme = none
