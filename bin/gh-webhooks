@@ -8,10 +8,10 @@ set -euo pipefail
 #   gh-webhooks status  — show current webhook state per repo
 #   gh-webhooks diff    — show what sync would change
 #
-# Config: $MYFILES/github/webhooks/webhooks.json
+# Config: $MYFILES/github/gh-config/webhooks/webhooks.json
 
 MYFILES="${HOME}/.myfiles"
-CONFIG="${MYFILES}/github/webhooks/webhooks.json"
+CONFIG="${MYFILES}/github/gh-config/webhooks/webhooks.json"
 
 if [[ ! -f "$CONFIG" ]]; then
   echo "gh-webhooks: config not found: $CONFIG" >&2
