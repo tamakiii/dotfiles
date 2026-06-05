@@ -9,4 +9,4 @@
 export GH_PROJECT_DEFAULT=5
 export LANG="en_US.UTF-8"
 export LANGUAGE="en_US"
-export EDITOR=hx
+export EDITOR="$(which hx || which helix)"

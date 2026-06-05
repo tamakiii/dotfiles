@@ -28,6 +28,3 @@ done
 PATH="$NEW:$PATH"
 
 # Optional: Environment-specific customizations
-
-# Added by Antigravity CLI installer
-export PATH="/Users/tamakiii/.local/bin:$PATH"
