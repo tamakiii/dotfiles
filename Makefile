@@ -14,9 +14,13 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 setup: \
-	~/.myfiles
+	~/.myfiles \
+	~/.local/share/tmux/plugins/tmux-resurrect \
+	~/.local/share/tmux/plugins/tmux-continuum
 
 teardown:
+	rm -rf ~/.local/share/tmux/plugins/tmux-continuum
+	rm -rf ~/.local/share/tmux/plugins/tmux-resurrect
 	rm -rf ~/.myfiles
 
 install: setup \
@@ -101,6 +105,12 @@ check-os:
 
 ~/.myfiles:
 	git clone git@github.com:tamakiii/myfiles.git $@
+
+~/.local/share/tmux/plugins/tmux-resurrect:
+	git clone https://github.com/tmux-plugins/tmux-resurrect.git $@
+
+~/.local/share/tmux/plugins/tmux-continuum:
+	git clone https://github.com/tmux-plugins/tmux-continuum.git $@
 
 ~/.zsh:
 	mkdir $@
