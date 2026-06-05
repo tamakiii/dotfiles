@@ -1,11 +1,3 @@
-# Environment-specific profile configuration template
-# This file contains machine/environment-specific settings that are generated
-# during dotfiles installation. The actual values come from environment variables
-# or keychain entries to keep sensitive information out of version control.
-
-# PATH configuration
-# Prioritized paths for development tools and utilities
-# Order matters: earlier entries take precedence
 paths=(
     # Local project binaries
     "bin"
@@ -48,17 +40,12 @@ done
 PATH="$NEW:$PATH"
 
 # Optional: Environment-specific customizations
-# Uncomment and modify as needed for specific environments
-# export CUSTOM_ENV_VAR="${CUSTOM_ENV_VAR:-default_value}"
-# export DEVELOPMENT_MODE="${DEVELOPMENT_MODE:-false}"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # OpenClaw Completion
 source "$HOME/.openclaw/completions/openclaw.zsh"
-
-export EDITOR=helix
 
 # Aliases
 alias hx=helix

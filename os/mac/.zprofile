@@ -1,8 +1,4 @@
-export LANG="en_US.UTF-8"
-export LANGUAGE="en_US"
-
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
 
 paths=(
   "$HOME/.local/bin"
@@ -23,8 +19,15 @@ paths=(
   "/usr/local/sbin"
 )
 
+# Build PATH from array
+# Loop through each path and prepend to create final PATH
 NEW="${paths[1]}" && paths=("${paths[@]:1}")
 for p in "${paths[@]}"; do
   NEW="$NEW:$p"
 done
 PATH="$NEW:$PATH"
+
+# Optional: Environment-specific customizations
+
+# Added by Antigravity CLI installer
+export PATH="/Users/tamakiii/.local/bin:$PATH"
