@@ -7,7 +7,7 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
   OS := mac
 else
-  OS := arch
+  OS := linux
 endif
 
 help:
