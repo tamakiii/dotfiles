@@ -46,6 +46,3 @@ export NVM_DIR="$HOME/.nvm"
 
 # OpenClaw Completion
 source "$HOME/.openclaw/completions/openclaw.zsh"
-
-# Aliases
-alias hx=helix
