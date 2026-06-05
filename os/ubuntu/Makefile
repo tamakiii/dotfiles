@@ -4,7 +4,7 @@ help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
 # No Ubuntu-specific install footprint yet. Add per-link targets here as
-# Wayland/GNOME analogs of the os/arch entries are needed
+# Wayland/GNOME analogs of the os/linux entries are needed
 # (e.g. wl-copy/wl-paste, gnome-terminal config, etc.).
 install:
 uninstall:
