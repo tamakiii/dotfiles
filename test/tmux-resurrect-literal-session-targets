@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -eu
+
+plugin_dir=${TMUX_RESURRECT_DIR:-"$HOME/.local/share/tmux/plugins/tmux-resurrect"}
+state_dir=$(mktemp -d "${TMPDIR:-/tmp}/tmux-resurrect-state.XXXXXX")
+socket_name="dotfiles-resurrect-test-$$"
+
+cleanup() {
+	tmux -L "$socket_name" kill-server >/dev/null 2>&1 || true
+	rm -rf "$state_dir"
+}
+trap cleanup EXIT HUP INT TERM
+
+test -x "$plugin_dir/scripts/save.sh"
+test -x "$plugin_dir/scripts/restore.sh"
+
+tmux -L "$socket_name" -f /dev/null new-session -d -s '@' -n literal-target
+tmux -L "$socket_name" set-option -g @resurrect-dir "$state_dir"
+tmux -L "$socket_name" set-option -g @resurrect-capture-pane-contents on
+tmux -L "$socket_name" run-shell "$plugin_dir/scripts/save.sh"
+
+saved_file=$(readlink -f "$state_dir/last")
+test -s "$saved_file"
+grep -q '^pane[[:space:]]\+@[[:space:]]' "$saved_file"
+
+tmux -L "$socket_name" kill-server
+tmux -L "$socket_name" -f /dev/null new-session -d -s bootstrap
+tmux -L "$socket_name" set-option -g @resurrect-dir "$state_dir"
+tmux -L "$socket_name" set-option -g @resurrect-capture-pane-contents on
+tmux -L "$socket_name" run-shell "$plugin_dir/scripts/restore.sh"
+
+tmux -L "$socket_name" list-sessions -F '#{session_name}' |
+	grep -Fqx '@'
+test "$(tmux -L "$socket_name" list-windows -a -F '#{session_name}:#{window_name}' |
+	awk -F ':' '$1 == "@" { print $2 }')" = literal-target
+test "$(tmux -L "$socket_name" list-panes -a -F '#{session_name}:#{pane_index}' |
+	awk -F ':' '$1 == "@" { count++ } END { print count + 0 }')" -eq 1
+
+echo "OK: tmux-resurrect saves and restores the literal @ session"

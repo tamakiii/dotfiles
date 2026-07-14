@@ -1,0 +1,48 @@
+diff --git a/scripts/restore.sh b/scripts/restore.sh
+index 1a5e3f9..ca89e40 100755
+--- a/scripts/restore.sh
++++ b/scripts/restore.sh
+@@ -87,13 +87,15 @@ has_restored_session_0() {
+ window_exists() {
+ 	local session_name="$1"
+ 	local window_number="$2"
+-	tmux list-windows -t "$session_name" -F "#{window_index}" 2>/dev/null |
+-		\grep -q "^$window_number$"
++	tmux list-windows -a -F "#{session_name}:#{window_index}" |
++		awk -F ':' -v session_name="$session_name" -v window_number="$window_number" \
++			'$1 == session_name && $2 == window_number { found = 1 } END { exit !found }'
+ }
+ 
+ session_exists() {
+ 	local session_name="$1"
+-	tmux has-session -t "$session_name" 2>/dev/null
++	tmux list-sessions -F "#{session_name}" |
++		\grep -Fqx -- "$session_name"
+ }
+ 
+ first_window_num() {
+diff --git a/scripts/save.sh b/scripts/save.sh
+index 01edcde..045bd4e 100755
+--- a/scripts/save.sh
++++ b/scripts/save.sh
+@@ -146,14 +146,16 @@ capture_pane_contents() {
+ 
+ get_active_window_index() {
+ 	local session_name="$1"
+-	tmux list-windows -t "$session_name" -F "#{window_flags} #{window_index}" |
+-		awk '$1 ~ /\*/ { print $2; }'
++	tmux list-windows -a -F "#{session_name}:#{window_flags}:#{window_index}" |
++		awk -F ':' -v session_name="$session_name" \
++			'$1 == session_name && $2 ~ /\*/ { print $3; }'
+ }
+ 
+ get_alternate_window_index() {
+ 	local session_name="$1"
+-	tmux list-windows -t "$session_name" -F "#{window_flags} #{window_index}" |
+-		awk '$1 ~ /-/ { print $2; }'
++	tmux list-windows -a -F "#{session_name}:#{window_flags}:#{window_index}" |
++		awk -F ':' -v session_name="$session_name" \
++			'$1 == session_name && $2 ~ /-/ { print $3; }'
+ }
+ 
+ dump_grouped_sessions() {
