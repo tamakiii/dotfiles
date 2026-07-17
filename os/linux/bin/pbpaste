@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Read the same seat pbcopy writes, or the round-trip breaks: nemu's clipboard
-# is per-seat and a seat-less wl-paste would read the agent seat. See
-# tamakiii/meta#1897.
-wl-paste --seat winit
+# Seat-less on purpose: since the compositor-side fix for tamakiii/meta#1897
+# (per-client seat visibility, tamakiii/meta#1898, deployed 2026-07-18) an
+# ordinary client sees exactly one seat, so this reads the same clipboard
+# every application uses.
+wl-paste

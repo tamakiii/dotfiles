@@ -2,11 +2,12 @@
 #
 # Copy stdin to the clipboard, in both of the places this host needs it.
 #
-# 1. The local Wayland clipboard. nemu advertises two wl_seats and puts the
-#    agent seat first; the clipboard is per-seat and only the human seat
-#    ("winit") ever holds keyboard focus, so a seat-less wl-copy would land
-#    where nothing reads it. The pin goes when tamakiii/meta#1897 is fixed
-#    compositor-side; the seat's role-based name is tamakiii/meta#1898.
+# 1. The local Wayland clipboard. Seat-less on purpose: since the
+#    compositor-side fix for tamakiii/meta#1897 (per-client seat visibility +
+#    the seat0 role name, tamakiii/meta#1898, deployed 2026-07-18), an
+#    ordinary client sees exactly one seat, so a bare wl-copy lands where
+#    every application reads. The old `--seat winit` pin is gone with the
+#    seat name itself — pinning it would now fail with "No such seat".
 #
 # 2. The terminal that owns this tty, via OSC 52. Under
 #    `ssh -t airedale "tmux attach"` this is the only route to the Mac's
@@ -26,7 +27,7 @@ trap 'rm -f "$buf"' EXIT
 # and mangles binary, and both destinations must get the same exact bytes.
 cat >"$buf"
 
-wl-copy --seat winit <"$buf" 2>/dev/null || true
+wl-copy <"$buf" 2>/dev/null || true
 
 # OSC 52 is best-effort. Terminals cap the escape, so oversized input goes to
 # the Wayland clipboard alone rather than emitting a truncated sequence that
