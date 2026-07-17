@@ -1,3 +1,55 @@
 #!/bin/bash
+#
+# Copy stdin to the clipboard, in both of the places this host needs it.
+#
+# 1. The local Wayland clipboard. nemu advertises two wl_seats and puts the
+#    agent seat first; the clipboard is per-seat and only the human seat
+#    ("winit") ever holds keyboard focus, so a seat-less wl-copy would land
+#    where nothing reads it. The pin goes when tamakiii/meta#1897 is fixed
+#    compositor-side; the seat's role-based name is tamakiii/meta#1898.
+#
+# 2. The terminal that owns this tty, via OSC 52. Under
+#    `ssh -t airedale "tmux attach"` this is the only route to the Mac's
+#    clipboard, because wl-copy writes airedale's clipboard and the Mac cannot
+#    see it. The receiving terminal has to permit clipboard writes (Ghostty:
+#    clipboard-write).
+#
+# The two destinations are deliberately independent: on a plain SSH session
+# with no Wayland display, wl-copy fails and OSC 52 still works.
 
-wl-copy
+set -uo pipefail
+
+buf=$(mktemp "${TMPDIR:-/tmp}/pbcopy.XXXXXX")
+trap 'rm -f "$buf"' EXIT
+
+# Buffer stdin to a file rather than a variable: $(cat) strips trailing newlines
+# and mangles binary, and both destinations must get the same exact bytes.
+cat >"$buf"
+
+wl-copy --seat winit <"$buf" 2>/dev/null || true
+
+# OSC 52 is best-effort. Terminals cap the escape, so oversized input goes to
+# the Wayland clipboard alone rather than emitting a truncated sequence that
+# would paste as garbage.
+#
+# Probe /dev/tty by opening it, not with `[ -w ]`: the device node exists and is
+# writable by permission even when the process has no controlling terminal, so
+# the test passes and the write then fails with ENXIO.
+if { : >/dev/tty; } 2>/dev/null; then
+	b64=$(base64 <"$buf" | tr -d '\n')
+	if [ "${#b64}" -le 74000 ]; then
+		if [ -n "${TMUX:-}" ]; then
+			# Under its default set-clipboard=external, tmux *ignores* an
+			# application's OSC 52 rather than relaying it, so the escape has to
+			# ride tmux's DCS passthrough to reach the outer terminal. That
+			# needs `allow-passthrough on`, which .config/tmux/tmux.conf sets.
+			# ESC inside the wrapper is doubled, per the passthrough encoding.
+			# Going this way instead of setting `set-clipboard on` keeps the
+			# relay scoped to this script, rather than letting every program
+			# inside tmux write the system clipboard.
+			printf '\033Ptmux;\033\033]52;c;%s\a\033\\' "$b64" >/dev/tty
+		else
+			printf '\033]52;c;%s\a' "$b64" >/dev/tty
+		fi
+	fi
+fi
