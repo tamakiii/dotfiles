@@ -1,57 +1,45 @@
 #!/usr/bin/env bash
-# sweep-artifacts — reclaim disk by deleting 100%-reproducible build artifact
-# directories (target/, node_modules/, .gradle/ ...) that:
+# sweep-artifacts — delete 100%-reproducible build artifact directories
+# (target/, node_modules/, .gradle/ ...) under ONE directory that:
 #   1. have had no file modified within --days days (nobody built there lately), and
 #   2. sit in a worktree/checkout no live process currently has its cwd inside.
 #
-# Only the artifact directory is removed, never the worktree or source. The only
-# cost is a from-scratch rebuild the next time that tree is built, so it is safe
-# to run over active worktrees: recently-built (1) and in-use (2) trees are
-# skipped; the rest just lose regenerable output.
+# Only the artifact directory is removed, never the source. The only cost is a
+# from-scratch rebuild the next time that tree is built, so it is safe to run
+# over active worktrees: recently-built (1) and in-use (2) trees are skipped.
+#
+# <dir> is scanned directly — there is no fixed root. Point it at one repo (its
+# main checkout + every worktree under it are covered) or at a single worktree.
 #
 # Usage:
-#   sweep-artifacts plan                        # dry-run, --days 7, ~/Git/tamakiii
-#   sweep-artifacts apply                        # delete the candidates
-#   sweep-artifacts plan  --days 3
-#   sweep-artifacts apply --names "target node_modules .gradle build" --exclude "nemu-compositor"
+#   sweep-artifacts plan  <dir>
+#   sweep-artifacts apply <dir> [--days N] [--names "target node_modules .gradle"]
 set -euo pipefail
 
-cmd=${1-}; shift 2>/dev/null || true
-case "$cmd" in
-    plan)  APPLY=false ;;
-    apply) APPLY=true ;;
-    *) echo "usage: sweep-artifacts <plan|apply> [--root DIR] [--days N] [--names \"target node_modules .gradle\"] [--exclude \"repo ...\"]" >&2; exit 2 ;;
-esac
+usage() { sed -n '2,19p' "$0" >&2; exit "${1:-2}"; }
 
-ROOT="$HOME/Git/tamakiii"
+cmd=${1-}
+case "$cmd" in plan) APPLY=false ;; apply) APPLY=true ;; -h|--help) usage 0 ;; *) usage ;; esac
+dir=${2-}
+case "$dir" in ""|-*) usage ;; esac
+[ -d "$dir" ] || { echo "sweep-artifacts: not a directory: $dir" >&2; exit 2; }
+shift 2
+
 DAYS=7
 NAMES="target node_modules .gradle"
-EXCLUDE=""
 while [ $# -gt 0 ]; do
     case "$1" in
-        --root)    ROOT=$2; shift 2 ;;
         --days)    DAYS=$2; shift 2 ;;
         --names)   NAMES=$2; shift 2 ;;
-        --exclude) EXCLUDE=$2; shift 2 ;;
-        -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
+        -h|--help) usage 0 ;;
         *) echo "sweep-artifacts: unknown option: $1" >&2; exit 2 ;;
     esac
 done
 
 cutoff=$(date -d "-${DAYS} days" '+%Y-%m-%d %H:%M:%S')
-
 declare -A cwd_active=()
-for link in /proc/[0-9]*/cwd; do
-    d=$(readlink "$link" 2>/dev/null) || continue
-    cwd_active["$d"]=1
-done
-process_inside() {
-    local base=$1 d
-    for d in "${!cwd_active[@]}"; do
-        case "$d" in "$base"|"$base"/*) return 0 ;; esac
-    done
-    return 1
-}
+for link in /proc/[0-9]*/cwd; do d=$(readlink "$link" 2>/dev/null) || continue; cwd_active["$d"]=1; done
+process_inside() { local b=$1 d; for d in "${!cwd_active[@]}"; do case "$d" in "$b"|"$b"/*) return 0 ;; esac; done; return 1; }
 
 declare -a pred=()
 for n in $NAMES; do pred+=( -o -name "$n" ); done
@@ -59,8 +47,6 @@ pred=( "${pred[@]:1}" )
 
 total=0; count=0; declare -a hits=()
 while IFS= read -r -d '' art; do
-    rel=${art#"$ROOT"/}; repo=${rel%%/*}
-    case " $EXCLUDE " in *" $repo "*) continue ;; esac
     # (1) touched within --days? shallow scan suffices — a build updates
     # target/debug + target/.fingerprint at depth <=2 every time.
     [ -n "$(find "$art" -maxdepth 2 -newermt "$cutoff" -print -quit 2>/dev/null)" ] && continue
@@ -68,16 +54,15 @@ while IFS= read -r -d '' art; do
     wtroot=$(git -C "$art" rev-parse --show-toplevel 2>/dev/null || dirname "$art")
     process_inside "$wtroot" && continue
     bytes=$(du -sb "$art" 2>/dev/null | cut -f1); bytes=${bytes:-0}
-    total=$((total+bytes)); count=$((count+1)); hits+=("$art")
+    total=$((total + bytes)); count=$((count + 1)); hits+=("$art")
     printf 'SWEEP  %6s  %s\n' "$(numfmt --to=iec "$bytes")" "${art#"$HOME"/}"
-done < <(find "$ROOT" -type d \( "${pred[@]}" \) -prune -print0 2>/dev/null)
+done < <(find "$dir" -type d \( "${pred[@]}" \) -prune -print0 2>/dev/null)
 
 echo "-------------------------------------------------------"
 printf '%d idle build artifacts, %s reclaimable (days=%s, names="%s")\n' \
     "$count" "$(numfmt --to=iec "$total")" "$DAYS" "$NAMES"
-$APPLY || { echo "(plan — run 'sweep-artifacts apply' to delete)"; exit 0; }
+$APPLY || { echo "(plan — run 'sweep-artifacts apply $dir' to delete)"; exit 0; }
 
-echo "Deleting..."
 for art in "${hits[@]}"; do
     rm -rf "$art" 2>/dev/null && echo "swept: ${art#"$HOME"/}" \
         || { sudo rm -rf "$art" && echo "swept (sudo): ${art#"$HOME"/}"; }
