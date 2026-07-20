@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# sweep-worktrees — remove *finished* linked git worktrees of ONE repository.
+#
+# A linked worktree of <dir> is a removal candidate only when it is merged into
+# the repo's default branch (origin/HEAD), has no uncommitted tracked changes,
+# has no live process cwd inside it, and its git HEAD is idle (--idle-hours).
+# The whole worktree is removed — the committed work is already on the default
+# branch, so nothing is lost. The primary (main) checkout is never touched.
+#
+# Usage:
+#   sweep-worktrees plan  <dir>
+#   sweep-worktrees apply <dir> [--idle-hours N]
+#
+#   <dir>  a git repository (or any of its worktrees). Only that repo's linked
+#          worktrees are considered — there is no fixed root and no directory scan.
+set -euo pipefail
+
+usage() { sed -n '2,18p' "$0" >&2; exit "${1:-2}"; }
+
+cmd=${1-}
+case "$cmd" in plan) APPLY=false ;; apply) APPLY=true ;; -h|--help) usage 0 ;; *) usage ;; esac
+dir=${2-}
+case "$dir" in ""|-*) usage ;; esac
+shift 2
+
+IDLE_HOURS=12
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --idle-hours) IDLE_HOURS=$2; shift 2 ;;
+        -h|--help)    usage 0 ;;
+        *) echo "sweep-worktrees: unknown option: $1" >&2; exit 2 ;;
+    esac
+done
+
+git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 || { echo "sweep-worktrees: not a git repo: $dir" >&2; exit 2; }
+def=$(git -C "$dir" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
+git -C "$dir" rev-parse --verify --quiet "$def" >/dev/null 2>&1 \
+    || { echo "sweep-worktrees: default branch '$def' not found in $dir" >&2; exit 2; }
+
+now=$(date +%s); idle_cutoff=$((now - IDLE_HOURS * 3600))
+declare -A cwd_active=()
+for link in /proc/[0-9]*/cwd; do d=$(readlink "$link" 2>/dev/null) || continue; cwd_active["$d"]=1; done
+process_inside() { local w=$1 d; for d in "${!cwd_active[@]}"; do case "$d" in "$w"|"$w"/*) return 0 ;; esac; done; return 1; }
+
+total=0; declare -a to_rm=()
+first=1; wt=""; head=""
+while IFS= read -r line; do
+    case "$line" in
+        "worktree "*) wt=${line#worktree } ;;
+        "HEAD "*)     head=${line#HEAD } ;;
+        "")
+            [ -n "$wt" ] || continue
+            if [ "$first" = 1 ]; then first=0; wt=""; head=""; continue; fi   # primary checkout — never touch
+            [ -d "$wt" ] || { wt=""; head=""; continue; }
+            reason=""
+            if [ -z "$head" ] || ! git -C "$dir" merge-base --is-ancestor "$head" "$def" 2>/dev/null; then
+                reason=unmerged
+            elif [ -n "$(git -C "$wt" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
+                reason=dirty
+            elif process_inside "$wt"; then
+                reason="in-use(cwd)"
+            else
+                gd=$(git -C "$wt" rev-parse --git-dir 2>/dev/null || echo ""); mt=0
+                [ -n "$gd" ] && [ -e "$gd/HEAD" ] && mt=$(stat -c %Y "$gd/HEAD" 2>/dev/null || echo 0)
+                [ "$mt" -gt "$idle_cutoff" ] && reason="active(<${IDLE_HOURS}h)"
+            fi
+            if [ -z "$reason" ]; then
+                b=$(du -sb "$wt" 2>/dev/null | cut -f1); b=${b:-0}; total=$((total + b)); to_rm+=("$wt")
+                printf 'SWEEP  %6s  %s\n' "$(numfmt --to=iec "$b")" "${wt#"$HOME"/}"
+            else
+                printf 'keep   %-14s %s\n' "$reason" "${wt#"$HOME"/}"
+            fi
+            wt=""; head=""
+            ;;
+    esac
+done < <(git -C "$dir" worktree list --porcelain 2>/dev/null; echo)
+
+echo "----------------------------------------------------------------"
+printf '%d finished worktrees, %s reclaimable\n' "${#to_rm[@]}" "$(numfmt --to=iec "$total")"
+$APPLY || { echo "(plan — run 'sweep-worktrees apply $dir' to remove)"; exit 0; }
+
+for wt in "${to_rm[@]}"; do
+    git -C "$dir" worktree remove --force "$wt" 2>/dev/null && echo "removed: ${wt#"$HOME"/}" \
+        || { rm -rf "$wt" 2>/dev/null || sudo rm -rf "$wt"; echo "removed (rm): ${wt#"$HOME"/}"; }
+done
+git -C "$dir" worktree prune 2>/dev/null || true
+echo "done. reclaimed ~$(numfmt --to=iec "$total")."
