@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# sweep-worktrees — reclaim disk by removing *finished* git worktrees.
+#
+# A worktree is a removal candidate only when ALL hold:
+#   1. it is not the repo's main checkout;
+#   2. its HEAD is an ancestor of the repo's default branch (origin/HEAD) —
+#      the work has landed, so nothing unique lives only in the worktree;
+#   3. it has no uncommitted *tracked* changes (untracked build junk is fine);
+#   4. no running process has its cwd inside it (nobody is working in it now);
+#   5. its git HEAD has not been touched within --idle-hours (no recent activity).
+#
+# The whole worktree directory is removed (source checkout + untracked build
+# output + registration). Because (2) proves the committed work is in the
+# default branch, nothing is lost — a new worktree can always be recreated.
+#
+# Usage:
+#   sweep-worktrees plan                       # dry-run over ~/Git/tamakiii
+#   sweep-worktrees apply                       # remove the candidates
+#   sweep-worktrees plan  --root ~/src
+#   sweep-worktrees apply --idle-hours 24 --exclude "nemu-compositor nemu-alcove"
+set -euo pipefail
+
+cmd=${1-}; shift 2>/dev/null || true
+case "$cmd" in
+    plan)  APPLY=false ;;
+    apply) APPLY=true ;;
+    *) echo "usage: sweep-worktrees <plan|apply> [--root DIR] [--idle-hours N] [--exclude \"repo ...\"]" >&2; exit 2 ;;
+esac
+
+ROOT="$HOME/Git/tamakiii"
+IDLE_HOURS=12
+EXCLUDE=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --root)       ROOT=$2; shift 2 ;;
+        --idle-hours) IDLE_HOURS=$2; shift 2 ;;
+        --exclude)    EXCLUDE=$2; shift 2 ;;
+        -h|--help)    sed -n '2,20p' "$0"; exit 0 ;;
+        *) echo "sweep-worktrees: unknown option: $1" >&2; exit 2 ;;
+    esac
+done
+
+now=$(date +%s)
+idle_cutoff=$((now - IDLE_HOURS * 3600))
+
+declare -A cwd_active=()
+for link in /proc/[0-9]*/cwd; do
+    d=$(readlink "$link" 2>/dev/null) || continue
+    cwd_active["$d"]=1
+done
+process_inside() {
+    local wt=$1 d
+    for d in "${!cwd_active[@]}"; do
+        case "$d" in "$wt"|"$wt"/*) return 0 ;; esac
+    done
+    return 1
+}
+
+total_bytes=0
+declare -a to_remove=()
+declare -A repos_touched=()
+
+shopt -s nullglob
+for repo in "$ROOT"/*/; do
+    repo=${repo%/}
+    [ -e "$repo/.git" ] || continue
+    case " $EXCLUDE " in *" ${repo##*/} "*) continue ;; esac
+    def=$(git -C "$repo" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
+    git -C "$repo" rev-parse --verify --quiet "$def" >/dev/null 2>&1 || continue
+
+    wt=""; head=""
+    while IFS= read -r line; do
+        case "$line" in
+            "worktree "*) wt=${line#worktree } ;;
+            "HEAD "*)     head=${line#HEAD } ;;
+            "")
+                [ -n "$wt" ] || continue
+                [ "$wt" != "$repo" ] || { wt=""; head=""; continue; }
+                [ -d "$wt" ]  || { wt=""; head=""; continue; }
+                reason=""
+                if [ -z "$head" ] || ! git -C "$repo" merge-base --is-ancestor "$head" "$def" 2>/dev/null; then
+                    reason="unmerged"
+                elif [ -n "$(git -C "$wt" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
+                    reason="dirty"
+                elif process_inside "$wt"; then
+                    reason="in-use(cwd)"
+                else
+                    gd=$(git -C "$wt" rev-parse --git-dir 2>/dev/null || echo "")
+                    mt=0; [ -n "$gd" ] && [ -e "$gd/HEAD" ] && mt=$(stat -c %Y "$gd/HEAD" 2>/dev/null || echo 0)
+                    [ "$mt" -gt "$idle_cutoff" ] && reason="active(<${IDLE_HOURS}h)"
+                fi
+
+                if [ -z "$reason" ]; then
+                    bytes=$(du -sb "$wt" 2>/dev/null | cut -f1); bytes=${bytes:-0}
+                    total_bytes=$((total_bytes + bytes))
+                    to_remove+=("$repo|$wt")
+                    repos_touched["$repo"]=1
+                    printf 'SWEEP  %6s  %s\n' "$(numfmt --to=iec "$bytes")" "${wt#"$HOME"/}"
+                else
+                    printf 'keep   %-14s %s\n' "$reason" "${wt#"$HOME"/}"
+                fi
+                wt=""; head=""
+                ;;
+        esac
+    done < <(git -C "$repo" worktree list --porcelain 2>/dev/null; echo)
+done
+
+echo "----------------------------------------------------------------"
+printf '%d finished worktrees, %s reclaimable\n' "${#to_remove[@]}" "$(numfmt --to=iec "$total_bytes")"
+$APPLY || { echo "(plan — run 'sweep-worktrees apply' to remove)"; exit 0; }
+
+echo "Removing..."
+for row in "${to_remove[@]}"; do
+    IFS='|' read -r repo wt <<<"$row"
+    if git -C "$repo" worktree remove --force "$wt" 2>/dev/null; then
+        echo "removed: ${wt#"$HOME"/}"
+    else
+        rm -rf "$wt" 2>/dev/null || sudo rm -rf "$wt"
+        echo "removed (rm): ${wt#"$HOME"/}"
+    fi
+done
+for repo in "${!repos_touched[@]}"; do git -C "$repo" worktree prune 2>/dev/null || true; done
+echo "done. reclaimed ~$(numfmt --to=iec "$total_bytes")."
