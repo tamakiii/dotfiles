@@ -9,14 +9,14 @@
 #
 # Usage:
 #   sweep-worktrees plan  <dir>
-#   sweep-worktrees apply <dir> [--idle-hours N] [--no-fetch]
+#   sweep-worktrees apply <dir> [--idle-hours N] [--fetch]
 #
 #   <dir>  a git repository (or any of its worktrees). Only that repo's linked
 #          worktrees are considered — there is no fixed root and no directory scan.
 #
-# origin is fetched first, because a stale origin/HEAD makes freshly merged
-# branches look unmerged forever. Only remote-tracking refs are updated; no
-# working tree is touched. --no-fetch skips it (offline runs).
+# Keeping origin up to date is somebody else's job — a stale origin/HEAD only
+# makes this sweep miss recent merges, never remove the wrong thing. It warns
+# when the last fetch is old; --fetch does the fetch here instead.
 set -euo pipefail
 trap 'echo "sweep-worktrees: aborted (line $LINENO, exit $?)" >&2' ERR
 
@@ -47,12 +47,13 @@ case "$dir" in ""|-*) usage ;; esac
 shift 2
 
 IDLE_HOURS=12
-FETCH=true
+FETCH=false
 SCAN=true
+STALE_HOURS=24
 while [ $# -gt 0 ]; do
     case "$1" in
         --idle-hours) IDLE_HOURS=$2; shift 2 ;;
-        --no-fetch)   FETCH=false; shift ;;
+        --fetch)      FETCH=true; shift ;;
         --no-scan)    SCAN=false; shift ;;
         -h|--help)    usage 0 ;;
         *) echo "sweep-worktrees: unknown option: $1" >&2; exit 2 ;;
@@ -60,9 +61,19 @@ while [ $# -gt 0 ]; do
 done
 
 git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 || { echo "sweep-worktrees: not a git repo: $dir" >&2; exit 2; }
-if $FETCH && git -C "$dir" remote get-url origin >/dev/null 2>&1; then
-    git -C "$dir" fetch --quiet --prune origin \
-        || echo "sweep-worktrees: warning: fetch failed, judging against possibly stale refs" >&2
+if git -C "$dir" remote get-url origin >/dev/null 2>&1; then
+    if $FETCH; then
+        git -C "$dir" fetch --quiet --prune origin \
+            || echo "sweep-worktrees: warning: fetch failed, judging against possibly stale refs" >&2
+    else
+        # A stale origin only costs recall — merged worktrees stay behind — so say
+        # so and carry on rather than reaching out from a local cleanup command.
+        fh=$(git -C "$dir" rev-parse --path-format=absolute --git-path FETCH_HEAD 2>/dev/null || echo "")
+        ft=0; [ -n "$fh" ] && [ -e "$fh" ] && ft=$(stat -c %Y "$fh" 2>/dev/null || echo 0)
+        if [ "$ft" -lt "$(( $(date +%s) - STALE_HOURS * 3600 ))" ]; then
+            echo "sweep-worktrees: note: origin last fetched >${STALE_HOURS}h ago; recent merges will be missed (--fetch to refresh)" >&2
+        fi
+    fi
 fi
 def=$(git -C "$dir" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
 git -C "$dir" rev-parse --verify --quiet "$def" >/dev/null 2>&1 \
@@ -80,6 +91,14 @@ process_inside() { local w=$1 d; for d in "${!cwd_active[@]}"; do case "$d" in "
 # then shows as '-' (upstream). Detached worktrees work too — this needs only
 # the commit, not a branch name. Sets MERGE_KIND so the plan can show *how* a
 # worktree was judged finished.
+#
+# A '-' means $def holds a commit whose patch equals this branch's entire net
+# change against the merge base, so the content is on the default branch no
+# matter which PR carried it there. If a change reached $def split across
+# several commits the patch-ids will not line up and the worktree is kept —
+# this errs towards keeping. And `git worktree remove` drops the directory
+# only: the branch ref and its commits survive, so the worst case of a wrong
+# call is re-creating the worktree and rebuilding, not lost work.
 MERGE_KIND=""
 is_merged() {
     local h=$1 mb t probe
