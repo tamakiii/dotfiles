@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# sweep — clean every git repository under ONE root, in one command.
+#
+# Discovers repositories under <root>, including clones nested inside another
+# repository that a `for r in <root>/*` loop never reaches, refreshes origin so
+# recent merges are visible, removes finished worktrees, then sweeps idle build
+# artifacts across the whole root in a single pass.
+#
+# Whatever it cannot decide by itself — a clone parked inside another repo, a
+# stray .git, a repo it could not fetch or sweep — is listed under REVIEW at the
+# end rather than skipped in silence. Nothing in that list is ever touched.
+#
+# Usage:
+#   sweep plan  <root>
+#   sweep apply <root> [--days N] [--idle-hours N] [--names "..."]
+#                      [--no-fetch] [--depth N] [--verbose]
+set -euo pipefail
+trap 'echo "sweep: aborted (line $LINENO, exit $?)" >&2' ERR
+
+usage() { sed -n '2,17p' "$0" >&2; exit "${1:-2}"; }
+
+cmd=${1-}
+case "$cmd" in plan|apply) ;; -h|--help) usage 0 ;; *) usage ;; esac
+root=${2-}
+case "$root" in ""|-*) usage ;; esac
+[ -d "$root" ] || { echo "sweep: not a directory: $root" >&2; exit 2; }
+root=$(cd "$root" && pwd -P)
+shift 2
+
+DAYS=7; IDLE_HOURS=12; NAMES="target node_modules .gradle"
+FETCH=true; DEPTH=6; VERBOSE=false
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --days)       DAYS=$2; shift 2 ;;
+        --idle-hours) IDLE_HOURS=$2; shift 2 ;;
+        --names)      NAMES=$2; shift 2 ;;
+        --depth)      DEPTH=$2; shift 2 ;;
+        --no-fetch)   FETCH=false; shift ;;
+        --verbose)    VERBOSE=true; shift ;;
+        -h|--help)    usage 0 ;;
+        *) echo "sweep: unknown option: $1" >&2; exit 2 ;;
+    esac
+done
+
+# Sibling tools, so a worktree copy of the dotfiles calls its own versions.
+bin=$(cd "$(dirname "$(readlink -f "$0")")" && pwd -P)
+for t in sweep-worktrees sweep-artifacts; do
+    [ -x "$bin/$t" ] || { echo "sweep: missing $bin/$t" >&2; exit 2; }
+done
+
+short() { echo "${1#"$HOME"/}"; }
+declare -a review=()
+
+# A repository owns its object store; a linked worktree and a submodule do not.
+# So a directory is a repo root exactly when git resolves its common dir to a
+# .git *inside* that directory. That also rejects the empty .git directories
+# that get left behind, which a plain `find -name .git` would report as repos.
+declare -a repos=()
+while IFS= read -r g; do
+    d=${g%/.git}
+    common=$(git -C "$d" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "")
+    if [ "$common" = "$d/.git" ]; then
+        repos+=("$d")
+    else
+        review+=("stray-.git       $(short "$g")")
+    fi
+done < <(find "$root" -mindepth 1 -maxdepth "$DEPTH" \
+              \( -name target -o -name node_modules -o -name .gradle -o -name .git \) \
+              -prune -type d -name .git -print 2>/dev/null | sort)
+
+[ "${#repos[@]}" -gt 0 ] || { echo "sweep: no git repositories under $root" >&2; exit 2; }
+
+# A clone sitting inside another clone is nobody's worktree, so no per-repo
+# sweep can retire it as a unit. Its artifacts still get swept below.
+for r in "${repos[@]}"; do
+    for o in "${repos[@]}"; do
+        case "$r" in "$o"/*) review+=("nested-clone     $(short "$r")   (inside $(basename "$o"))"); break ;; esac
+    done
+done
+
+wt_total=0; wt_count=0
+for repo in "${repos[@]}"; do
+    name=${repo#"$root"/}
+    if git -C "$repo" remote get-url origin >/dev/null 2>&1; then
+        $FETCH && { git -C "$repo" fetch --quiet --prune origin 2>/dev/null \
+            || review+=("fetch-failed     $(short "$repo")"); }
+    else
+        review+=("no-origin        $(short "$repo")")
+    fi
+
+    # A repo we cannot judge is a note, not a crash: say which kind and move on.
+    if ! out=$("$bin/sweep-worktrees" "$cmd" "$repo" --idle-hours "$IDLE_HOURS" --no-scan 2>&1); then
+        case "$out" in
+            *"default branch"*) review+=("no-default-branch  $(short "$repo")") ;;
+            *) review+=("sweep-worktrees-failed  $(short "$repo")")
+               printf '\n== %s\n%s\n' "$name" "$out" ;;
+        esac
+        continue
+    fi
+    n=$(printf '%s\n' "$out" | grep -c '^SWEEP' || true)
+    [ "$n" -eq 0 ] && ! $VERBOSE && continue
+    wt_count=$((wt_count + n))
+    printf '\n== %s\n' "$name"
+    if $VERBOSE; then printf '%s\n' "$out"; else printf '%s\n' "$out" | grep -vE '^keep|^-{10}'; fi
+    printf '%s\n' "$out" | grep -q '^FAILED\|could not be removed' \
+        && review+=("removal-failed   $(short "$repo")")
+    b=$(printf '%s\n' "$out" | sed -n 's/^[0-9]* finished worktrees, \(.*\) reclaimable$/\1/p')
+    [ -n "$b" ] && wt_total=$((wt_total + $(numfmt --from=iec "$b" 2>/dev/null || echo 0)))
+done
+
+# One pass over the whole root: `find` reaches nested clones too, and running it
+# after the worktree sweep means it never sizes up trees that just went away.
+printf '\n== build artifacts under %s\n' "$(short "$root")"
+art=$("$bin/sweep-artifacts" "$cmd" "$root" --days "$DAYS" --names "$NAMES" 2>&1) || \
+    review+=("sweep-artifacts-failed  $(short "$root")")
+printf '%s\n' "$art" | grep -vE "^-{10}|^\(plan — run 'sweep-artifacts"
+printf '%s\n' "$art" | grep -q '^FAILED\|could not be removed' \
+    && review+=("removal-failed   $(short "$root") (artifacts)")
+
+echo
+echo "================================================================"
+printf '%d repositories, %d finished worktrees (%s)\n' \
+    "${#repos[@]}" "$wt_count" "$(numfmt --to=iec "$wt_total")"
+echo "(worktree and artifact totals overlap — artifacts inside a swept worktree go with it)"
+
+if [ "${#review[@]}" -gt 0 ]; then
+    echo
+    echo "REVIEW — not handled automatically:"
+    printf '  %s\n' "${review[@]}" | sort -u
+fi
+if [ "$cmd" = plan ]; then echo; echo "(plan — run 'sweep apply $root' to do it)"; fi
+exit 0
