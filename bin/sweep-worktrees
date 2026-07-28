@@ -9,13 +9,36 @@
 #
 # Usage:
 #   sweep-worktrees plan  <dir>
-#   sweep-worktrees apply <dir> [--idle-hours N]
+#   sweep-worktrees apply <dir> [--idle-hours N] [--no-fetch]
 #
 #   <dir>  a git repository (or any of its worktrees). Only that repo's linked
 #          worktrees are considered — there is no fixed root and no directory scan.
+#
+# origin is fetched first, because a stale origin/HEAD makes freshly merged
+# branches look unmerged forever. Only remote-tracking refs are updated; no
+# working tree is touched. --no-fetch skips it (offline runs).
 set -euo pipefail
+trap 'echo "sweep-worktrees: aborted (line $LINENO, exit $?)" >&2' ERR
 
-usage() { sed -n '2,18p' "$0" >&2; exit "${1:-2}"; }
+usage() { sed -n '2,19p' "$0" >&2; exit "${1:-2}"; }
+
+# Size of a directory in bytes, never fatal. `du` exits non-zero when it cannot
+# read a subdirectory — rootless-podman builds leave mode-700 trees owned by a
+# subuid — and under `set -euo pipefail` that would kill the whole sweep. The
+# reported total then undercounts those subtrees, which is fine for an estimate.
+dirsize() { local b; b=$(du -sb -- "$1" 2>/dev/null | cut -f1) || true; echo "${b:-0}"; }
+
+# Remove a tree that may hold subdirectories owned by a container subuid and
+# mode 700 — we cannot unlink those as ourselves. `podman unshare` enters the
+# user namespace where that subuid maps to root, which can. `sudo -n` is the
+# last resort and fails fast instead of blocking on a password prompt in cron.
+force_rm() {
+    local d=$1
+    if rm -rf -- "$d" 2>/dev/null; then return 0; fi
+    if command -v podman >/dev/null 2>&1 && podman unshare rm -rf -- "$d" 2>/dev/null; then return 0; fi
+    if sudo -n rm -rf -- "$d" 2>/dev/null; then return 0; fi
+    return 1
+}
 
 cmd=${1-}
 case "$cmd" in plan) APPLY=false ;; apply) APPLY=true ;; -h|--help) usage 0 ;; *) usage ;; esac
@@ -24,15 +47,23 @@ case "$dir" in ""|-*) usage ;; esac
 shift 2
 
 IDLE_HOURS=12
+FETCH=true
+SCAN=true
 while [ $# -gt 0 ]; do
     case "$1" in
         --idle-hours) IDLE_HOURS=$2; shift 2 ;;
+        --no-fetch)   FETCH=false; shift ;;
+        --no-scan)    SCAN=false; shift ;;
         -h|--help)    usage 0 ;;
         *) echo "sweep-worktrees: unknown option: $1" >&2; exit 2 ;;
     esac
 done
 
 git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 || { echo "sweep-worktrees: not a git repo: $dir" >&2; exit 2; }
+if $FETCH && git -C "$dir" remote get-url origin >/dev/null 2>&1; then
+    git -C "$dir" fetch --quiet --prune origin \
+        || echo "sweep-worktrees: warning: fetch failed, judging against possibly stale refs" >&2
+fi
 def=$(git -C "$dir" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
 git -C "$dir" rev-parse --verify --quiet "$def" >/dev/null 2>&1 \
     || { echo "sweep-worktrees: default branch '$def' not found in $dir" >&2; exit 2; }
@@ -41,6 +72,26 @@ now=$(date +%s); idle_cutoff=$((now - IDLE_HOURS * 3600))
 declare -A cwd_active=()
 for link in /proc/[0-9]*/cwd; do d=$(readlink "$link" 2>/dev/null) || continue; cwd_active["$d"]=1; done
 process_inside() { local w=$1 d; for d in "${!cwd_active[@]}"; do case "$d" in "$w"|"$w"/*) return 0 ;; esac; done; return 1; }
+
+# Is $1 already in $def? A fast-forward or merge-commit history makes it an
+# ancestor, but a squash merge rewrites the branch into one new commit, so the
+# tip is never an ancestor. Replay the branch's tree as a single commit on top
+# of the merge base and let `git cherry` compare patch-ids: a squashed branch
+# then shows as '-' (upstream). Detached worktrees work too — this needs only
+# the commit, not a branch name. Sets MERGE_KIND so the plan can show *how* a
+# worktree was judged finished.
+MERGE_KIND=""
+is_merged() {
+    local h=$1 mb t probe
+    [ -n "$h" ] || return 1
+    MERGE_KIND=ancestor
+    git -C "$dir" merge-base --is-ancestor "$h" "$def" 2>/dev/null && return 0
+    MERGE_KIND=squash
+    mb=$(git -C "$dir" merge-base "$def" "$h" 2>/dev/null)     || return 1
+    t=$(git -C "$dir" rev-parse "$h^{tree}" 2>/dev/null)       || return 1
+    probe=$(git -C "$dir" commit-tree "$t" -p "$mb" -m squash-probe 2>/dev/null) || return 1
+    ! git -C "$dir" cherry "$def" "$probe" 2>/dev/null | grep -q '^+'
+}
 
 total=0; declare -a to_rm=()
 first=1; wt=""; head=""
@@ -53,7 +104,7 @@ while IFS= read -r line; do
             if [ "$first" = 1 ]; then first=0; wt=""; head=""; continue; fi   # primary checkout — never touch
             [ -d "$wt" ] || { wt=""; head=""; continue; }
             reason=""
-            if [ -z "$head" ] || ! git -C "$dir" merge-base --is-ancestor "$head" "$def" 2>/dev/null; then
+            if ! is_merged "$head"; then
                 reason=unmerged
             elif [ -n "$(git -C "$wt" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
                 reason=dirty
@@ -65,8 +116,8 @@ while IFS= read -r line; do
                 [ "$mt" -gt "$idle_cutoff" ] && reason="active(<${IDLE_HOURS}h)"
             fi
             if [ -z "$reason" ]; then
-                b=$(du -sb "$wt" 2>/dev/null | cut -f1); b=${b:-0}; total=$((total + b)); to_rm+=("$wt")
-                printf 'SWEEP  %6s  %s\n' "$(numfmt --to=iec "$b")" "${wt#"$HOME"/}"
+                b=$(dirsize "$wt"); total=$((total + b)); to_rm+=("$wt")
+                printf 'SWEEP  %6s  %-8s %s\n' "$(numfmt --to=iec "$b")" "$MERGE_KIND" "${wt#"$HOME"/}"
             else
                 printf 'keep   %-14s %s\n' "$reason" "${wt#"$HOME"/}"
             fi
@@ -75,13 +126,48 @@ while IFS= read -r line; do
     esac
 done < <(git -C "$dir" worktree list --porcelain 2>/dev/null; echo)
 
+# Report git trees nested inside <dir> that <dir> does not own. Tools other than
+# this one drop worktrees wherever they like — e.g. Codex has put worktrees of
+# tamakiii/nemu-desktop and tamakiii/home under tamakiii/nemu/.worktrees/ — and a
+# standalone clone nested that way is reachable from no `git worktree list` at
+# all, so no per-repo sweep will ever see it. Report, never remove: removing a
+# foreign worktree from here would corrupt the owning repository's metadata.
+foreign_scan() {
+    local mine root common owner label b found=0
+    mine=$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 0
+    root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || return 0
+    while IFS= read -r g; do
+        local wt=${g%/.git}
+        common=$(git -C "$wt" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || continue
+        [ "$common" = "$mine" ] && continue
+        case "$common" in "$mine"/*) continue ;; esac   # our own submodule (.git/modules/...)
+        owner=${common%/.git}
+        if [ "$owner" = "$wt" ]; then label="standalone-clone"; else label="owned-by:${owner##*/}"; fi
+        b=$(dirsize "$wt")
+        [ "$found" = 0 ] && { echo "----------------------------------------------------------------"; found=1; }
+        printf 'FOREIGN %6s %-22s %s\n' "$(numfmt --to=iec "$b")" "$label" "${wt#"$HOME"/}"
+    done < <(find "$root" -mindepth 2 -maxdepth 6 \
+                  \( -name target -o -name node_modules -o -name .gradle -o -name .git \) \
+                  -prune -name .git -print 2>/dev/null)
+    [ "$found" = 1 ] && echo "(not swept from here — run sweep-worktrees against the owning repo; a standalone-clone belongs to no repo and needs a manual decision)"
+    return 0
+}
+if $SCAN; then foreign_scan; fi
+
 echo "----------------------------------------------------------------"
 printf '%d finished worktrees, %s reclaimable\n' "${#to_rm[@]}" "$(numfmt --to=iec "$total")"
 $APPLY || { echo "(plan — run 'sweep-worktrees apply $dir' to remove)"; exit 0; }
 
+failed=0
 for wt in "${to_rm[@]}"; do
-    git -C "$dir" worktree remove --force "$wt" 2>/dev/null && echo "removed: ${wt#"$HOME"/}" \
-        || { rm -rf "$wt" 2>/dev/null || sudo rm -rf "$wt"; echo "removed (rm): ${wt#"$HOME"/}"; }
+    if git -C "$dir" worktree remove --force "$wt" 2>/dev/null; then
+        echo "removed: ${wt#"$HOME"/}"
+    elif force_rm "$wt"; then
+        echo "removed (rm): ${wt#"$HOME"/}"
+    else
+        echo "FAILED to remove: ${wt#"$HOME"/}" >&2; failed=$((failed + 1))
+    fi
 done
 git -C "$dir" worktree prune 2>/dev/null || true
 echo "done. reclaimed ~$(numfmt --to=iec "$total")."
+[ "$failed" -eq 0 ] || { echo "$failed worktree(s) could not be removed" >&2; exit 1; }

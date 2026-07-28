@@ -15,8 +15,27 @@
 #   sweep-artifacts plan  <dir>
 #   sweep-artifacts apply <dir> [--days N] [--names "target node_modules .gradle"]
 set -euo pipefail
+trap 'echo "sweep-artifacts: aborted (line $LINENO, exit $?)" >&2' ERR
 
-usage() { sed -n '2,19p' "$0" >&2; exit "${1:-2}"; }
+usage() { sed -n '2,16p' "$0" >&2; exit "${1:-2}"; }
+
+# Size of a directory in bytes, never fatal. `du` exits non-zero when it cannot
+# read a subdirectory — rootless-podman builds leave mode-700 trees owned by a
+# subuid — and under `set -euo pipefail` that would kill the whole sweep. The
+# reported total then undercounts those subtrees, which is fine for an estimate.
+dirsize() { local b; b=$(du -sb -- "$1" 2>/dev/null | cut -f1) || true; echo "${b:-0}"; }
+
+# Remove a tree that may hold subdirectories owned by a container subuid and
+# mode 700 — we cannot unlink those as ourselves. `podman unshare` enters the
+# user namespace where that subuid maps to root, which can. `sudo -n` is the
+# last resort and fails fast instead of blocking on a password prompt in cron.
+force_rm() {
+    local d=$1
+    if rm -rf -- "$d" 2>/dev/null; then return 0; fi
+    if command -v podman >/dev/null 2>&1 && podman unshare rm -rf -- "$d" 2>/dev/null; then return 0; fi
+    if sudo -n rm -rf -- "$d" 2>/dev/null; then return 0; fi
+    return 1
+}
 
 cmd=${1-}
 case "$cmd" in plan) APPLY=false ;; apply) APPLY=true ;; -h|--help) usage 0 ;; *) usage ;; esac
@@ -53,7 +72,7 @@ while IFS= read -r -d '' art; do
     # (2) is anyone working in the enclosing worktree/checkout right now?
     wtroot=$(git -C "$art" rev-parse --show-toplevel 2>/dev/null || dirname "$art")
     process_inside "$wtroot" && continue
-    bytes=$(du -sb "$art" 2>/dev/null | cut -f1); bytes=${bytes:-0}
+    bytes=$(dirsize "$art")
     total=$((total + bytes)); count=$((count + 1)); hits+=("$art")
     printf 'SWEEP  %6s  %s\n' "$(numfmt --to=iec "$bytes")" "${art#"$HOME"/}"
 done < <(find "$dir" -type d \( "${pred[@]}" \) -prune -print0 2>/dev/null)
@@ -63,8 +82,13 @@ printf '%d idle build artifacts, %s reclaimable (days=%s, names="%s")\n' \
     "$count" "$(numfmt --to=iec "$total")" "$DAYS" "$NAMES"
 $APPLY || { echo "(plan — run 'sweep-artifacts apply $dir' to delete)"; exit 0; }
 
+failed=0
 for art in "${hits[@]}"; do
-    rm -rf "$art" 2>/dev/null && echo "swept: ${art#"$HOME"/}" \
-        || { sudo rm -rf "$art" && echo "swept (sudo): ${art#"$HOME"/}"; }
+    if force_rm "$art"; then
+        echo "swept: ${art#"$HOME"/}"
+    else
+        echo "FAILED to sweep: ${art#"$HOME"/}" >&2; failed=$((failed + 1))
+    fi
 done
 echo "done. reclaimed ~$(numfmt --to=iec "$total")."
+[ "$failed" -eq 0 ] || { echo "$failed artifact(s) could not be removed" >&2; exit 1; }
