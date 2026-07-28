@@ -2,25 +2,31 @@
 # sweep — clean every git repository under ONE root, in one command.
 #
 # Discovers repositories under <root>, including clones nested inside another
-# repository that a `for r in <root>/*` loop never reaches, refreshes origin so
-# recent merges are visible, removes finished worktrees, then sweeps idle build
-# artifacts across the whole root in a single pass.
+# repository that a `for r in <root>/*` loop never reaches, removes finished
+# worktrees, then sweeps idle build artifacts across the whole root in a single
+# pass.
+#
+# plan changes nothing at all — not even a ref. Refreshing origin is its own
+# subcommand, so a plan is repeatable and can never disagree with the apply that
+# follows it. Judging against stale refs only costs recall (merged worktrees
+# stay behind, never a wrong removal), so plan and apply just report it.
 #
 # Whatever it cannot decide by itself — a clone parked inside another repo, a
-# stray .git, a repo it could not fetch or sweep — is listed under REVIEW at the
-# end rather than skipped in silence. Nothing in that list is ever touched.
+# stray .git, a repo with stale refs or no default branch — is listed under
+# REVIEW at the end rather than skipped in silence. Nothing there is touched.
 #
 # Usage:
+#   sweep fetch <root> [--depth N]            # git fetch --prune origin, that's all
 #   sweep plan  <root>
 #   sweep apply <root> [--days N] [--idle-hours N] [--names "..."]
-#                      [--no-fetch] [--depth N] [--verbose]
+#                      [--stale-hours N] [--depth N] [--verbose]
 set -euo pipefail
 trap 'echo "sweep: aborted (line $LINENO, exit $?)" >&2' ERR
 
-usage() { sed -n '2,17p' "$0" >&2; exit "${1:-2}"; }
+usage() { sed -n '2,22p' "$0" >&2; exit "${1:-2}"; }
 
 cmd=${1-}
-case "$cmd" in plan|apply) ;; -h|--help) usage 0 ;; *) usage ;; esac
+case "$cmd" in fetch|plan|apply) ;; -h|--help) usage 0 ;; *) usage ;; esac
 root=${2-}
 case "$root" in ""|-*) usage ;; esac
 [ -d "$root" ] || { echo "sweep: not a directory: $root" >&2; exit 2; }
@@ -28,15 +34,15 @@ root=$(cd "$root" && pwd -P)
 shift 2
 
 DAYS=7; IDLE_HOURS=12; NAMES="target node_modules .gradle"
-FETCH=true; DEPTH=6; VERBOSE=false
+DEPTH=6; VERBOSE=false; STALE_HOURS=24
 while [ $# -gt 0 ]; do
     case "$1" in
-        --days)       DAYS=$2; shift 2 ;;
-        --idle-hours) IDLE_HOURS=$2; shift 2 ;;
-        --names)      NAMES=$2; shift 2 ;;
-        --depth)      DEPTH=$2; shift 2 ;;
-        --no-fetch)   FETCH=false; shift ;;
-        --verbose)    VERBOSE=true; shift ;;
+        --days)        DAYS=$2; shift 2 ;;
+        --idle-hours)  IDLE_HOURS=$2; shift 2 ;;
+        --names)       NAMES=$2; shift 2 ;;
+        --depth)       DEPTH=$2; shift 2 ;;
+        --stale-hours) STALE_HOURS=$2; shift 2 ;;
+        --verbose)     VERBOSE=true; shift ;;
         -h|--help)    usage 0 ;;
         *) echo "sweep: unknown option: $1" >&2; exit 2 ;;
     esac
@@ -70,6 +76,28 @@ done < <(find "$root" -mindepth 1 -maxdepth "$DEPTH" \
 
 [ "${#repos[@]}" -gt 0 ] || { echo "sweep: no git repositories under $root" >&2; exit 2; }
 
+# Refreshing origin is deliberately its own subcommand. Folding it into plan
+# would make a dry run move refs, and would let plan and apply reach different
+# conclusions purely because of which ran first.
+if [ "$cmd" = fetch ]; then
+    ok=0
+    for repo in "${repos[@]}"; do
+        if ! git -C "$repo" remote get-url origin >/dev/null 2>&1; then
+            review+=("no-origin        $(short "$repo")"); continue
+        fi
+        if git -C "$repo" fetch --quiet --prune origin 2>/dev/null; then
+            ok=$((ok + 1))
+        else
+            review+=("fetch-failed     $(short "$repo")")
+        fi
+    done
+    printf '%d of %d repositories fetched\n' "$ok" "${#repos[@]}"
+    if [ "${#review[@]}" -gt 0 ]; then
+        echo; echo "REVIEW — not handled automatically:"; printf '  %s\n' "${review[@]}" | sort -u
+    fi
+    exit 0
+fi
+
 # A clone sitting inside another clone is nobody's worktree, so no per-repo
 # sweep can retire it as a unit. Its artifacts still get swept below.
 for r in "${repos[@]}"; do
@@ -78,12 +106,27 @@ for r in "${repos[@]}"; do
     done
 done
 
-wt_total=0; wt_count=0
+wt_total=0; wt_count=0; now=$(date +%s)
 for repo in "${repos[@]}"; do
     name=${repo#"$root"/}
     if git -C "$repo" remote get-url origin >/dev/null 2>&1; then
-        $FETCH && { git -C "$repo" fetch --quiet --prune origin 2>/dev/null \
-            || review+=("fetch-failed     $(short "$repo")"); }
+        # Read-only staleness check: when were this repo's remote refs last
+        # written? FETCH_HEAD answers that after a fetch; a clone that has never
+        # been fetched has none, and packed-refs carries the clone time instead —
+        # without that fallback every fresh clone reads as "never fetched".
+        ft=0
+        for c in FETCH_HEAD packed-refs; do
+            f=$(git -C "$repo" rev-parse --path-format=absolute --git-path "$c" 2>/dev/null || echo "")
+            [ -n "$f" ] && [ -e "$f" ] || continue
+            t=$(stat -c %Y "$f" 2>/dev/null || echo 0)
+            [ "$t" -gt "$ft" ] && ft=$t
+        done
+        age=$(( (now - ft) / 3600 ))
+        if [ "$ft" -eq 0 ]; then
+            review+=("stale-refs       $(short "$repo")   (no fetch on record)")
+        elif [ "$age" -ge "$STALE_HOURS" ]; then
+            review+=("stale-refs       $(short "$repo")   (refs ${age}h old)")
+        fi
     else
         review+=("no-origin        $(short "$repo")")
     fi
@@ -101,6 +144,8 @@ for repo in "${repos[@]}"; do
     [ "$n" -eq 0 ] && ! $VERBOSE && continue
     wt_count=$((wt_count + n))
     printf '\n== %s\n' "$name"
+    # Its own staleness note is redundant here — REVIEW already carries it.
+    out=$(printf '%s\n' "$out" | grep -v '^sweep-worktrees: note: origin last fetched')
     if $VERBOSE; then printf '%s\n' "$out"; else printf '%s\n' "$out" | grep -vE '^keep|^-{10}'; fi
     printf '%s\n' "$out" | grep -q '^FAILED\|could not be removed' \
         && review+=("removal-failed   $(short "$repo")")
@@ -127,6 +172,9 @@ if [ "${#review[@]}" -gt 0 ]; then
     echo
     echo "REVIEW — not handled automatically:"
     printf '  %s\n' "${review[@]}" | sort -u
+fi
+if printf '%s\n' "${review[@]:-}" | grep -q '^stale-refs'; then
+    echo; echo "(some refs are stale — 'sweep fetch $root' first if recent merges matter)"
 fi
 if [ "$cmd" = plan ]; then echo; echo "(plan — run 'sweep apply $root' to do it)"; fi
 exit 0
