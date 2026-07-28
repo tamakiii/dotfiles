@@ -80,18 +80,34 @@ done < <(find "$root" -mindepth 1 -maxdepth "$DEPTH" \
 # would make a dry run move refs, and would let plan and apply reach different
 # conclusions purely because of which ran first.
 if [ "$cmd" = fetch ]; then
-    ok=0
+    # Whether a fetch moved anything is read from refs/remotes/origin before and
+    # after, not scraped from git's output, so it does not ride on the wording of
+    # a given git version. A line per repository as it goes, because this is the
+    # one subcommand that spends most of its time waiting on the network.
+    refsnap() { git -C "$1" for-each-ref --format='%(refname) %(objectname)' refs/remotes/origin 2>/dev/null | sort; }
+    n=${#repos[@]}; w=${#n}; i=0; ok=0; changed=0
+    printf 'fetching %d repositories under %s\n' "$n" "$(short "$root")"
     for repo in "${repos[@]}"; do
+        i=$((i + 1))
+        printf '[%*d/%d] %-44s ' "$w" "$i" "$n" "${repo#"$root"/}"
         if ! git -C "$repo" remote get-url origin >/dev/null 2>&1; then
-            review+=("no-origin        $(short "$repo")"); continue
+            echo "no origin"; review+=("no-origin        $(short "$repo")"); continue
         fi
+        before=$(refsnap "$repo")
         if git -C "$repo" fetch --quiet --prune origin 2>/dev/null; then
             ok=$((ok + 1))
+            moved=$(comm -3 <(printf '%s\n' "$before") <(refsnap "$repo") | grep -c . || true)
+            if [ "$moved" -gt 0 ]; then
+                changed=$((changed + 1)); printf '%d refs updated\n' "$moved"
+            else
+                echo "up to date"
+            fi
         else
-            review+=("fetch-failed     $(short "$repo")")
+            echo "FAILED"; review+=("fetch-failed     $(short "$repo")")
         fi
     done
-    printf '%d of %d repositories fetched\n' "$ok" "${#repos[@]}"
+    echo
+    printf '%d of %d fetched, %d updated\n' "$ok" "$n" "$changed"
     if [ "${#review[@]}" -gt 0 ]; then
         echo; echo "REVIEW — not handled automatically:"; printf '  %s\n' "${review[@]}" | sort -u
     fi
