@@ -1,7 +1,7 @@
-.PHONY: help setup teardown
+.PHONY: help setup teardown test
 .PHONY: install install-myfiles install-os 
 .PHONY: uninstall uninstall-os uninstall-myfiles
-.PHONY: check check-myfiles check-os
+.PHONY: check check-myfiles check-os check-tmux-resurrect
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -13,9 +13,12 @@ endif
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
 
+test: setup
+	test/tmux-resurrect-literal-session-targets
+
 setup: \
 	~/.myfiles \
-	~/.local/share/tmux/plugins/tmux-resurrect \
+	~/.local/share/tmux/plugins/tmux-resurrect/.dotfiles-literal-session-targets-v2 \
 	~/.local/share/tmux/plugins/tmux-continuum
 
 teardown:
@@ -91,7 +94,7 @@ LINKS := \
 	~/.local/bin/gh-app-token ~/.local/bin/gh \
 	~/.local/bin/gh-as ~/.local/bin/gh-apps ~/.local/bin/gh-webhooks
 
-check: check-myfiles check-os
+check: check-myfiles check-os check-tmux-resurrect
 	@for link in $(LINKS); do \
 		test -e "$$link" || { echo "BROKEN: $$link"; exit 1; }; \
 	done; \
@@ -103,11 +106,21 @@ check-myfiles:
 check-os:
 	$(MAKE) -s -C os/$(OS) check
 
+check-tmux-resurrect:
+	bin/patch-tmux-resurrect --check ~/.local/share/tmux/plugins/tmux-resurrect
+
 ~/.myfiles:
 	git clone git@github.com:tamakiii/myfiles.git $@
 
 ~/.local/share/tmux/plugins/tmux-resurrect:
 	git clone https://github.com/tmux-plugins/tmux-resurrect.git $@
+
+~/.local/share/tmux/plugins/tmux-resurrect/.dotfiles-literal-session-targets-v2: \
+		~/.local/share/tmux/plugins/tmux-resurrect \
+		bin/patch-tmux-resurrect \
+		patches/tmux-resurrect-literal-session-targets.patch
+	bin/patch-tmux-resurrect ~/.local/share/tmux/plugins/tmux-resurrect
+	touch $@
 
 ~/.local/share/tmux/plugins/tmux-continuum:
 	git clone https://github.com/tmux-plugins/tmux-continuum.git $@
