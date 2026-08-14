@@ -45,3 +45,11 @@ bindkey '^r' fzf-history
 # private half of the dotfiles tree (tamakiii/myfiles), which installs the file
 # to the path below. Origin: tamakiii/meta#276.
 [[ -f ~/.local/lib/shell/claude.zsh ]] && source ~/.local/lib/shell/claude.zsh
+
+# Put ~/.local/bin on PATH for interactive shells that are not login shells.
+# `.zprofile` builds the whole PATH but only login shells read it, so a plain
+# interactive zsh started from a bare environment does not get this directory.
+# The script is uv's, it is idempotent, and it is a no-op once .zprofile has
+# already run. Carried here from the live ~/.zshrc, where an installer had
+# written it — see tamakiii/meta#2388.
+[[ -f ~/.local/bin/env ]] && source ~/.local/bin/env
