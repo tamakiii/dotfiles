@@ -40,6 +40,8 @@ function fzf-history() {
 zle -N fzf-history
 bindkey '^r' fzf-history
 
-# Wrap `claude` with frequently-used --add-dir paths. Defined in the private
-# half of the dotfiles tree (tamakiii/myfiles). Origin: tamakiii/meta#276.
-[[ -f ~/.myfiles/shell/claude.zsh ]] && source ~/.myfiles/shell/claude.zsh
+# Wrap `claude` with frequently-used --add-dir paths, and provide the launcher
+# that loads the Figma plugin only when it is asked for. Both are defined in the
+# private half of the dotfiles tree (tamakiii/myfiles), which installs the file
+# to the path below. Origin: tamakiii/meta#276.
+[[ -f ~/.local/lib/shell/claude.zsh ]] && source ~/.local/lib/shell/claude.zsh
