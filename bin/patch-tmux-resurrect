@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -eu
+
+usage() {
+	echo "Usage: $0 [--check] TMUX_RESURRECT_DIR" >&2
+	exit 2
+}
+
+mode=apply
+if [ "${1:-}" = "--check" ]; then
+	mode=check
+	shift
+fi
+
+[ "$#" -eq 1 ] || usage
+
+plugin_dir=$1
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+patch_file="$script_dir/../patches/tmux-resurrect-literal-session-targets.patch"
+
+if [ ! -d "$plugin_dir/.git" ]; then
+	echo "tmux-resurrect checkout not found: $plugin_dir" >&2
+	exit 1
+fi
+
+if git -C "$plugin_dir" apply --reverse --check "$patch_file" >/dev/null 2>&1; then
+	echo "OK: tmux-resurrect uses literal session targets"
+	exit 0
+fi
+
+if [ "$mode" = check ]; then
+	echo "BROKEN: tmux-resurrect literal-session-target patch is not applied" >&2
+	exit 1
+fi
+
+if ! git -C "$plugin_dir" apply --check "$patch_file"; then
+	echo "Refusing to modify an unsupported tmux-resurrect checkout" >&2
+	exit 1
+fi
+
+git -C "$plugin_dir" apply "$patch_file"
+echo "Applied tmux-resurrect literal-session-target compatibility patch"
