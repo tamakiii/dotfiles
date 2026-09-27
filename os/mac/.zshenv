@@ -7,6 +7,21 @@
 # the skills that wrap it (pull-request-create, kanban-sweep). See
 # tamakiii/meta#300.
 export GH_PROJECT_DEFAULT=5
+
+# Append the user's own tools to PATH for every zsh, not only login shells:
+# `ssh host <command>` runs `zsh -c` and never reads .zprofile, so without
+# this it sees neither ~/.local/bin nor mise's shims. Appended, not
+# prepended, so the order .zprofile or a parent process set stays as it is;
+# here, before EDITOR, so `which hx` below can find hx.
+for dir in "$HOME/.local/bin" "$HOME/.local/share/mise/shims"; do
+  case ":$PATH:" in
+    *":$dir:"*) ;;
+    *) PATH="$PATH:$dir" ;;
+  esac
+done
+unset dir
+export PATH
+
 export LANG="en_US.UTF-8"
 export LANGUAGE="en_US"
 export EDITOR="$(which hx || which helix)"
