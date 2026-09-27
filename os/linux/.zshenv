@@ -16,4 +16,4 @@ export GH_PROJECT_DEFAULT=5
 export KIKIGAKI_ARCHIVE="/mnt/retriever/ARAKI/Documents/ChatGPT/chatgpt.com"
 export LANG="en_US.UTF-8"
 export LANGUAGE="en_US"
-export EDITOR="$(which hx || which helix)"
+export EDITOR="$(command -v hx || command -v helix || echo vi)"

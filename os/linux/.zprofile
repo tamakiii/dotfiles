@@ -39,6 +39,10 @@ for p in "${paths[@]}"; do
 done
 PATH="$NEW:$PATH"
 
+# Resolve EDITOR again now that PATH is complete. .zshenv runs before this
+# file, so where hx is installed per user in ~/.local/bin it cannot see it.
+export EDITOR="$(command -v hx || command -v helix || echo vi)"
+
 # Optional: Environment-specific customizations
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
