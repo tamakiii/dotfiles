@@ -2,6 +2,9 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 paths=(
   "$HOME/.local/bin"
+  # mise's shims for .config/mise/config.toml; after ~/.local/bin so its gh
+  # wrapper stays ahead of the real gh. Absent where mise is not installed.
+  "$HOME/.local/share/mise/shims"
   "$HOME/.bun/bin"
   "/opt/homebrew/opt/make/libexec/gnubin"
   "/opt/homebrew/opt/coreutils/libexec/gnubin"

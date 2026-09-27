@@ -1,0 +1,35 @@
+# The owner's per-user command-line tools, pinned, for any machine that has
+# mise (https://mise.jdx.dev). `make install` links ~/.config/mise here, so
+# mise reads this as its global config and writes mise.lock beside it.
+#
+#   mise install              install what is declared, checked against mise.lock
+#   mise lock --global        after changing a version: record its URLs and sha256
+#
+# The shims directory, ~/.local/share/mise/shims, is on PATH through
+# .zprofile's paths array, right after ~/.local/bin. It is not prepended by
+# `mise activate`, because ~/.local/bin/gh is the identity wrapper and has to
+# stay ahead of the real gh, which gh-as finds by walking PATH.
+#
+# Only single release files belong here. Tools that need the distribution's
+# shared libraries are the machine's business (Homebrew on macOS, a distrobox
+# on airedale's distro OS).
+
+[tools]
+go = "1.27.1"
+node = "24.21.0"
+uv = "0.12.19"
+jq = "1.8.2"
+gh = "2.101.0"
+fzf = "0.74.4"
+helix = "25.07.1"
+delta = "0.19.2"
+typos = "1.50.3"
+"github:arl/gitmux" = "0.11.5"
+
+[settings]
+# Refuse any version whose download is not already recorded, with its
+# checksum, in mise.lock.
+locked = true
+# The platforms the owner's machines run: airedale and retriever (Fedora),
+# weimaraner (Apple silicon).
+lockfile_platforms = ["linux-x64", "macos-arm64"]
