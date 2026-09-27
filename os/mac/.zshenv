@@ -14,6 +14,7 @@ export GH_PROJECT_DEFAULT=5
 # prepended, so the order .zprofile or a parent process set stays as it is;
 # here, before EDITOR, so `which hx` below can find hx.
 for dir in "$HOME/.local/bin" "$HOME/.local/share/mise/shims"; do
+  [ -d "$dir" ] || continue
   case ":$PATH:" in
     *":$dir:"*) ;;
     *) PATH="$PATH:$dir" ;;

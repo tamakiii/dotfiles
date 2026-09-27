@@ -21,6 +21,7 @@ export KIKIGAKI_ARCHIVE="/mnt/retriever/ARAKI/Documents/ChatGPT/chatgpt.com"
 # prepended, so the order .zprofile or a parent process set stays as it is;
 # here, before EDITOR, so `command -v hx` below can find hx.
 for dir in "$HOME/.local/bin" "$HOME/.local/share/mise/shims"; do
+    [ -d "$dir" ] || continue
     case ":$PATH:" in
         *":$dir:"*) ;;
         *) PATH="$PATH:$dir" ;;
