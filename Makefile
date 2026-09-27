@@ -31,6 +31,7 @@ install: setup \
 	~/.config/ghostty/themes \
 	~/.config/gitmux \
 	~/.config/git \
+	~/.config/mise \
 	~/.local/bin/tmux-window-name \
 	~/.local/bin/tmux-pane-label \
 	~/.local/bin/tmux-rename-sessions \
@@ -61,6 +62,7 @@ uninstall: uninstall-os uninstall-myfiles
 	rm -f ~/.local/bin/tmux-rename-sessions
 	rm -f ~/.local/bin/tmux-pane-label
 	rm -f ~/.local/bin/tmux-window-name
+	rm -rf ~/.config/mise
 	rm -rf ~/.config/git
 	rm -rf ~/.config/gitmux
 	rm -rf ~/.config/ghostty/themes
@@ -134,6 +136,9 @@ check-os:
 	ln -sfnv $(abspath $|) $@
 
 ~/.config/git: | .config/git
+	ln -sfnv $(abspath $|) $@
+
+~/.config/mise: | .config/mise
 	ln -sfnv $(abspath $|) $@
 
 ~/.local/bin/tmux-window-name: | bin/tmux-window-name

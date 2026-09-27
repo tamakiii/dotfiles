@@ -55,3 +55,14 @@ make uninstall
 ```
 
 Removes all symlinks.
+
+## Command-line tools
+
+[`.config/mise/config.toml`](.config/mise/config.toml) declares the per-user command-line tools (jq, gh, fzf, helix, delta, gitmux, typos, go, node, uv) at pinned versions, and [`mise.lock`](.config/mise/mise.lock) records each download's URL and SHA-256 for Linux x64 and Apple silicon. `make install` links `~/.config/mise` here; it does not install mise or the tools. On a machine with mise:
+
+```sh
+mise install            # install what is declared, refusing anything not in mise.lock
+mise lock --global      # after changing a version in config.toml
+```
+
+`.zprofile` puts `~/.local/share/mise/shims` on `PATH` right after `~/.local/bin`, so the `gh` wrapper there stays ahead of the real `gh`. Where mise is not installed that directory does not exist and nothing changes.
