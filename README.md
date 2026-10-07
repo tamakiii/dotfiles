@@ -50,6 +50,20 @@ This will:
 
 All configs are symlinked to `$HOME`.
 
+`make setup` also applies a small compatibility patch to `tmux-resurrect`.
+The plugin otherwise passes session names such as `@` through tmux's ambiguous
+target parser; tmux 3.7b can crash while saving or restoring such a session. The
+patch finds sessions and windows from unfiltered listings and compares their
+names as data instead. `make check` verifies that the installed plugin remains
+patched. Setup fails instead of changing the checkout if the upstream source no
+longer matches the reviewed patch.
+
+Run the isolated save/restore regression test with:
+
+```sh
+make test
+```
+
 ```sh
 make uninstall
 ```
