@@ -128,6 +128,18 @@ url = "https://github.com/jgm/pandoc/releases/download/3.11/pandoc-3.11-arm64-ma
 url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/534533197"
 provenance = "github-attestations"
 
+[[tools.terraform]]
+version = "1.16.5"
+backend = "aqua:hashicorp/terraform"
+
+[tools.terraform."platforms.linux-x64"]
+checksum = "sha256:2bc2fcfff033265c9e02ca0351f01794eb122f62a9b2a49a3294b9e49eaab5e4"
+url = "https://releases.hashicorp.com/terraform/1.16.5/terraform_1.16.5_linux_amd64.zip"
+
+[tools.terraform."platforms.macos-arm64"]
+checksum = "sha256:ecdef65e24193d627f27c39baeda31295f08c938d8a3d4764f442fb916d4b7dc"
+url = "https://releases.hashicorp.com/terraform/1.16.5/terraform_1.16.5_darwin_arm64.zip"
+
 [[tools.typos]]
 version = "1.50.3"
 backend = "aqua:crate-ci/typos"
