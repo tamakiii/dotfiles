@@ -6,6 +6,7 @@ paths=(
   # wrapper stays ahead of the real gh. Absent where mise is not installed.
   "$HOME/.local/share/mise/shims"
   "$HOME/.bun/bin"
+  "$HOME/.cargo/bin"
   "/opt/homebrew/opt/make/libexec/gnubin"
   "/opt/homebrew/opt/coreutils/libexec/gnubin"
   "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
@@ -17,6 +18,7 @@ paths=(
   "/opt/homebrew/opt/binutils/bin"
   "/opt/homebrew/opt/node/bin"
   "/opt/homebrew/opt/go/bin"
+  "/opt/homebrew/opt/rustup/bin"
   "/opt/homebrew/bin"
   "/Applications/Xcode.app/Contents/Developer/usr/bin"
   "/usr/local/sbin"
