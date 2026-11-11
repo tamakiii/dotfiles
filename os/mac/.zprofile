@@ -17,6 +17,8 @@ paths=(
   "/opt/homebrew/opt/binutils/bin"
   "/opt/homebrew/opt/node/bin"
   "/opt/homebrew/opt/go/bin"
+  "/opt/homebrew/opt/rustup/bin"
+  "$HOME/.cargo/bin"
   "/opt/homebrew/bin"
   "/Applications/Xcode.app/Contents/Developer/usr/bin"
   "/usr/local/sbin"
