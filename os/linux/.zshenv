@@ -8,13 +8,6 @@
 # tamakiii/meta#300.
 export GH_PROJECT_DEFAULT=5
 
-# Where the kikigaki skill keeps captured ChatGPT conversations: `c/` for
-# ones saved from the signed-in browser, `share/` for the older share-link
-# route. Both import-conversation.py and build-turns.py read this, so the
-# archive is named here rather than in either script. Machine-specific
-# because the retriever mount is.
-export KIKIGAKI_ARCHIVE="/mnt/retriever/ARAKI/Documents/ChatGPT/chatgpt.com"
-
 # A shell that is not a login shell, such as the `zsh -c` that `ssh host
 # <command>` runs, does not read .zprofile, so the user's tools go on PATH
 # here too; appended so .zprofile's order wins.
