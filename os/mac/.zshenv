@@ -8,10 +8,11 @@
 # tamakiii/meta#300.
 export GH_PROJECT_DEFAULT=5
 
-# `ssh host <command>` runs `zsh -c`, which reads only this file, so the
-# user's tools go on PATH here too; appended so .zprofile's order wins.
+# A shell that is not a login shell, such as the `zsh -c` that `ssh host
+# <command>` runs, does not read .zprofile, so the user's tools go on PATH
+# here too; appended so .zprofile's order wins.
 typeset -U path
-path+=(~/.local/bin(N) ~/.local/share/mise/shims(N))
+path+=(~/.local/bin(N) ~/.local/share/mise/shims(N) ~/.cargo/bin(N))
 
 export LANG="en_US.UTF-8"
 export LANGUAGE="en_US"
